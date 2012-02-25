@@ -8,7 +8,7 @@
         	 />
         <EditTextPreference 
         	android:title="@string/password"
-        	android:key="username"
+        	android:key="password"
         	android:password="true"
         	 />
 
