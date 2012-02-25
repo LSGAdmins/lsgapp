@@ -9,7 +9,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class lsgapp extends ListActivity {
-    /** Called when the activity is first created. */
+    /** Called when the activity is first created. Test */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
