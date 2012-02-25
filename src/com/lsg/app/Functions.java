@@ -75,6 +75,8 @@ public class Functions {
         		JSONArray jArray = new JSONArray(get);
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
+    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, context.MODE_PRIVATE, null);
+    			myDB.delete(Functions.DB_TABLE, null, null); //clear vertretungen
         		while(i < jArray.length()) {
         			JSONObject jObject = jArray.getJSONObject(i);
         			ContentValues values = new ContentValues();
@@ -82,16 +84,16 @@ public class Functions {
         			values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
         			values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
         			values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
-        			values.put(Functions.DB_LEHRER, jObject.getString("klassenstufe"));
-        			values.put(Functions.DB_RAUM, jObject.getString("klassenstufe"));
-        			values.put(Functions.DB_ART, jObject.getString("klassenstufe"));
-        			values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("klassenstufe"));
-        			values.put(Functions.DB_FACH, jObject.getString("klassenstufe"));
-        			values.put(Functions.DB_DATE, jObject.getString("klassenstufe"));
-        			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, context.MODE_PRIVATE, null);
+        			values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
+        			values.put(Functions.DB_RAUM, jObject.getString("raum"));
+        			values.put(Functions.DB_ART, jObject.getString("art"));
+        			values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
+        			values.put(Functions.DB_FACH, jObject.getString("fach"));
+        			values.put(Functions.DB_DATE, jObject.getString("date"));
             		myDB.insert(Functions.DB_TABLE, null, values);
         			i++;
         			}
+        		myDB.close();
         		} catch(JSONException e) {Log.d("json", e.getMessage());}
         	
         }

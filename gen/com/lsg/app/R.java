@@ -14,11 +14,16 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int refresh=0x7f070001;
-        public static final int settings=0x7f070000;
+        public static final int refresh=0x7f070005;
+        public static final int settings=0x7f070004;
+        public static final int vertretung_bottom=0x7f070003;
+        public static final int vertretung_title=0x7f070000;
+        public static final int vertretung_type=0x7f070001;
+        public static final int vertretung_when=0x7f070002;
     }
     public static final class layout {
         public static final int main_listitem=0x7f030000;
+        public static final int vertretung_item=0x7f030001;
     }
     public static final class menu {
         public static final int vplan=0x7f060000;
