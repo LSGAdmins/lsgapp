@@ -25,7 +25,8 @@ public class lsgapp extends ListActivity {
 			startActivity(intent);
 		}
 		if(listtext.equals(getString(R.string.events))) {
-			
+			Intent intent = new Intent(this, Events.class);
+			startActivity(intent);
 		}
 	}
 }

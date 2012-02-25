@@ -22,9 +22,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Functions {
-	public static final String DB_NAME            = "vertretungen";
-	public static final String DB_TABLE           = "vertretungen";
 	public static final String DB_ROWID           = "_id";
+	public static final String DB_NAME            = "lsgapp";
+	//VPlan
+	public static final String DB_TABLE           = "vertretungen";
 	public static final String DB_KLASSENSTUFE    = "klassenstufe";
 	public static final String DB_KLASSE          = "klasse";
 	public static final String DB_STUNDE          = "stunde";
@@ -117,6 +118,81 @@ public class Functions {
     	    	    + Functions.DB_VERTRETUNGSTEXT    + " text,"
     	    	    + Functions.DB_FACH               + " text,"
     	    	    + Functions.DB_DATE               + " text"
+    				+");");
+    		//upgrades for table
+    		/*if(myDB.getVersion() == 0) {
+    			myDB.setVersion(1);
+    		}*/
+    		myDB.close();
+        } catch (Exception e) { Log.d("db", e.getMessage());}
+	}
+	
+	//Termine
+	public static final String DB_EVENTS_TABLE    = "events";
+	public static final String DB_DATES    		  = "dates";
+	public static final String DB_ENDDATES        = "enddates";
+	public static final String DB_TIMES           = "times";
+	public static final String DB_ENDTIMES        = "endtimes";
+	public static final String DB_TITLE           = "title";
+	public static final String DB_VENUE           = "venue";
+	public static void refreshEvents(Context context) {
+		 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		try {
+			Functions.testeventsDB(context);
+        	URL url = new URL("http://linux.lsg.musin.de/cp/termine_app.php");
+        	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
+        	conn.setDoOutput(true);
+        	conn.setRequestMethod("POST");
+        	OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+        	wr.flush();
+        	wr.close();
+        	//get response
+        	InputStream response = conn.getInputStream();
+        	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
+        	String line;
+        	String get = "";
+        	while ((line = reader.readLine()) != null) {
+        		get += line;
+        		}
+        	try {
+        		JSONArray jArray = new JSONArray(get);
+        		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
+        		int i = 0;
+    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, context.MODE_PRIVATE, null);
+    			myDB.delete(Functions.DB_EVENTS_TABLE, null, null); //clear termine
+        		while(i < jArray.length()) {
+        			JSONObject jObject = jArray.getJSONObject(i);
+        			ContentValues values = new ContentValues();
+        			values.put(Functions.DB_DATES, jObject.getString("dates"));
+        			values.put(Functions.DB_ENDDATES, jObject.getString("enddates"));
+        			values.put(Functions.DB_TIMES, jObject.getString("times"));
+        			values.put(Functions.DB_ENDTIMES, jObject.getString("endtimes"));
+        			values.put(Functions.DB_TITLE, jObject.getString("title"));
+        			values.put(Functions.DB_VENUE, jObject.getString("venue"));
+            		myDB.insert(Functions.DB_EVENTS_TABLE, null, values);
+        			i++;
+        			}
+        		myDB.close();
+        		} catch(JSONException e) {Log.d("json", e.getMessage());}
+        	
+        }
+        catch(Exception e) {
+	    	Log.d("except", e.getMessage());
+        }
+	}
+	public static void testeventsDB(Context context) {
+    	try {
+    		SQLiteDatabase myDB;
+    		myDB = context.openOrCreateDatabase(DB_NAME, context.MODE_PRIVATE, null);
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
+    				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
+    	    	    + Functions.DB_DATES              + " text,"
+    	     	    + Functions.DB_ENDDATES           + " text,"
+    	    	    + Functions.DB_TIMES              + " text,"
+    	    	    + Functions.DB_ENDTIMES           + " text,"
+    	    	    + Functions.DB_TITLE              + " text,"
+    	    	    + Functions.DB_VENUE              + " text"
     				+");");
     		//upgrades for table
     		/*if(myDB.getVersion() == 0) {
