@@ -7,9 +7,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,7 +31,7 @@ public class Functions {
 	public static final String DB_VERTRETER       = "vertreter";
 	public static final String DB_LEHRER          = "lehrer";
 	public static final String DB_RAUM            = "raum";
-	public static final String DB_ART             = "art";;
+	public static final String DB_ART             = "art";
 	public static final String DB_VERTRETUNGSTEXT = "vertretungstext";
 	public static final String DB_FACH            = "fach";
 	public static final String DB_DATE            = "date";
@@ -74,7 +77,19 @@ public class Functions {
         		int i = 0;
         		while(i < jArray.length()) {
         			JSONObject jObject = jArray.getJSONObject(i);
-        			Log.d("lehrer", jObject.getString("lehrer"));
+        			ContentValues values = new ContentValues();
+        			values.put(Functions.DB_KLASSENSTUFE, jObject.getString("klassenstufe"));
+        			values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
+        			values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
+        			values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
+        			values.put(Functions.DB_LEHRER, jObject.getString("klassenstufe"));
+        			values.put(Functions.DB_RAUM, jObject.getString("klassenstufe"));
+        			values.put(Functions.DB_ART, jObject.getString("klassenstufe"));
+        			values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("klassenstufe"));
+        			values.put(Functions.DB_FACH, jObject.getString("klassenstufe"));
+        			values.put(Functions.DB_DATE, jObject.getString("klassenstufe"));
+        			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, context.MODE_PRIVATE, null);
+            		myDB.insert(Functions.DB_TABLE, null, values);
         			i++;
         			}
         		} catch(JSONException e) {Log.d("json", e.getMessage());}
