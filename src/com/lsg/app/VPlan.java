@@ -16,6 +16,8 @@ public class VPlan extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Functions.refreshVPlan(this);
+		
 		Functions.setTheme(false, this);
 		
 		SQLiteDatabase myDB;
