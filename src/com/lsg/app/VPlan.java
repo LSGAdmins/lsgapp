@@ -27,7 +27,7 @@ public class VPlan extends ListActivity {
         public void handleMessage(Message msg) {
         	if(msg.arg1 == 1) {
         		loading.cancel();
-        		updateCursor(false);
+        		updateCursor(mine);
         	}
         }
     };
