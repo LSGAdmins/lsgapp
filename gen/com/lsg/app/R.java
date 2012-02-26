@@ -30,24 +30,21 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int all=0x7f090011;
-        public static final int event_date=0x7f090002;
-        public static final int event_enddate=0x7f090004;
-        public static final int event_endtime=0x7f090003;
-        public static final int event_time=0x7f090001;
+        public static final int all=0x7f09000e;
+        public static final int event_date=0x7f090001;
+        public static final int event_place=0x7f090002;
         public static final int event_title=0x7f090000;
-        public static final int event_venue=0x7f090005;
-        public static final int mine=0x7f090010;
-        public static final int refresh=0x7f09000e;
-        public static final int settings=0x7f09000f;
-        public static final int vertretung_bottom=0x7f09000c;
-        public static final int vertretung_class=0x7f090007;
-        public static final int vertretung_date=0x7f090006;
-        public static final int vertretung_text=0x7f09000b;
-        public static final int vertretung_title=0x7f090008;
-        public static final int vertretung_type=0x7f090009;
-        public static final int vertretung_type_info=0x7f09000d;
-        public static final int vertretung_when=0x7f09000a;
+        public static final int mine=0x7f09000d;
+        public static final int refresh=0x7f09000b;
+        public static final int settings=0x7f09000c;
+        public static final int vertretung_bottom=0x7f090009;
+        public static final int vertretung_class=0x7f090004;
+        public static final int vertretung_date=0x7f090003;
+        public static final int vertretung_text=0x7f090008;
+        public static final int vertretung_title=0x7f090005;
+        public static final int vertretung_type=0x7f090006;
+        public static final int vertretung_type_info=0x7f09000a;
+        public static final int vertretung_when=0x7f090007;
     }
     public static final class layout {
         public static final int events_item=0x7f030000;
@@ -60,18 +57,19 @@ public final class R {
         public static final int vplan=0x7f080001;
     }
     public static final class string {
-        public static final int all=0x7f070010;
+        public static final int all=0x7f070011;
         public static final int app_name=0x7f070001;
         public static final int at=0x7f070009;
-        public static final int classes=0x7f07000e;
+        public static final int classes=0x7f07000f;
         public static final int events=0x7f070003;
         public static final int hello=0x7f070000;
         public static final int hour=0x7f07000a;
+        public static final int loading_events=0x7f07000d;
         public static final int loading_vertretungen=0x7f07000c;
         public static final int login=0x7f070006;
-        public static final int mine=0x7f070011;
-        public static final int no_class=0x7f07000d;
-        public static final int no_classes=0x7f07000f;
+        public static final int mine=0x7f070012;
+        public static final int no_class=0x7f07000e;
+        public static final int no_classes=0x7f070010;
         public static final int password=0x7f070007;
         public static final int refresh=0x7f070005;
         public static final int room=0x7f07000b;
