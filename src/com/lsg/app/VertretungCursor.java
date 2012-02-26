@@ -50,8 +50,6 @@ public class VertretungCursor extends CursorAdapter {
 			olddate  = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
 			oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
 			cursor.moveToPosition(position);
-
-			Log.d("position", new Integer(position).toString());
 		}
 		
 		String date = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
@@ -83,6 +81,11 @@ public class VertretungCursor extends CursorAdapter {
 		holder.title.setText(klasse + " (" + fach + ")");
 		String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
 		holder.type.setText(type);
+		
+		/*Log.d("type", "'" + type +"'");
+		if(type.equals("Entfall"))
+			holder.type.setTextColor(R.color.darkorange);*/
+		
 		String when = cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE));
 		holder.when.setText(when + ". " +context.getString(R.string.hour));
 		String vtext = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
