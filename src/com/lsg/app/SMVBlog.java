@@ -4,8 +4,9 @@ import org.apache.http.util.EncodingUtils;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.WebChromeClient;
@@ -34,7 +35,9 @@ public class SMVBlog extends Activity {
 				Toast.makeText(activity, getString(R.string.oops) + description, Toast.LENGTH_SHORT).show();
 				}
 			});
-		String postData = "log=&pwd=&redirect_to=http://www.lsg.musin.de/smv/aktuelles/";
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String postData = "log=" + prefs.getString("username", "")
+				+ "&pwd=" + prefs.getString("password", "") + "&redirect_to=http://www.lsg.musin.de/smv/aktuelles/";
 		webview.postUrl("http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
 	}
 	@Override
