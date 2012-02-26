@@ -1,0 +1,61 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/lightblue" />
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="3">
+    <TableRow>
+        <TextView
+            android:text="von "
+    	    android:textSize="16sp"
+            android:layout_column="1"
+            android:gravity="left"
+            android:padding="3dip" />
+        <TextView
+            android:id="@+id/event_time"
+    	    android:textSize="16sp"
+            android:layout_column="2"
+            android:gravity="left"
+            android:padding="3dip" />
+        <TextView
+            android:id="@+id/event_date"
+    	    android:textSize="16sp"
+    	    android:layout_column="3"
+    	    android:gravity="left"
+    	    android:padding="3dip" />
+        <TextView
+            android:text="bis "
+    	    android:textSize="16sp"
+            android:layout_column="4"
+            android:gravity="right"
+            android:padding="3dip" />
+        <TextView
+            android:id="@+id/event_endtime"
+   	    	android:textSize="16sp"
+    	    android:layout_column="5"
+    	    android:gravity="right"
+    	    android:padding="3dip" />
+        <TextView
+            android:id="@+id/event_enddate"
+   	    	android:textSize="16sp"
+    	    android:layout_column="6"
+    	    android:gravity="right"
+    	    android:padding="3dip" />
+    </TableRow>
+</TableLayout>
+    <TextView
+        android:id="@+id/event_venue"
+    	    android:textSize="16sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -1,3 +1,7 @@
-
-    <resources>
-    </resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="action_vertretungen">
+        <item>Alle Vertretungen</item>
+        <item>Meine Vertretungen</item>
+    </string-array>
+</resources>

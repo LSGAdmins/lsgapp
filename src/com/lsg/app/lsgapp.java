@@ -13,7 +13,7 @@ public class lsgapp extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Functions.setTheme(false, this);
+        Functions.setTheme(false, false, this);
         String[] actions = {getString(R.string.vplan), getString(R.string.events)};
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_listitem, actions));
     }
@@ -25,7 +25,8 @@ public class lsgapp extends ListActivity {
 			startActivity(intent);
 		}
 		if(listtext.equals(getString(R.string.events))) {
-			
+			Intent intent = new Intent(this, Events.class);
+			startActivity(intent);
 		}
 	}
 }

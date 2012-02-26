@@ -9,4 +9,9 @@
     <string name="login">Zugangsdaten</string>
     <string name="password">Passwort</string>
     <string name="username">Benutzername</string>
+    <string name="at">bei</string>
+    <string name="hour">Stunde</string>
+    <string name="room">Raum</string>
+    <string name="loading_vertretungen">Lade Vertretungen...</string>
+    <string name="no_class"></string>
 </resources>

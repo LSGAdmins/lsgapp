@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:label="@string/vplan" android:name="VPlan"></activity>
+        <activity android:label="@string/events" android:name="Events"></activity>
         <activity android:name="Settings" android:label="@string/settings"></activity>
     </application>
 
