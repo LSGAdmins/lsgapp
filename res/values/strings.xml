@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, lsgapp!</string>
+    <string name="versioncode">alpha1</string>
     <string name="app_name">LSGäpp</string>
+    <string name="act_version">Aktuelle Version</string>
+    <string name="your_version">Deine Version</string>
+    <string name="your_version_is_act">Deine Version ist aktuell</string>
     <string name="vplan">Vertretungsplan</string>
     <string name="events">Termine</string>
     <string name="settings">Einstellungen</string>
@@ -22,6 +26,7 @@
     <string name="smvblog">SMVBlog</string>
     <string name="oops">Oops!</string>
     <string name="about">Über</string>
+    <string name="updatecheck">Update-Check</string>
     <string name="abouttext">Dies ist die Android-App für Schüler des LSG. \n
         Sie wurde von Maximilian Mühlbauer (scirocco101@gmail.com) und Paul Thiele (thielepaul@gmail.com) programmiert. \n
         Die Icons stammen von Dominik Philp (philp.dominik@gmail.com). \n

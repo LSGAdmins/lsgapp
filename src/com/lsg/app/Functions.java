@@ -143,6 +143,33 @@ public class Functions {
 	    	Log.d("except", e.getMessage());
         }
 	}
+	public static String getActVersion(Context context) {
+    	String get = "";
+		try {
+			Functions.testDB(context);
+			String data = "";
+        	URL url = new URL("http://linux.lsg.musin.de/cp/getActVersion.php");
+        	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
+        	conn.setDoOutput(true);
+        	conn.setRequestMethod("POST");
+        	OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+        	wr.write(data);
+        	wr.flush();
+        	wr.close();
+        	//get response
+        	InputStream response = conn.getInputStream();
+        	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
+        	String line;
+        	while ((line = reader.readLine()) != null) {
+        		get += line;
+        		}
+        }
+        catch(Exception e) {
+	    	Log.d("except", e.getMessage());
+        }
+    	return get;
+	}
 	public static void testDB(Context context) {
     	try {
     		SQLiteDatabase myDB;

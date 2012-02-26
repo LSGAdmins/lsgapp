@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lsg.app"
     android:versionCode="1"
-    android:versionName="1.0" android:installLocation="preferExternal">
+    android:versionName="@string/versioncode" android:installLocation="preferExternal">
 
     <uses-sdk android:minSdkVersion="7" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -24,6 +24,7 @@
         <activity android:name="Settings" android:label="@string/settings"></activity>
         <activity android:name="HelpAbout"></activity>
         <activity android:label="@string/smvblog" android:name="SMVBlog"></activity>
+        <activity android:label="@string/updatecheck" android:name="UpdateCheck"></activity>
     </application>
 
 </manifest>

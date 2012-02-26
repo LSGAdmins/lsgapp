@@ -17,7 +17,8 @@ public class lsgapp extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Functions.setTheme(false, false, this);
-        String[] actions = {getString(R.string.vplan), getString(R.string.events), getString(R.string.smvblog)};
+        String[] actions = {getString(R.string.vplan), getString(R.string.events), getString(R.string.smvblog),
+        		getString(R.string.updatecheck)};
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_listitem, actions));
     }
 	protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -33,6 +34,10 @@ public class lsgapp extends ListActivity {
 		}
 		if(listtext.equals(getString(R.string.smvblog))) {
 			Intent intent = new Intent(this, SMVBlog.class);
+			startActivity(intent);
+		}
+		if(listtext.equals(getString(R.string.updatecheck))) {
+			Intent intent = new Intent(this, UpdateCheck.class);
 			startActivity(intent);
 		}
 	}
