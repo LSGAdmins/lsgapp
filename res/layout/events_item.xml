@@ -9,15 +9,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:textColor="@color/lightblue" />
+        android:paddingLeft="10dip"
+        android:paddingTop="10dip"
+        android:textStyle="bold" />
     <TextView
         android:id="@+id/event_date"
-    	android:textSize="16sp"
+    	android:textSize="18sp"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dip" />
     <TextView
         android:id="@+id/event_place"
     	android:textSize="16sp"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dip"
+        android:paddingBottom="10dip" />
 </LinearLayout>
