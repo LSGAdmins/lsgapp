@@ -10,7 +10,7 @@
         android:id="@+id/vertretung_date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="36sp"
+        android:textSize="30sp"
   	    android:gravity="center_vertical|center_horizontal"
         android:textColor="@color/darkblue" />
     <TextView
@@ -26,7 +26,8 @@
         android:id="@+id/vertretung_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="26sp" />
+        android:textSize="22sp"
+        android:layout_marginLeft="2sp" />
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -34,30 +35,26 @@
     <TableRow>
         <TextView
             android:id="@+id/vertretung_type"
-    	    android:textSize="16sp"
-            android:layout_column="1" />
+    	    android:textSize="14sp"
+            android:layout_column="1"
+      	    android:layout_marginLeft="2sp" />
         <TextView
             android:id="@+id/vertretung_when"
             android:gravity="right"
-    	    android:textSize="16sp" />
+    	    android:textSize="14sp"
+            android:layout_marginRight="2sp" />
     </TableRow>
 </TableLayout>
     <TextView
         android:id="@+id/vertretung_text"
-    	    android:textSize="16sp"
+    	android:textSize="14sp"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2sp" />
     <TextView
         android:id="@+id/vertretung_bottom"
-    	    android:textSize="16sp"
+    	    android:textSize="14sp"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-    <!-- detection -->
-    <TextView
-        android:id="@+id/vertretung_type_info"
-        android:textSize="0sp"
-        android:visibility="gone"
-        android:text="standard"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2sp" />
 </LinearLayout>
