@@ -24,6 +24,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Functions {
+	public static final String helpabout = "helpabout";
+	public static final String help      = "help";
+	public static final String about     = "about";
+	
 	public static final String DB_ROWID           = "_id";
 	public static final String DB_NAME            = "lsgapp";
 	//VPlan
