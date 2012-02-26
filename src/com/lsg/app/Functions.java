@@ -42,9 +42,9 @@ public class Functions {
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Black;
 		if(Build.VERSION.SDK_INT >= 11) {
-			theme = 0x0103006b;  //-> android.R.Theme_Holo, needed, because build target is only 2.3.1
+			theme = android.R.style.Theme_Holo_Light;
 			if(dialog)
-				theme = 0x0103006f;  //-> android.R.Theme_Holo_Dialog, needed, because build target is only 2.3.1
+				theme = android.R.style.Theme_Holo_Light_Dialog;
 		} else {
 			if(dialog) {
 				theme = android.R.style.Theme_Dialog;

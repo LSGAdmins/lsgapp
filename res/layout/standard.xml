@@ -6,14 +6,15 @@
     >
     <!-- possible seperators -->
     <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+id/vertretung_date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="36sp"
   	    android:gravity="center_vertical|center_horizontal"
-        android:textColor="@color/darkblue"
-        android:background="@color/darkorange" />
+        android:textColor="@color/darkblue" />
     <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+id/vertretung_class"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

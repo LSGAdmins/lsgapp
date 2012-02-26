@@ -61,6 +61,7 @@ public class VertretungCursor extends CursorAdapter {
 		else {
 			holder.date.setVisibility(View.VISIBLE);
 			holder.date.setText(date);
+			oldclass = "";
 		}
 
 		String klassä = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
