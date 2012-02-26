@@ -31,8 +31,8 @@ public class Events extends ListActivity {
 		SimpleCursorAdapter device_event_adapter = new SimpleCursorAdapter(this,
 				R.layout.events_item,
 				d,
-				new String[] { Functions.DB_TITLE, Functions.DB_VENUE, Functions.DB_DATES, Functions.DB_ENDDATES },
-				new int[] { R.id.event_title, R.id.event_venue, R.id.event_date, R.id.event_enddate });
+				new String[] { Functions.DB_TITLE, Functions.DB_TIMES, Functions.DB_DATES, Functions.DB_ENDTIMES, Functions.DB_ENDDATES, Functions.DB_VENUE },
+				new int[] { R.id.event_title, R.id.event_time, R.id.event_date, R.id.event_endtime, R.id.event_enddate, R.id.event_venue });
 		getListView().setAdapter(device_event_adapter);
 	}
 	@Override
