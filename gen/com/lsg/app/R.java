@@ -60,12 +60,14 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f070001;
         public static final int at=0x7f070009;
+        public static final int classes=0x7f07000e;
         public static final int events=0x7f070003;
         public static final int hello=0x7f070000;
         public static final int hour=0x7f07000a;
         public static final int loading_vertretungen=0x7f07000c;
         public static final int login=0x7f070006;
         public static final int no_class=0x7f07000d;
+        public static final int no_classes=0x7f07000f;
         public static final int password=0x7f070007;
         public static final int refresh=0x7f070005;
         public static final int room=0x7f07000b;

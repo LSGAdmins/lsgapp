@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="lightblue">#33B5E5</color>
+<color name="darkblue">#0099CC</color>
+
+<color name="lightpurple">#AA66CC</color>
+<color name="darkpurple">#9933CC</color>
+
+<color name="lightgreen">#99CC00</color>
+<color name="darkgreen">#669900</color>
+
+<color name="lightorange">#FFBB33</color>
+<color name="darkorange">#FF8800</color>
+
+<color name="lightred">#FF4444</color>
+<color name="darkred">#CC0000</color>
+
+<color name="oldblue">#0000ff</color>
+</resources>

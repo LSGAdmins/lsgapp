@@ -14,4 +14,6 @@
     <string name="room">Raum</string>
     <string name="loading_vertretungen">Lade Vertretungen...</string>
     <string name="no_class"></string>
+    <string name="classes">Klassen</string>
+    <string name="no_classes">Ohne Klassenbezeichnung</string>
 </resources>
