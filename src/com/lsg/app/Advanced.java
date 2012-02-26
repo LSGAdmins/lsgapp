@@ -2,9 +2,6 @@ package com.lsg.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
@@ -19,22 +16,17 @@ public class Advanced {
 		ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
-				String klasse = prefs.getString("class", "");
-				String where_cond;
 				switch(itemPosition) {
 				case 0:
-					where_cond = "";
+					act.updateCursor(false);
 					break;
 				case 1:
-					where_cond = " WHERE klasse LIKE '%" + klasse + "%' OR klasse LIKE 'null' ";
+					act.updateCursor(true);
 					break;
 					default:
-						where_cond = "";
+						act.updateCursor(false);
 						break;
 						}
-				Log.d("asdf", where_cond);
-				act.updateCursor(where_cond);
 			return false;
 			}
 		};

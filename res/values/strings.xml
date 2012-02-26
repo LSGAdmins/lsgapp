@@ -16,4 +16,6 @@
     <string name="no_class"></string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
+    <string name="all">Alle Vertretungen</string>
+    <string name="mine">Meine Vertretungen</string>
 </resources>

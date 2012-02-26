@@ -17,7 +17,6 @@ public class VertretungCursor extends CursorAdapter {
 		public TextView type;
 		public TextView when;
 		public TextView vtext;
-		public TextView bottom_up;
 		public TextView bottom;
 	}
 	public VertretungCursor(Context context, Cursor c) {

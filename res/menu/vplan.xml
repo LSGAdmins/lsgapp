@@ -9,4 +9,10 @@
             android:icon="@drawable/ic_launcher"
             android:title="@string/refresh"
             android:showAsAction="ifRoom|withText" />
+        <item android:id="@+id/mine"
+            android:icon="@drawable/ic_launcher"
+            android:title="@string/mine" />
+        <item android:id="@+id/all"
+            android:icon="@drawable/ic_launcher"
+            android:title="@string/all" />
     </menu>
