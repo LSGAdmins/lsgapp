@@ -56,11 +56,11 @@ public class EventCursor extends CursorAdapter {
 		if (place.equals("null")) {
 			holder.place.setText("");
 			holder.place.setVisibility(View.GONE);
-			holder.date.setPadding(10,0,0,10);
+			holder.date.setPadding(10,0,10,10);
 		} else {
 			holder.place.setVisibility(View.VISIBLE);
 			holder.place.setText("Ort: " + place);
-			holder.date.setPadding(10,0,0,0);
+			holder.date.setPadding(10,0,10,0);
 		}
 	}
 }

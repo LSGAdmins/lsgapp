@@ -5,4 +5,5 @@
     android:layout_height="wrap_content"
     android:textSize="20sp"
     android:layout_marginLeft="5sp"
-    android:layout_marginRight="5sp" />
+    android:layout_marginRight="5sp"
+    android:background="@layout/border" />
