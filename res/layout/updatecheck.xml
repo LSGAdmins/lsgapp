@@ -1,8 +1,21 @@
-<TextView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" 
-    android:id="@+id/updatecheck"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:layout_marginLeft="5sp"
-    android:layout_marginRight="5sp" />
+    android:orientation="vertical" >
+    <TextView
+   	    android:id="@+id/updatecheck_yourversion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="26sp"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="5sp" />
+    <TextView
+   	    android:id="@+id/updatecheck_actversion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="26sp"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="5sp" />
+    
+</LinearLayout>

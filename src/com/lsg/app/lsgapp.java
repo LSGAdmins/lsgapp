@@ -15,11 +15,12 @@ public class lsgapp extends ListActivity {
     /** Called when the activity is first created. Test */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         Functions.setTheme(false, false, this);
+        super.onCreate(savedInstanceState);
         String[] actions = {getString(R.string.vplan), getString(R.string.events), getString(R.string.smvblog),
         		getString(R.string.updatecheck)};
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_listitem, actions));
+        Functions.styleListView(getListView(), this);
     }
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);

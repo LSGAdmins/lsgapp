@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,6 +49,7 @@ public class VPlan extends ListActivity {
 		vcursor = new VertretungCursor(this, c);
 		getListView().setAdapter(vcursor);
 		updateCursor(false);
+        Functions.styleListView(getListView(), this);
 	}
 	public void updateCursor(boolean mine) {
 		String where_cond = "";
@@ -68,8 +70,13 @@ public class VPlan extends ListActivity {
 				+ ", " + Functions.DB_VERTRETUNGSTEXT + ", " + Functions.DB_VERTRETER + ", " + Functions.DB_RAUM
 				+ ", " + Functions.DB_KLASSENSTUFE + ", " + Functions.DB_DATE + " FROM "
         		+ Functions.DB_TABLE + where_cond + ";", null);
-		startManagingCursor(c);
+		//startManagingCursor(c);
 		vcursor.changeCursor(c);
+	}
+	@Override
+	public void onResume() {
+		updateCursor(mine);
+		super.onResume();
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

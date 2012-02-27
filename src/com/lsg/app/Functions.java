@@ -13,14 +13,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class Functions {
@@ -46,6 +47,7 @@ public class Functions {
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Black;
 		if(Build.VERSION.SDK_INT >= 11) {
+			Log.d("asdf", "ics");
 			theme = android.R.style.Theme_Holo_Light;
 			if(dialog)
 				theme = android.R.style.Theme_Holo_Light_Dialog;
@@ -57,6 +59,13 @@ public class Functions {
 		act.setTheme(theme);
 		if(homeasup && Build.VERSION.SDK_INT >= 11)
 			Advanced.homeasup(act);
+	}
+	public static void styleListView(ListView lv, Context context) {
+		if(Build.VERSION.SDK_INT >= 11) {
+			ColorDrawable sage = new ColorDrawable(context.getResources().getColor(R.color.seperatorgrey));
+			lv.setDivider(sage);
+			lv.setDividerHeight(2);
+		}
 	}
 	
 	public static void refreshVPlan(Context context) {

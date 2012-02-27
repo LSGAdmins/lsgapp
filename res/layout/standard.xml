@@ -1,5 +1,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/standard_rellayout"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
@@ -26,7 +27,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="22sp"
-        android:layout_marginLeft="2sp" />
+        android:layout_marginLeft="5sp" />
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -36,12 +37,12 @@
             android:id="@+id/vertretung_type"
     	    android:textSize="14sp"
             android:layout_column="1"
-      	    android:layout_marginLeft="2sp" />
+      	    android:layout_marginLeft="5sp" />
         <TextView
             android:id="@+id/vertretung_when"
             android:gravity="right"
     	    android:textSize="14sp"
-            android:layout_marginRight="2sp" />
+            android:layout_marginRight="5sp" />
     </TableRow>
 </TableLayout>
     <TextView
@@ -49,11 +50,11 @@
     	android:textSize="14sp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2sp" />
+        android:layout_marginLeft="5sp" />
     <TextView
         android:id="@+id/vertretung_bottom"
     	    android:textSize="14sp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2sp" />
+        android:layout_marginLeft="5sp" />
 </LinearLayout>

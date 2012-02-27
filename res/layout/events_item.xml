@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:background="@layout/border"
     >
     <TextView
         android:id="@+id/event_title"
@@ -10,6 +11,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:paddingLeft="10dip"
+        android:paddingRight="10dip"
         android:paddingTop="10dip"
         android:textStyle="bold" />
     <TextView
@@ -17,6 +19,7 @@
     	android:textSize="18sp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:paddingRight="10dip"
         android:paddingLeft="10dip" />
     <TextView
         android:id="@+id/event_place"
@@ -24,5 +27,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10dip"
+        android:paddingRight="10dip"
         android:paddingBottom="10dip" />
 </LinearLayout>

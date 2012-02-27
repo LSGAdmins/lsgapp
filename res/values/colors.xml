@@ -16,4 +16,12 @@
 <color name="darkred">#CC0000</color>
 
 <color name="oldblue">#0000ff</color>
+
+<color name="floralwhite">#fffaf0</color>
+<color name="ghostwhite">#f8f8ff</color>
+
+<color name="mintcream">#f5fffa</color>
+<color name="seperatorgrey">#DDD</color>
+<color name="fontgrey">#666</color>
+<color name="fontblack">#222</color>
 </resources>

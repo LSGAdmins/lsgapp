@@ -53,9 +53,14 @@ public class EventCursor extends CursorAdapter {
 		else
 			holder.date.setText("von " + datebeginning + " " + timebeginning + " bis " + dateending + " " + timeending);
 		String place = cursor.getString(cursor.getColumnIndex(Functions.DB_VENUE));
-		if (place.equals("null"))
+		if (place.equals("null")) {
 			holder.place.setText("");
-		else
+			holder.place.setVisibility(View.GONE);
+			holder.date.setPadding(10,0,10,10);
+		} else {
+			holder.place.setVisibility(View.VISIBLE);
 			holder.place.setText("Ort: " + place);
+			holder.date.setPadding(10,0,10,0);
+		}
 	}
 }

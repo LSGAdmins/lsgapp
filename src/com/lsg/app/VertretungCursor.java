@@ -2,15 +2,16 @@ package com.lsg.app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class VertretungCursor extends CursorAdapter {
 	static class Standard {
+		public LinearLayout standard;
 		public TextView date;
 		public TextView klasse;
 		public TextView title;
@@ -27,6 +28,7 @@ public class VertretungCursor extends CursorAdapter {
 		LayoutInflater inflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View rowView = inflater.inflate(R.layout.standard, null, true);
 			Standard holder = new Standard();
+			holder.standard = (LinearLayout) rowView.findViewById(R.id.standard_rellayout);
 			holder.date = (TextView) rowView.findViewById(R.id.vertretung_date);
 			holder.klasse = (TextView) rowView.findViewById(R.id.vertretung_class);
 			holder.title = (TextView) rowView.findViewById(R.id.vertretung_title);
@@ -44,13 +46,17 @@ public class VertretungCursor extends CursorAdapter {
 		
 		String olddate  = "";
 		String oldclass = "";
-		if(cursor.getPosition() > 0) {
-			int position = cursor.getPosition();
+		int position = cursor.getPosition();
+		if(position > 0) {
 			cursor.moveToPosition(position-1);
 			olddate  = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
 			oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
 			cursor.moveToPosition(position);
 		}
+		int color = ((position % 2) == 0) ? R.color.floralwhite : R.color.ghostwhite;
+		//holder.standard.setBackgroundColor(color);
+		//LinearLayout lin = (LinearLayout) view.findViewById(R.id.standard_rellayout);
+		//lin.setBackgroundColor(color);
 		
 		String date = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
 		if(date.equals(olddate))
@@ -106,7 +112,10 @@ public class VertretungCursor extends CursorAdapter {
 		} else {
 			String vertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
 			String raum = cursor.getString(cursor.getColumnIndex(Functions.DB_RAUM));
-			holder.bottom.setText(lehrer + " → " + vertreter + '\n' + context.getString(R.string.room) + " " + raum);
+			String raumInsert = "";
+			if(!raum.equals("null"))
+				raumInsert = '\n' + context.getString(R.string.room) + " " + raum;
+			holder.bottom.setText(lehrer + " → " + vertreter + raumInsert);
 		}
 		}
 }

@@ -2,8 +2,8 @@ package com.lsg.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class UpdateCheck extends Activity {
 	@Override
@@ -14,16 +14,15 @@ public class UpdateCheck extends Activity {
 		
 		setContentView(R.layout.updatecheck);
 		
-		TextView updatecheck = (TextView) findViewById(R.id.updatecheck);
-		//yourVersion.setText(getString(R.string.your_version) + ": " + getString(R.string.versioncode));
+		TextView yourVersion = (TextView) findViewById(R.id.updatecheck_yourversion);
+		yourVersion.setText(getString(R.string.your_version) + ": " + getString(R.string.versioncode));
+		
+		TextView actVersion = (TextView) findViewById(R.id.updatecheck_actversion);
 		String actVers = Functions.getActVersion(this);
+		Log.d("'" + getString(R.string.versioncode) + "'", "'" + actVers + "'");
 		if(actVers.equals(getString(R.string.versioncode)))
-			updatecheck.setText(getString(R.string.your_version) + ": " + getString(R.string.versioncode)
-					+ '\n' + getString(R.string.act_version) + ": " + actVers);
+			actVersion.setText(getString(R.string.act_version) + ": " + actVers);
 		else
-			updatecheck.setText(getString(R.string.your_version) + ": " + getString(R.string.versioncode)
-					+ '\n' + getString(R.string.your_version_is_act));
-		//actVersion.setText("dsaf");
-		//Toast.makeText(this, actVers, Toast.LENGTH_LONG).show();
+			actVersion.setText(getString(R.string.your_version_is_act));
 	}
 }

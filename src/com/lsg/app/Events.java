@@ -46,6 +46,8 @@ public class Events extends ListActivity {
 	ecursor = new EventCursor(this, d);
 	getListView().setAdapter(ecursor);
 	updateCursor("");
+
+    Functions.styleListView(getListView(), this);
 	
 	
 	}
