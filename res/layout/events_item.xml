@@ -3,24 +3,26 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@layout/border"
+    android:background="@layout/background"
     >
     <TextView
         android:id="@+id/event_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:paddingLeft="10dip"
         android:paddingRight="10dip"
         android:paddingTop="10dip"
-        android:textStyle="bold" />
+        android:textStyle="bold" 
+        android:textColor="@color/fontblack"/>
     <TextView
         android:id="@+id/event_date"
     	android:textSize="18sp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingRight="10dip"
-        android:paddingLeft="10dip" />
+        android:paddingLeft="10dip"
+        android:textColor="@color/fontgrey" />
     <TextView
         android:id="@+id/event_place"
     	android:textSize="16sp"
@@ -28,5 +30,6 @@
         android:layout_height="wrap_content"
         android:paddingLeft="10dip"
         android:paddingRight="10dip"
-        android:paddingBottom="10dip" />
+        android:paddingBottom="10dip"
+        android:textColor="@color/fontgrey" />
 </LinearLayout>

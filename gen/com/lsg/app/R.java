@@ -58,7 +58,7 @@ public final class R {
     }
     public static final class layout {
         public static final int about=0x7f030000;
-        public static final int border=0x7f030001;
+        public static final int background=0x7f030001;
         public static final int events_item=0x7f030002;
         public static final int help=0x7f030003;
         public static final int main_listitem=0x7f030004;
