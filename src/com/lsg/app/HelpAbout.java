@@ -14,6 +14,7 @@ public class HelpAbout extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
+		getWindow().setBackgroundDrawableResource(R.layout.background);
 		Bundle data = getIntent().getExtras();
 		String type = data.getString(Functions.helpabout);
 		if(type.equals(Functions.help)) {

@@ -7,5 +7,6 @@
         android:text="@string/abouttext"
         android:layout_width="fill_parent"
         android:autoLink="all"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/fontblack" />
 </ScrollView>

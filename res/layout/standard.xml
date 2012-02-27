@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:textSize="30sp"
   	    android:gravity="center_vertical|center_horizontal"
-        android:textColor="@color/darkblue" />
+        android:textColor="@color/darkblue"
+        android:background="@layout/background" />
     <TextView
         style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+id/vertretung_class"
@@ -21,7 +22,8 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
   	    android:gravity="center_vertical|center_horizontal"
-        android:textColor="@color/lightblue" />
+        android:textColor="@color/lightblue"
+         />
     <!-- content -->
     <TextView
         android:id="@+id/vertretung_title"
