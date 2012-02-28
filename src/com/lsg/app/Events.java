@@ -46,13 +46,13 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
 		//set header search bar
-				if(Build.VERSION.SDK_INT < 11) {
-					LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
-					View search = inflater.inflate(R.layout.search, null);
-					EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
-					searchEdit.addTextChangedListener(this);
-					getListView().addHeaderView(search);
-				}
+		if(Build.VERSION.SDK_INT < 11) {
+			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+			View search = inflater.inflate(R.layout.search, null);
+			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
+			searchEdit.addTextChangedListener(this);
+			getListView().addHeaderView(search);
+			}
 		
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
 		

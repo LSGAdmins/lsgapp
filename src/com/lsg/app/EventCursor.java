@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 public class EventCursor extends CursorAdapter {
 	static class Standard {
+		public TextView month;
 		public TextView title;
 		public TextView date;
 		public TextView place;
@@ -24,6 +25,7 @@ public class EventCursor extends CursorAdapter {
 		LayoutInflater inflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View rowView = inflater.inflate(R.layout.events_item, null, true);
 			Standard holder = new Standard();
+			holder.month = (TextView) rowView.findViewById(R.id.event_month);
 			holder.title = (TextView) rowView.findViewById(R.id.event_title);
 			holder.date = (TextView) rowView.findViewById(R.id.event_date);
 			holder.place = (TextView) rowView.findViewById(R.id.event_place);
@@ -33,6 +35,13 @@ public class EventCursor extends CursorAdapter {
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
+		String olddate = "e.e";
+		int position = cursor.getPosition();
+		if(position > 0) {
+			cursor.moveToPosition(position-1);
+			olddate = cursor.getString(cursor.getColumnIndex(Functions.DB_DATES));
+			cursor.moveToNext();
+		}
 		Standard holder = (Standard) view.getTag();	
 		String title = cursor.getString(cursor.getColumnIndex(Functions.DB_TITLE));
 		holder.title.setText(title);
@@ -62,5 +71,14 @@ public class EventCursor extends CursorAdapter {
 			holder.place.setText("Ort: " + place);
 			holder.date.setPadding(10,0,10,0);
 		}
+		String[] oldmonth = olddate.split("\\.");
+		String[] month    = datebeginning.split("\\.");
+		Log.d(oldmonth[1], month[1]);
+		if(!oldmonth[1].equals(month[1])) {
+			holder.month.setVisibility(View.VISIBLE);
+			holder.month.setText(context.getResources().getStringArray(R.array.months)[new Integer(month[1])-1] + " '" + month[2]);
+		}
+		else
+			holder.month.setVisibility(View.GONE);
 	}
 }

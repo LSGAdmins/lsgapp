@@ -6,6 +6,15 @@
     android:background="@layout/background"
     >
     <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+id/event_month"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+  	    android:gravity="center_vertical|center_horizontal"
+        android:textColor="@color/lightblue"
+         />
+    <TextView
         android:id="@+id/event_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
