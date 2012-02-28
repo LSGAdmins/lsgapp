@@ -39,6 +39,8 @@ public class Events extends ListActivity {
 		
 		Functions.setTheme(false, true, this);
 		
+		getWindow().setBackgroundDrawableResource(R.layout.background);
+		
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
 		
 		

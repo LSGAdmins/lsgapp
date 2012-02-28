@@ -45,6 +45,8 @@ public class VPlan extends ListActivity implements TextWatcher {
 		Functions.testDB(this);
         
 		Functions.setTheme(false, true, this);
+		
+		getWindow().setBackgroundDrawableResource(R.layout.background);
 
 		//set header search bar
         LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
