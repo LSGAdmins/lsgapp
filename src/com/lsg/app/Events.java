@@ -10,24 +10,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
-public class Events extends ListActivity implements SQLlist {
+public class Events extends ListActivity implements SQLlist, TextWatcher{
 	private SQLiteDatabase myDB;
 	private Cursor d;
 	public EventCursor ecursor;
 	private ProgressDialog loading;
-
+	private String[] where_conds = new String[6];
 	
-
 	final Handler handler = new Handler() {
-        public void handleMessage(Message msg) {
+		public void handleMessage(Message msg) {
         	if(msg.arg1 == 1) {
         		loading.cancel();
-        		updateCursor("");
+        		updateCursor();
         	}
         }
     };
@@ -41,24 +45,33 @@ public class Events extends ListActivity implements SQLlist {
 		
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
+		//set header search bar
+				if(Build.VERSION.SDK_INT < 11) {
+					LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+					View search = inflater.inflate(R.layout.search, null);
+					EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
+					searchEdit.addTextChangedListener(this);
+					getListView().addHeaderView(search);
+				}
+		
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
 		
+		ecursor = new EventCursor(this, d);
+		getListView().setAdapter(ecursor);
+		updateWhereCond("");
+		updateCursor();
 		
-	
-	ecursor = new EventCursor(this, d);
-	getListView().setAdapter(ecursor);
-	updateCursor("");
-
-    Functions.styleListView(getListView(), this);
-	
-	
+		Functions.styleListView(getListView(), this);
 	}
-	public void updateCursor(String where_cond) {
-		d = myDB.rawQuery("SELECT " + Functions.DB_ROWID + ", " + Functions.DB_DATES + ", " + Functions.DB_ENDDATES
-				+ ", " + Functions.DB_TIMES + ", " + Functions.DB_ENDTIMES + ", " + Functions.DB_TITLE + ", " + Functions.DB_VENUE + " FROM "
-        		+ Functions.DB_EVENTS_TABLE + where_cond + ";", null);
-		startManagingCursor(d);
+	public void updateCursor() {
+		String where_cond = " " + Functions.DB_DATES + " LIKE ? OR " + Functions.DB_ENDDATES + " LIKE ? OR "
+		+ Functions.DB_TIMES + " LIKE ? OR " + Functions.DB_ENDTIMES + " LIKE ? OR " + Functions.DB_TITLE + " LIKE ? OR "
+				+ Functions.DB_VENUE + " LIKE ? ";
+		d = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
+				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
+				where_conds, null, null, null);
 		ecursor.changeCursor(d);
+		Log.d("asdf", "where");
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,6 +81,8 @@ public class Events extends ListActivity implements SQLlist {
 	    	Advanced search = new Advanced();
 	    	search.searchBarInit(menu, this);
 	    }
+	    else
+	    	menu.removeItem(R.id.search);
 	    return true;
 	}
 	@Override
@@ -104,22 +119,22 @@ public class Events extends ListActivity implements SQLlist {
 	}
     }
 	public void updateWhereCond(String searchText) {
-		String where_cond;
-
-		/*myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
-				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
-	    	    + Functions.DB_DATES              + " text,"
-	     	    + Functions.DB_ENDDATES           + " text,"
-	    	    + Functions.DB_TIMES              + " text,"
-	    	    + Functions.DB_ENDTIMES           + " text,"
-	    	    + Functions.DB_TITLE              + " text,"
-	    	    + Functions.DB_VENUE              + " text"*/
-		if(searchText.length() > 0)
-			where_cond = " WHERE " + Functions.DB_DATES + " LIKE ''"; // TODO fix where cond
-		else
-			where_cond = "";
-		updateCursor(where_cond);
-		Log.d("asdf", "where");
+		where_conds[0] = "%" + searchText + "%";
+		where_conds[1] = "%" + searchText + "%";
+		where_conds[2] = "%" + searchText + "%";
+		where_conds[3] = "%" + searchText + "%";
+		where_conds[4] = "%" + searchText + "%";
+		where_conds[5] = "%" + searchText + "%";
+		updateCursor();
+	}
+	public void afterTextChanged (Editable s) {
+	}
+	public void beforeTextChanged (CharSequence s, int start, int count, int after) {
+		
+	}
+	public void onTextChanged (CharSequence s, int start, int before, int count) {
+		String search = s + "";
+		updateWhereCond(search);
 	}
 	public void onDestroy() {
 		super.onDestroy();

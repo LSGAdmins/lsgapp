@@ -45,8 +45,8 @@ public final class R {
         public static final int help=0x7f090012;
         public static final int mine=0x7f090014;
         public static final int refresh=0x7f090010;
+        public static final int search=0x7f09000f;
         public static final int search_edit=0x7f090003;
-        public static final int search_events=0x7f09000f;
         public static final int settings=0x7f090013;
         public static final int standard_rellayout=0x7f090004;
         public static final int standard_webview=0x7f09000c;

@@ -41,7 +41,7 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	}
 	public void searchBarInit(Menu menu, final SQLlist list) {
 		this.list = list;
-	    SearchView searchView = (SearchView) menu.findItem(R.id.search_events).getActionView();
+	    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 	    searchView.setOnQueryTextListener(this);
 	}
 	public boolean onQueryTextChange(String text) {

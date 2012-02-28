@@ -113,6 +113,8 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	    	Advanced search = new Advanced();
 	    	search.searchBarInit(menu, this);
 	    }
+	    else
+	    	menu.removeItem(R.id.search);
 	    return true;
 	}
 	@Override
