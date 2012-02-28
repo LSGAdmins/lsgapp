@@ -6,23 +6,29 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
-public class VPlan extends ListActivity {
+public class VPlan extends ListActivity implements TextWatcher {
 	private ProgressDialog loading;
 	private SQLiteDatabase myDB;
 	private Cursor c;
 	public VertretungCursor vcursor;
 	private boolean mine = false;
+	private String search = "";
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -37,8 +43,16 @@ public class VPlan extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.testDB(this);
-		
+        
 		Functions.setTheme(false, true, this);
+
+		//set header search bar
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View search = inflater.inflate(R.layout.search, null);
+        EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
+        searchEdit.addTextChangedListener(this);
+        getListView().addHeaderView(search);
+        
 		if(Build.VERSION.SDK_INT >= 11) {
 			Advanced adv = new Advanced();
 			adv.dropDownNav(this);
@@ -52,12 +66,17 @@ public class VPlan extends ListActivity {
         Functions.styleListView(getListView(), this);
 	}
 	public void updateCursor(boolean mine) {
-		String where_cond = "";
+		String where_cond = search;
 		if(mine) {
 			this.mine = true;
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			String klasse = prefs.getString("class", "");
-			where_cond = " WHERE klasse LIKE '%" + klasse + "%' OR klasse LIKE 'null' ";
+			if(!where_cond.contains("WHERE"))
+				where_cond = " WHERE ";
+			else
+				where_cond += " OR ";
+			where_cond += " klasse LIKE '%" + klasse + "%' OR klasse LIKE 'null' ";
+			Log.d("asdf", where_cond);
 		}
 		else
 			this.mine = false;
@@ -138,6 +157,19 @@ public class VPlan extends ListActivity {
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
+	}
+	public void afterTextChanged (Editable s) {
+		
+	}
+	public void beforeTextChanged (CharSequence s, int start, int count, int after) {
+		
+	}
+	public void onTextChanged (CharSequence s, int start, int before, int count) {
+		if(s.length() > 0)
+			search = " WHERE klasse LIKE '%" + s + "%' OR fach LIKE '%" + s + "%' OR lehrer LIKE '%" + s + "%' ";
+		else
+			search = "";
+		updateCursor(mine);
 	}
 	@Override
 	public void onDestroy() {
