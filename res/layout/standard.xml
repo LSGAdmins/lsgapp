@@ -3,7 +3,8 @@
     android:id="@+id/standard_rellayout"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:background="@color/backgroundgrey" >
     <!-- possible seperators -->
     <TextView
         style="?android:attr/listSeparatorTextViewStyle"
@@ -27,7 +28,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="22sp"
-        android:layout_marginLeft="5sp" />
+        android:layout_marginLeft="5sp"
+        android:textColor="@color/fontgrey" />
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"

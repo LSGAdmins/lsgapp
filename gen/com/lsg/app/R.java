@@ -14,14 +14,15 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
+        public static final int backgroundgrey=0x7f06000f;
         public static final int darkblue=0x7f060001;
         public static final int darkgreen=0x7f060005;
         public static final int darkorange=0x7f060007;
         public static final int darkpurple=0x7f060003;
         public static final int darkred=0x7f060009;
         public static final int floralwhite=0x7f06000b;
-        public static final int fontblack=0x7f060010;
-        public static final int fontgrey=0x7f06000f;
+        public static final int fontblack=0x7f060011;
+        public static final int fontgrey=0x7f060010;
         public static final int ghostwhite=0x7f06000c;
         public static final int lightblue=0x7f060000;
         public static final int lightgreen=0x7f060004;

@@ -45,7 +45,7 @@ public class Functions {
 	public static final String DB_DATE            = "date";
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
-		int theme = android.R.style.Theme_Black;
+		int theme = android.R.style.Theme_Light;
 		if(Build.VERSION.SDK_INT >= 11) {
 			Log.d("asdf", "ics");
 			theme = android.R.style.Theme_Holo_Light;
@@ -92,6 +92,7 @@ public class Functions {
         		get += line;
         		}
         	try {
+        		Log.d("asdf", get);
         		JSONArray jArray = new JSONArray(get);
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
