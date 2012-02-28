@@ -133,8 +133,8 @@ public class lsgapp extends ListActivity {
         Functions.setTheme(false, false, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
         super.onCreate(savedInstanceState);
-        String[] actions = {getString(R.string.vplan), getString(R.string.events), getString(R.string.smvblog),
-        		getString(R.string.updatecheck)};
+        String[] actions = {getString(R.string.vplan), getString(R.string.events), getString(R.string.smvblog)/*,
+        		getString(R.string.updatecheck)*/};
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_listitem, actions));
         Functions.styleListView(getListView(), this);
         
