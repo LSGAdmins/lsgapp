@@ -9,13 +9,15 @@
         android:layout_height="wrap_content"
         android:textSize="26sp"
         android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp" />
+        android:layout_marginRight="5sp"
+        android:textColor="@color/fontblack" />
     <TextView
    	    android:id="@+id/updatecheck_actversion"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="26sp"
         android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp" />
+        android:layout_marginRight="5sp"
+        android:textColor="@color/fontblack" />
     
 </LinearLayout>

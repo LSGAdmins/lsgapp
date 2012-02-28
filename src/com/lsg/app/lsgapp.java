@@ -16,6 +16,7 @@ public class lsgapp extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Functions.setTheme(false, false, this);
+		getWindow().setBackgroundDrawableResource(R.layout.background);
         super.onCreate(savedInstanceState);
         String[] actions = {getString(R.string.vplan), getString(R.string.events), getString(R.string.smvblog),
         		getString(R.string.updatecheck)};

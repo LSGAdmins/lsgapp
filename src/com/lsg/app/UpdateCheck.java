@@ -11,7 +11,8 @@ public class UpdateCheck extends Activity {
 		super.onCreate(savedInstanceState);
 
 		Functions.setTheme(true, false, this);
-		
+		getWindow().setBackgroundDrawableResource(R.layout.background);
+
 		setContentView(R.layout.updatecheck);
 		
 		TextView yourVersion = (TextView) findViewById(R.id.updatecheck_yourversion);

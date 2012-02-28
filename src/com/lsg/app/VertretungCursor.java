@@ -2,9 +2,11 @@ package com.lsg.app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ public class VertretungCursor extends CursorAdapter {
 		public TextView when;
 		public TextView vtext;
 		public TextView bottom;
+		public WebView webv;
 	}
 	public VertretungCursor(Context context, Cursor c) {
 		super(context, c);
@@ -36,6 +39,7 @@ public class VertretungCursor extends CursorAdapter {
 			holder.when = (TextView) rowView.findViewById(R.id.vertretung_when);
 			holder.vtext = (TextView) rowView.findViewById(R.id.vertretung_text);
 			holder.bottom = (TextView) rowView.findViewById(R.id.vertretung_bottom);
+			holder.webv = (WebView) rowView.findViewById(R.id.standard_webview);
 			rowView.setTag(holder);
 			return rowView;
 			}
@@ -53,10 +57,6 @@ public class VertretungCursor extends CursorAdapter {
 			oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
 			cursor.moveToPosition(position);
 		}
-		int color = ((position % 2) == 0) ? R.color.floralwhite : R.color.ghostwhite;
-		//holder.standard.setBackgroundColor(color);
-		//LinearLayout lin = (LinearLayout) view.findViewById(R.id.standard_rellayout);
-		//lin.setBackgroundColor(color);
 		
 		String date = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
 		if(date.equals(olddate))
@@ -67,55 +67,74 @@ public class VertretungCursor extends CursorAdapter {
 			oldclass = "";
 		}
 
-		String klassä = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
-		if(klassä.equals(oldclass))
-			holder.klasse.setVisibility(View.GONE);
-		else {
-			holder.klasse.setVisibility(View.VISIBLE);
-			if(new Integer(klassä) < 14)
-				holder.klasse.setText(klassä + ". " + context.getString(R.string.classes));
+		String klassenstufe = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
+		String klasse = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSE));
+		if(!klasse.equals("infotext")) {
+			//hide
+			holder.webv.setVisibility(View.GONE);
+			//show needed views
+			holder.title.setVisibility(View.VISIBLE);
+			holder.type.setVisibility(View.VISIBLE);
+			holder.when.setVisibility(View.VISIBLE);
+			holder.bottom.setVisibility(View.VISIBLE);
+			
+			if(klassenstufe.equals(oldclass))
+				holder.klasse.setVisibility(View.GONE);
+			else {
+				holder.klasse.setVisibility(View.VISIBLE);
+				}
+			if(new Integer(klassenstufe) < 14)
+				holder.klasse.setText(klassenstufe + ". " + context.getString(R.string.classes));
 			else
 				holder.klasse.setText(context.getString(R.string.no_classes));
-		}
-		
-		String klasse = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSE));
-		if(klasse.equals("null")) {
-			klasse = context.getString(R.string.no_class);
-		}
-		
-		String fach = cursor.getString(cursor.getColumnIndex(Functions.DB_FACH));
-		holder.title.setText(klasse + " (" + fach + ")");
-		String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
-		holder.type.setText(type);
-		
-		/*Log.d("type", "'" + type +"'");
-		if(type.equals("Entfall"))
-			holder.type.setTextColor(R.color.darkorange);*/
-		
-		String when = cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE));
-		holder.when.setText(when + ". " +context.getString(R.string.hour));
-		String vtext = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
-		if(vtext.equals("null"))
-			holder.vtext.setVisibility(View.GONE);
-		else {
-			/*
-			 * android recycles Views
-			 * -> it happens, that a view with invisible vtext is reused
-			 * -> make visible in ANY CASE */
-			holder.vtext.setVisibility(View.VISIBLE);
-			holder.vtext.setText("[" + vtext + "]");
-		}
-		
-		String lehrer    = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
-		if(cursor.getString(cursor.getColumnIndex(Functions.DB_ART)).equals("Entfall")){
-			holder.bottom.setText(context.getString(R.string.at) + " " + lehrer);
+			if(klasse.equals("null")) {
+				klasse = context.getString(R.string.no_class);
+				}
+			
+			String fach = cursor.getString(cursor.getColumnIndex(Functions.DB_FACH));
+			holder.title.setText(klasse + " (" + fach + ")");
+			String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
+			holder.type.setText(type);
+			
+			String when = cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE));
+			holder.when.setText(when + ". " +context.getString(R.string.hour));
+			String vtext = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
+			if(vtext.equals("null"))
+				holder.vtext.setVisibility(View.GONE);
+			else {
+				/*
+				 * 			 * android recycles Views
+				 * 			 * -> it happens, that a view with invisible vtext is reused
+				 * 			 * -> make visible in ANY CASE */
+				holder.vtext.setVisibility(View.VISIBLE);
+				holder.vtext.setText("[" + vtext + "]");
+				}
+			String lehrer    = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
+			if(cursor.getString(cursor.getColumnIndex(Functions.DB_ART)).equals("Entfall")){
+				holder.bottom.setText(context.getString(R.string.at) + " " + lehrer);
+				} else {
+				String vertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
+				String raum = cursor.getString(cursor.getColumnIndex(Functions.DB_RAUM));
+				String raumInsert = "";
+				if(!raum.equals("null"))
+					raumInsert = '\n' + context.getString(R.string.room) + " " + raum;
+				holder.bottom.setText(lehrer + " → " + vertreter + raumInsert);
+			}
 		} else {
-			String vertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
-			String raum = cursor.getString(cursor.getColumnIndex(Functions.DB_RAUM));
-			String raumInsert = "";
-			if(!raum.equals("null"))
-				raumInsert = '\n' + context.getString(R.string.room) + " " + raum;
-			holder.bottom.setText(lehrer + " → " + vertreter + raumInsert);
+			holder.klasse.setText(context.getString(R.string.info));
+			//hide views not needed
+			holder.title.setVisibility(View.GONE);
+			holder.type.setVisibility(View.GONE);
+			holder.when.setVisibility(View.GONE);
+			holder.bottom.setVisibility(View.GONE);
+			holder.vtext.setVisibility(View.GONE);
+			
+			//unhide needed views that could be hidden
+			holder.klasse.setVisibility(View.VISIBLE);
+			holder.webv.setVisibility(View.VISIBLE);
+			String info = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
+			holder.webv.loadData(info, "text/html", null);
+			//holder.vtext.setText(Html.fromHtml(cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))));
 		}
 		}
 }
