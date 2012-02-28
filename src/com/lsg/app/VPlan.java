@@ -22,7 +22,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-public class VPlan extends ListActivity implements TextWatcher {
+public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
+	private String[] where_conds = new String[4];
 	private ProgressDialog loading;
 	private SQLiteDatabase myDB;
 	private Cursor c;
@@ -41,6 +42,11 @@ public class VPlan extends ListActivity implements TextWatcher {
     
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		where_conds[0] = "%";
+		where_conds[1] = "%";
+		where_conds[2] = "%";
+		where_conds[3] = "%";
+		
 		super.onCreate(savedInstanceState);
 		Functions.testDB(this);
         
@@ -49,15 +55,16 @@ public class VPlan extends ListActivity implements TextWatcher {
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 
 		//set header search bar
-        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
-        View search = inflater.inflate(R.layout.search, null);
-        EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
-        searchEdit.addTextChangedListener(this);
-        getListView().addHeaderView(search);
+		if(Build.VERSION.SDK_INT < 11) {
+			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+			View search = inflater.inflate(R.layout.search, null);
+			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
+			searchEdit.addTextChangedListener(this);
+			getListView().addHeaderView(search);
+		}
         
 		if(Build.VERSION.SDK_INT >= 11) {
-			Advanced adv = new Advanced();
-			adv.dropDownNav(this);
+			Advanced.dropDownNav(this);
 		}
 		
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
@@ -68,31 +75,30 @@ public class VPlan extends ListActivity implements TextWatcher {
         Functions.styleListView(getListView(), this);
 	}
 	public void updateCursor(boolean mine) {
-		String where_cond = search;
 		if(mine) {
 			this.mine = true;
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			String klasse = prefs.getString("class", "");
-			if(!where_cond.contains("WHERE"))
-				where_cond = " WHERE ";
-			else
-				where_cond += " OR ";
-			where_cond += " klasse LIKE '%" + klasse + "%' OR klasse LIKE 'null' ";
-			Log.d("asdf", where_cond);
+			where_conds[0] =  "%" + klasse + "%";
 		}
 		else
-			this.mine = false;
-		if(where_cond.equals(""))
-			mine = false;
-		else
-			mine = true;
-		c = myDB.rawQuery("SELECT " + Functions.DB_ROWID + ", " + Functions.DB_KLASSE + ", " + Functions.DB_ART
-				+ ", " + Functions.DB_STUNDE + ", " + Functions.DB_LEHRER + ", " + Functions.DB_FACH
-				+ ", " + Functions.DB_VERTRETUNGSTEXT + ", " + Functions.DB_VERTRETER + ", " + Functions.DB_RAUM
-				+ ", " + Functions.DB_KLASSENSTUFE + ", " + Functions.DB_DATE + " FROM "
-        		+ Functions.DB_TABLE + where_cond + ";", null);
-		//startManagingCursor(c);
+			where_conds[0] = "%";
+		String where_cond = "( " + Functions.DB_KLASSE + " LIKE ? OR " + Functions.DB_KLASSE + " LIKE 'null' ) AND ( " + Functions.DB_KLASSE
+				+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
+		c = myDB.query(Functions.DB_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
+				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
+				where_conds, null, null, null);
 		vcursor.changeCursor(c);
+	}
+	public void updateWhereCond(String searchText) {
+		search = " WHERE " + Functions.DB_KLASSE + " LIKE '%" + searchText + "%' OR " + Functions.DB_FACH + " LIKE '%" + searchText
+				+ "%' OR " + Functions.DB_LEHRER + " LIKE '%"
+				+ searchText + "%' ";
+		where_conds[1] = "%" + searchText + "%";
+		where_conds[2] = "%" + searchText + "%";
+		where_conds[3] = "%" + searchText + "%";
+		updateCursor(mine);
 	}
 	@Override
 	public void onResume() {
@@ -103,6 +109,10 @@ public class VPlan extends ListActivity implements TextWatcher {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.vplan, menu);
+	    if(Build.VERSION.SDK_INT >= 11) {
+	    	Advanced search = new Advanced();
+	    	search.searchBarInit(menu, this);
+	    }
 	    return true;
 	}
 	@Override
@@ -161,17 +171,13 @@ public class VPlan extends ListActivity implements TextWatcher {
 	    }
 	}
 	public void afterTextChanged (Editable s) {
-		
 	}
 	public void beforeTextChanged (CharSequence s, int start, int count, int after) {
 		
 	}
 	public void onTextChanged (CharSequence s, int start, int before, int count) {
-		if(s.length() > 0)
-			search = " WHERE klasse LIKE '%" + s + "%' OR fach LIKE '%" + s + "%' OR lehrer LIKE '%" + s + "%' ";
-		else
-			search = "";
-		updateCursor(mine);
+		String search = s + "";
+		updateWhereCond(search);
 	}
 	@Override
 	public void onDestroy() {

@@ -37,16 +37,17 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int about=0x7f090010;
-        public static final int all=0x7f090014;
+        public static final int about=0x7f090011;
+        public static final int all=0x7f090015;
         public static final int event_date=0x7f090001;
         public static final int event_place=0x7f090002;
         public static final int event_title=0x7f090000;
-        public static final int help=0x7f090011;
-        public static final int mine=0x7f090013;
-        public static final int refresh=0x7f09000f;
+        public static final int help=0x7f090012;
+        public static final int mine=0x7f090014;
+        public static final int refresh=0x7f090010;
         public static final int search_edit=0x7f090003;
-        public static final int settings=0x7f090012;
+        public static final int search_events=0x7f09000f;
+        public static final int settings=0x7f090013;
         public static final int standard_rellayout=0x7f090004;
         public static final int standard_webview=0x7f09000c;
         public static final int updatecheck_actversion=0x7f09000e;

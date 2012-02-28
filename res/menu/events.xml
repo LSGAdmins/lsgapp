@@ -1,5 +1,10 @@
 
     <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/search_events"
+            android:icon="@android:drawable/ic_menu_search"
+            android:title="@string/search"
+            android:showAsAction="ifRoom|withText"
+            android:actionViewClass="android.widget.SearchView" />
         <item android:id="@+id/refresh"
             android:icon="@android:drawable/ic_menu_rotate"
             android:title="@string/refresh"

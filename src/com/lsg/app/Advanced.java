@@ -2,10 +2,13 @@ package com.lsg.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.view.Menu;
 import android.widget.ArrayAdapter;
+import android.widget.SearchView;
 import android.widget.SpinnerAdapter;
 
-public class Advanced {
+public class Advanced implements SearchView.OnQueryTextListener {
+	private SQLlist list;
 	public static void homeasup(Activity act) {
 	    ActionBar actionBar = act.getActionBar();
 	    actionBar.setDisplayHomeAsUpEnabled(true);
@@ -35,5 +38,17 @@ public class Advanced {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		
 		actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);
+	}
+	public void searchBarInit(Menu menu, final SQLlist list) {
+		this.list = list;
+	    SearchView searchView = (SearchView) menu.findItem(R.id.search_events).getActionView();
+	    searchView.setOnQueryTextListener(this);
+	}
+	public boolean onQueryTextChange(String text) {
+		list.updateWhereCond(text);
+		return true;
+	}
+	public boolean onQueryTextSubmit(String text) {
+		return true;
 	}
 }

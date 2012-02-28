@@ -5,17 +5,17 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
-import android.widget.SimpleCursorAdapter;
 
-public class Events extends ListActivity {
+public class Events extends ListActivity implements SQLlist {
 	private SQLiteDatabase myDB;
 	private Cursor d;
 	public EventCursor ecursor;
@@ -64,6 +64,10 @@ public class Events extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.events, menu);
+	    if(Build.VERSION.SDK_INT >= 11) {
+	    	Advanced search = new Advanced();
+	    	search.searchBarInit(menu, this);
+	    }
 	    return true;
 	}
 	@Override
@@ -99,8 +103,24 @@ public class Events extends ListActivity {
 	        return super.onOptionsItemSelected(item);
 	}
     }
-	
-	
+	public void updateWhereCond(String searchText) {
+		String where_cond;
+
+		/*myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
+				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
+	    	    + Functions.DB_DATES              + " text,"
+	     	    + Functions.DB_ENDDATES           + " text,"
+	    	    + Functions.DB_TIMES              + " text,"
+	    	    + Functions.DB_ENDTIMES           + " text,"
+	    	    + Functions.DB_TITLE              + " text,"
+	    	    + Functions.DB_VENUE              + " text"*/
+		if(searchText.length() > 0)
+			where_cond = " WHERE " + Functions.DB_DATES + " LIKE ''"; // TODO fix where cond
+		else
+			where_cond = "";
+		updateCursor(where_cond);
+		Log.d("asdf", "where");
+	}
 	public void onDestroy() {
 		super.onDestroy();
 		myDB.close();
