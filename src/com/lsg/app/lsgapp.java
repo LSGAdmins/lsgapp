@@ -108,7 +108,7 @@ public class lsgapp extends ListActivity {
     private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
     	@Override
     	public void onReceive(Context arg0, Intent arg1) {
-    		Log.d("asdf", "onreceive");
+    		/*Log.d("asdf", "onreceive");
     		DownloadManager.Query query = new DownloadManager.Query();
     		query.setFilterById(prefs.getLong("downid", 0));
     		Cursor cursor = downloadManager.query(query);
@@ -122,10 +122,10 @@ public class lsgapp extends ListActivity {
     				//Log.d("asdf",downloadManager.getUriForDownloadedFile(downloadID).toString());
     				String fileName = downloadManager.getUriForDownloadedFile(downloadID).toString();
     				Intent intent = new Intent(Intent.ACTION_VIEW);
-    				intent.setDataAndType(downloadManager.getUriForDownloadedFile(downloadID), "application/vnd.android.package-archive");
+    				intent.setDataAndType(Uri.fromFile(new File(downloadManager.getUriForDownloadedFile(downloadID))), "application/vnd.android.package-archive");
     				startActivity(intent);
     				}
-    			}
+    			}*/
     		}
     	};
     @Override
