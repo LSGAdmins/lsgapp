@@ -13,8 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
@@ -25,6 +27,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class Functions {
+	public static final String UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/ControlPanel.apk";
 	public static final String helpabout = "helpabout";
 	public static final String help      = "help";
 	public static final String about     = "about";
@@ -151,7 +154,7 @@ public class Functions {
 	    	Log.d("except", e.getMessage());
         }
 	}
-	public static String getActVersion(Context context) {
+	/*public static String getActVersion(Context context) {
     	String get = "";
 		try {
 			Functions.testDB(context);
@@ -177,7 +180,7 @@ public class Functions {
 	    	Log.d("except", e.getMessage());
         }
     	return get;
-	}
+	}*/
 	public static void testDB(Context context) {
     	try {
     		SQLiteDatabase myDB;

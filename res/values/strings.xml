@@ -25,6 +25,9 @@
     <string name="mine">Meine Vertretungen</string>
     <string name="smvblog">SMVBlog</string>
     <string name="oops">Oops!</string>
+    <string name="update_available">Update verfügbar!</string>
+    <string name="update">Update!</string>
+    <string name="no_update">Keine Lust</string>
     <string name="search">Suche...</string>
     <string name="info">Info zum Tag</string>
     <string name="about">Über</string>

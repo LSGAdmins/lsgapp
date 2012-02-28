@@ -79,8 +79,8 @@ public final class R {
         public static final int vplan=0x7f080002;
     }
     public static final class string {
-        public static final int about=0x7f07001b;
-        public static final int abouttext=0x7f07001d;
+        public static final int about=0x7f07001e;
+        public static final int abouttext=0x7f070020;
         public static final int act_version=0x7f070003;
         public static final int all=0x7f070015;
         public static final int app_name=0x7f070002;
@@ -88,24 +88,27 @@ public final class R {
         public static final int classes=0x7f070013;
         public static final int events=0x7f070007;
         public static final int hello=0x7f070000;
-        public static final int help=0x7f07001e;
-        public static final int helptext=0x7f07001f;
+        public static final int help=0x7f070021;
+        public static final int helptext=0x7f070022;
         public static final int hour=0x7f07000e;
-        public static final int info=0x7f07001a;
+        public static final int info=0x7f07001d;
         public static final int loading_events=0x7f070011;
         public static final int loading_vertretungen=0x7f070010;
         public static final int login=0x7f07000a;
         public static final int mine=0x7f070016;
         public static final int no_class=0x7f070012;
         public static final int no_classes=0x7f070014;
+        public static final int no_update=0x7f07001b;
         public static final int oops=0x7f070018;
         public static final int password=0x7f07000b;
         public static final int refresh=0x7f070009;
         public static final int room=0x7f07000f;
-        public static final int search=0x7f070019;
+        public static final int search=0x7f07001c;
         public static final int settings=0x7f070008;
         public static final int smvblog=0x7f070017;
-        public static final int updatecheck=0x7f07001c;
+        public static final int update=0x7f07001a;
+        public static final int update_available=0x7f070019;
+        public static final int updatecheck=0x7f07001f;
         public static final int username=0x7f07000c;
         public static final int versioncode=0x7f070001;
         public static final int vplan=0x7f070006;

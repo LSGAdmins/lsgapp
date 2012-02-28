@@ -15,15 +15,15 @@ public class UpdateCheck extends Activity {
 
 		setContentView(R.layout.updatecheck);
 		
-		TextView yourVersion = (TextView) findViewById(R.id.updatecheck_yourversion);
+		/*TextView yourVersion = (TextView) findViewById(R.id.updatecheck_yourversion);
 		yourVersion.setText(getString(R.string.your_version) + ": " + getString(R.string.versioncode));
 		
 		TextView actVersion = (TextView) findViewById(R.id.updatecheck_actversion);
 		String actVers = Functions.getActVersion(this);
 		Log.d("'" + getString(R.string.versioncode) + "'", "'" + actVers + "'");
-		if(actVers.equals(getString(R.string.versioncode)))
+		if(actVers.contains(getString(R.string.versioncode)))
 			actVersion.setText(getString(R.string.act_version) + ": " + actVers);
 		else
-			actVersion.setText(getString(R.string.your_version_is_act));
+			actVersion.setText(getString(R.string.your_version_is_act));*/
 	}
 }
