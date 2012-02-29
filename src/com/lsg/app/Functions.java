@@ -27,7 +27,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class Functions {
-	public static final String UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/ControlPanel.apk";
+	public static final String UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
 	public static final String helpabout = "helpabout";
 	public static final String help      = "help";
 	public static final String about     = "about";

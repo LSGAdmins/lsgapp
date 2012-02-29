@@ -17,7 +17,9 @@
     <string name="hour">Stunde</string>
     <string name="room">Raum</string>
     <string name="loading_vertretungen">Lade Vertretungen...</string>
-    <string name="loading_events">Lade Termine...</string>  
+    <string name="loading_events">Lade Termine...</string>
+    <string name="downloading">Lade Update herunter</string>
+    <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
     <string name="no_class"></string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
@@ -25,7 +27,7 @@
     <string name="mine">Meine Vertretungen</string>
     <string name="smvblog">SMVBlog</string>
     <string name="oops">Oops!</string>
-    <string name="update_available">Update verfügbar!</string>
+    <string name="update_available"><b>Update verfügbar!</b></string>
     <string name="update">Update!</string>
     <string name="no_update">Keine Lust</string>
     <string name="search">Suche...</string>

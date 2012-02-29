@@ -22,6 +22,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -35,10 +36,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class lsgapp extends ListActivity {
-	private DownloadManager downloadManager;
-	SharedPreferences prefs;
+	Download down;
 	final Handler handler = new Handler();
     class UpdateCheck extends Thread {
     	Handler handler;
@@ -79,12 +80,15 @@ public class lsgapp extends ListActivity {
             					       .setCancelable(false)
             					       .setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
             					           public void onClick(DialogInterface dialog, int id) {
-            					        	   Uri downloadUri = Uri.parse(Functions.UPDATE_URL);
-            					        	   DownloadManager.Request request = new DownloadManager.Request(downloadUri);
-            					        	   long downid = downloadManager.enqueue(request);
-            					        	   SharedPreferences.Editor edit = prefs.edit();
-            					        	   edit.putLong("downid", downid);
-            					        	   edit.commit();
+            					       		Toast.makeText(lsgapp.this, getString(R.string.downloading), Toast.LENGTH_LONG).show();
+            					        	   if(Build.VERSION.SDK_INT >= 9) {
+            					        		   down.download();
+            					        	   }
+            					        	   else {
+            					        		   Intent intent = new Intent(Intent.ACTION_VIEW);
+            					        		   intent.setData(Uri.parse(Functions.UPDATE_URL));
+            					        		   startActivity(intent);
+            					        	   }
             					           }
             					       })
             					       .setNegativeButton(getString(R.string.no_update), new DialogInterface.OnClickListener() {
@@ -105,29 +109,7 @@ public class lsgapp extends ListActivity {
             }
     	}
     }
-    private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
-    	@Override
-    	public void onReceive(Context arg0, Intent arg1) {
-    		/*Log.d("asdf", "onreceive");
-    		DownloadManager.Query query = new DownloadManager.Query();
-    		query.setFilterById(prefs.getLong("downid", 0));
-    		Cursor cursor = downloadManager.query(query);
-    		if(cursor.moveToFirst()){
-    			int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
-    			int status = cursor.getInt(columnIndex);
-    			if(status == DownloadManager.STATUS_SUCCESSFUL){
-    				//Retrieve the saved request id
-    				long downloadID = prefs.getLong("downid", 0);
-    				ParcelFileDescriptor file;
-    				//Log.d("asdf",downloadManager.getUriForDownloadedFile(downloadID).toString());
-    				String fileName = downloadManager.getUriForDownloadedFile(downloadID).toString();
-    				Intent intent = new Intent(Intent.ACTION_VIEW);
-    				intent.setDataAndType(Uri.fromFile(new File(downloadManager.getUriForDownloadedFile(downloadID))), "application/vnd.android.package-archive");
-    				startActivity(intent);
-    				}
-    			}*/
-    		}
-    	};
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Functions.setTheme(false, false, this);
@@ -138,8 +120,9 @@ public class lsgapp extends ListActivity {
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_listitem, actions));
         Functions.styleListView(getListView(), this);
         
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+        if(Build.VERSION.SDK_INT >= 9)
+ 		   down = new Download(lsgapp.this);
+        
         UpdateCheck uCheck = new UpdateCheck(handler);
         uCheck.start();
     }
@@ -172,13 +155,16 @@ public class lsgapp extends ListActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		unregisterReceiver(downloadReceiver);
+		if(Build.VERSION.SDK_INT >= 9)
+			unregisterReceiver(down.downloadReceiver);
 	}
 	@Override
 	public void onResume() {
 		super.onResume();
-		IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-		registerReceiver(downloadReceiver, intentFilter);
+		if(Build.VERSION.SDK_INT >= 9) {
+			IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+			registerReceiver(down.downloadReceiver, intentFilter);
+		}
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
