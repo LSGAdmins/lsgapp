@@ -34,7 +34,7 @@ public class SMVBlog extends Activity {
 			});
 		webview.setWebViewClient(new WebViewClient() {
 			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-				Toast.makeText(activity, getString(R.string.oops) + description, Toast.LENGTH_SHORT).show();
+				Toast.makeText(activity, getString(R.string.oops) + " " + description, Toast.LENGTH_SHORT).show();
 				}
 			});
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

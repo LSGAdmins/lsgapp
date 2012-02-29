@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
@@ -100,6 +101,7 @@ public class Functions {
 	}
 	
 	public static Runnable getErrorRunnable(String error, final Context context) {
+		Log.d("asdf", "errorrunnable");
 		if(error.equals("jsonerror")) {
 			Runnable r = new Runnable (){
 				public void run() {
@@ -112,6 +114,9 @@ public class Functions {
 			Runnable r = new Runnable (){
 					public void run() {
 						Toast.makeText(context, context.getString(R.string.loginerror), Toast.LENGTH_LONG).show();
+						Intent intent = new Intent(context, Settings.class);
+						intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+						context.startActivity(intent);
 					}
 					};
 					return r;
@@ -126,7 +131,7 @@ public class Functions {
 					}
 	}
 	
-	public static void refreshVPlan(final Context context, Handler h) {
+	public static boolean refreshVPlan(final Context context, Handler h) {
 		Functions.testDB(context);
 		String get = Functions.getData(Functions.VP_URL, context, true);
 		if(!get.equals("networkerror") && !get.equals("loginerror")) {
@@ -156,10 +161,14 @@ public class Functions {
         		} catch(JSONException e) {
         			Log.d("json", e.getMessage());
         			h.post(getErrorRunnable("jsonerror", context));
+        			return false;
         		}
 			}
-		else
+		else {
 			h.post(getErrorRunnable(get, context));
+			return false;
+		}
+		return true;
 		}
 	public static void getClass(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -218,7 +227,7 @@ public class Functions {
 	public static final String DB_ENDTIMES        = "endtimes";
 	public static final String DB_TITLE           = "title";
 	public static final String DB_VENUE           = "venue";
-	public static void refreshEvents(Context context, Handler h) {
+	public static boolean refreshEvents(Context context, Handler h) {
 		Functions.testDB(context);
 		String get = Functions.getData(Functions.EVENT_URL, context, false);
 		if(!get.equals("networkerror")) {
@@ -244,9 +253,13 @@ public class Functions {
         		} catch(JSONException e) {
         			Log.d("json", e.getMessage());
         			h.post(getErrorRunnable("jsonerror", context));
+        			return false;
         		}	
         }
-		else
+		else {
 			h.post(getErrorRunnable(get, context));
+			return false;
+		}
+		return true;
 	}
 }

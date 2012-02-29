@@ -29,13 +29,19 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	private Cursor c;
 	public VertretungCursor vcursor;
 	private boolean mine = false;
-	private String search = "";
+	private boolean update_locked = false;
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
+        	Log.d("msg", new Integer(msg.arg1).toString());
         	if(msg.arg1 == 1) {
         		loading.cancel();
         		updateCursor(mine);
+        		update_locked = false;
+        	}
+        	if(msg.arg1 == 2) {
+        		loading.cancel();
+        		update_locked = false;
         	}
         }
     };
@@ -89,12 +95,14 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
 				where_conds, null, null, null);
+		if(c.getCount() == 0)
+			updateVP();
 		vcursor.changeCursor(c);
 	}
 	public void updateWhereCond(String searchText) {
-		search = " WHERE " + Functions.DB_KLASSE + " LIKE '%" + searchText + "%' OR " + Functions.DB_FACH + " LIKE '%" + searchText
+		/*search = " WHERE " + Functions.DB_KLASSE + " LIKE '%" + searchText + "%' OR " + Functions.DB_FACH + " LIKE '%" + searchText
 				+ "%' OR " + Functions.DB_LEHRER + " LIKE '%"
-				+ searchText + "%' ";
+				+ searchText + "%' ";*/
 		where_conds[1] = "%" + searchText + "%";
 		where_conds[2] = "%" + searchText + "%";
 		where_conds[3] = "%" + searchText + "%";
@@ -104,6 +112,31 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	public void onResume() {
 		updateCursor(mine);
 		super.onResume();
+	}
+	public void updateVP() {
+		if(!update_locked) {
+			Log.d("asdf", "updatevp");
+			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vertretungen), true);
+			update_locked = true;
+			class ProgressThread extends Thread {
+				Handler handler;
+				ProgressThread(Handler h) {
+					handler = h;
+					}
+				public void run() {
+					Looper.prepare();
+					boolean update = Functions.refreshVPlan(VPlan.this, handler);
+					Functions.getClass(VPlan.this);
+					Message msg = handler.obtainMessage();
+					msg.arg1 = 1;
+					if(!update)
+						msg.arg1 = 2;
+					handler.sendMessage(msg);
+					}
+				}
+			ProgressThread progress = new ProgressThread(handler);
+			progress.start();
+			}
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -138,23 +171,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	    	startActivity(settings);
 	        return true;
 	    case R.id.refresh:
-			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vertretungen), true);
-			class ProgressThread extends Thread {
-				Handler handler;
-				ProgressThread(Handler h) {
-					handler = h;
-				}
-				public void run() {
-					Looper.prepare();
-			    	Functions.refreshVPlan(VPlan.this, handler);
-			    	Functions.getClass(VPlan.this);
-			    	Message msg = handler.obtainMessage();
-			    	msg.arg1 = 1;
-			    	handler.sendMessage(msg);
-				}
-			}
-			ProgressThread progress = new ProgressThread(handler);
-			progress.start();
+	    	updateVP();
 	    	return true;
 	    case R.id.mine:
 	    	updateCursor(true);

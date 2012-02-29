@@ -26,12 +26,19 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 	public EventCursor ecursor;
 	private ProgressDialog loading;
 	private String[] where_conds = new String[6];
+	private boolean update_locked = false;
 	
 	final Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
         	if(msg.arg1 == 1) {
         		loading.cancel();
         		updateCursor();
+        		update_locked = false;
+        	}
+        	if(msg.arg1 == 2) {
+        		loading.cancel();
+        		Log.d("asdf", "cancel");
+        		update_locked = false;
         	}
         }
     };
@@ -70,9 +77,36 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 		d = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
 				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
 				where_conds, null, null, null);
+		if(d.getCount() == 0) {
+			updateEvents();
+			Log.d("asdf", "no events");
+		}
 		ecursor.changeCursor(d);
-		Log.d("asdf", "where");
 	}
+	public void updateEvents() {
+		if(!update_locked) {
+			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events), true);
+			Log.d("asdf", "updateevents");
+			update_locked = true;
+			class ProgressThread extends Thread {
+				Handler handler;
+			ProgressThread(Handler h) {
+				handler = h;
+				}
+			public void run() {
+				Looper.prepare();
+				boolean update = Functions.refreshEvents(Events.this, handler);
+				Message msg = handler.obtainMessage();
+				msg.arg1 = 1;
+				if(!update)
+					msg.arg1 = 2;
+				handler.sendMessage(msg);
+				}
+			}
+			ProgressThread progress = new ProgressThread(handler);
+			progress.start();
+			}
+		}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -90,23 +124,7 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.refresh:
-			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events), true);
-			class ProgressThread extends Thread {
-				Handler handler;
-				ProgressThread(Handler h) {
-					handler = h;
-				}
-				public void run() {
-					Looper.prepare();
-			    	Functions.refreshEvents(Events.this, handler);
-			    	Functions.getClass(Events.this);
-			    	Message msg = handler.obtainMessage();
-			    	msg.arg1 = 1;
-			    	handler.sendMessage(msg);
-				}
-			}
-			ProgressThread progress = new ProgressThread(handler);
-			progress.start();
+	    	updateEvents();
 	    	return true;
 	    case android.R.id.home:
 	        // app icon in action bar clicked; go home
