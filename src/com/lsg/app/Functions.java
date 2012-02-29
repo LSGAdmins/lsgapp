@@ -13,10 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
@@ -28,6 +26,9 @@ import android.widget.Toast;
 
 public class Functions {
 	public static final String UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
+	public static final String VP_URL     = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String CLASS_URL  = "http://linux.lsg.musin.de/cp/getClass.php";
+	
 	public static final String helpabout = "helpabout";
 	public static final String help      = "help";
 	public static final String about     = "about";
@@ -70,13 +71,12 @@ public class Functions {
 		}
 	}
 	
-	public static void refreshVPlan(Context context) {
+	public static String getData(String urlString, Context context, boolean login) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
-			Functions.testDB(context);
 			String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("username", ""), "UTF-8");
         	data       += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("password", ""), "UTF-8");
-        	URL url = new URL("http://linux.lsg.musin.de/cp/vp_app.php");
+        	URL url = new URL(urlString);
         	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
         	conn.setDoOutput(true);
@@ -93,6 +93,14 @@ public class Functions {
         	while ((line = reader.readLine()) != null) {
         		get += line;
         		}
+        	return get;
+		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage()); return "errorfetching";}
+	}
+	
+	public static void refreshVPlan(Context context) {
+		try {
+			Functions.testDB(context);
+			String get = Functions.getData(Functions.VP_URL, context, true);
         	try {
         		JSONArray jArray = new JSONArray(get);
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
@@ -127,25 +135,7 @@ public class Functions {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
 			Functions.testDB(context);
-			String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("username", ""), "UTF-8");
-        	data       += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("password", ""), "UTF-8");
-        	URL url = new URL("http://linux.lsg.musin.de/cp/getClass.php");
-        	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
-        	conn.setDoOutput(true);
-        	conn.setRequestMethod("POST");
-        	OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        	wr.write(data);
-        	wr.flush();
-        	wr.close();
-        	//get response
-        	InputStream response = conn.getInputStream();
-        	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
-        	String line;
-        	String get = "";
-        	while ((line = reader.readLine()) != null) {
-        		get += line;
-        		}
+			String get = Functions.getData(Functions.CLASS_URL, context, true);
         	SharedPreferences.Editor editor = prefs.edit();
         	editor.putString("class", get);
         	editor.commit();
@@ -154,33 +144,6 @@ public class Functions {
 	    	Log.d("except", e.getMessage());
         }
 	}
-	/*public static String getActVersion(Context context) {
-    	String get = "";
-		try {
-			Functions.testDB(context);
-			String data = "";
-        	URL url = new URL("http://linux.lsg.musin.de/cp/getActVersion.php");
-        	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
-        	conn.setDoOutput(true);
-        	conn.setRequestMethod("POST");
-        	OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        	wr.write(data);
-        	wr.flush();
-        	wr.close();
-        	//get response
-        	InputStream response = conn.getInputStream();
-        	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
-        	String line;
-        	while ((line = reader.readLine()) != null) {
-        		get += line;
-        		}
-        }
-        catch(Exception e) {
-	    	Log.d("except", e.getMessage());
-        }
-    	return get;
-	}*/
 	public static void testDB(Context context) {
     	try {
     		SQLiteDatabase myDB;
