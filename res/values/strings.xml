@@ -16,6 +16,9 @@
     <string name="at">bei</string>
     <string name="hour">Stunde</string>
     <string name="room">Raum</string>
+    <string name="networkerror">Netzwerkfehler beim Abruf</string>
+    <string name="jsonerror">Fehler beim Parsen der Daten</string>
+    <string name="loginerror">Login-Fehler \n Bitte überprüfen Sie Benutzernamen und Passwort</string>
     <string name="loading_vertretungen">Lade Vertretungen...</string>
     <string name="loading_events">Lade Termine...</string>
     <string name="downloading">Lade Update herunter</string>

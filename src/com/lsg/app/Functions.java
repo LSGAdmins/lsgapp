@@ -19,6 +19,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ListView;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 public class Functions {
 	public static final String UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
 	public static final String VP_URL     = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String EVENT_URL  = "http://linux.lsg.musin.de/cp/termine_app.php";
 	public static final String CLASS_URL  = "http://linux.lsg.musin.de/cp/getClass.php";
 	
 	public static final String helpabout = "helpabout";
@@ -94,18 +96,45 @@ public class Functions {
         		get += line;
         		}
         	return get;
-		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage()); return "errorfetching";}
+		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage()); return "networkerror";}
 	}
 	
-	public static void refreshVPlan(Context context) {
-		try {
-			Functions.testDB(context);
-			String get = Functions.getData(Functions.VP_URL, context, true);
-        	try {
+	public static Runnable getErrorRunnable(String error, final Context context) {
+		if(error.equals("jsonerror")) {
+			Runnable r = new Runnable (){
+				public void run() {
+					Toast.makeText(context, context.getString(R.string.jsonerror), Toast.LENGTH_LONG).show();
+					}
+				};
+				return r;
+				}
+		else if(error.equals("loginerror")) {
+			Runnable r = new Runnable (){
+					public void run() {
+						Toast.makeText(context, context.getString(R.string.loginerror), Toast.LENGTH_LONG).show();
+					}
+					};
+					return r;
+		}
+		else {
+			Runnable r = new Runnable (){
+					public void run() {
+						Toast.makeText(context, context.getString(R.string.networkerror), Toast.LENGTH_LONG).show();
+					}
+					};
+					return r;
+					}
+	}
+	
+	public static void refreshVPlan(final Context context, Handler h) {
+		Functions.testDB(context);
+		String get = Functions.getData(Functions.VP_URL, context, true);
+		if(!get.equals("networkerror") && !get.equals("loginerror")) {
+			try {
         		JSONArray jArray = new JSONArray(get);
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
-    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, context.MODE_PRIVATE, null);
+    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
     			myDB.delete(Functions.DB_TABLE, null, null); //clear vertretungen
         		while(i < jArray.length()) {
         			JSONObject jObject = jArray.getJSONObject(i);
@@ -124,13 +153,14 @@ public class Functions {
         			i++;
         			}
         		myDB.close();
-        		} catch(JSONException e) {Log.d("json", e.getMessage());}
-        	
-        }
-        catch(Exception e) {
-	    	Log.d("except", e.getMessage());
-        }
-	}
+        		} catch(JSONException e) {
+        			Log.d("json", e.getMessage());
+        			h.post(getErrorRunnable("jsonerror", context));
+        		}
+			}
+		else
+			h.post(getErrorRunnable(get, context));
+		}
 	public static void getClass(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
@@ -147,7 +177,7 @@ public class Functions {
 	public static void testDB(Context context) {
     	try {
     		SQLiteDatabase myDB;
-    		myDB = context.openOrCreateDatabase(DB_NAME, context.MODE_PRIVATE, null);
+    		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
     		//vertretungen
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TABLE
     				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
@@ -188,31 +218,15 @@ public class Functions {
 	public static final String DB_ENDTIMES        = "endtimes";
 	public static final String DB_TITLE           = "title";
 	public static final String DB_VENUE           = "venue";
-	public static void refreshEvents(Context context) {
-		 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		try {
-			Functions.testDB(context);
-        	URL url = new URL("http://linux.lsg.musin.de/cp/termine_app.php");
-        	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
-        	conn.setDoOutput(true);
-        	conn.setRequestMethod("POST");
-        	OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        	wr.flush();
-        	wr.close();
-        	//get response
-        	InputStream response = conn.getInputStream();
-        	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
-        	String line;
-        	String get = "";
-        	while ((line = reader.readLine()) != null) {
-        		get += line;
-        		}
-        	try {
+	public static void refreshEvents(Context context, Handler h) {
+		Functions.testDB(context);
+		String get = Functions.getData(Functions.EVENT_URL, context, false);
+		if(!get.equals("networkerror")) {
+			try {
         		JSONArray jArray = new JSONArray(get);
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
-    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, context.MODE_PRIVATE, null);
+    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
     			myDB.delete(Functions.DB_EVENTS_TABLE, null, null); //clear termine
         		while(i < jArray.length()) {
         			JSONObject jObject = jArray.getJSONObject(i);
@@ -227,11 +241,12 @@ public class Functions {
         			i++;
         			}
         		myDB.close();
-        		} catch(JSONException e) {Log.d("json", e.getMessage());}
-        	
+        		} catch(JSONException e) {
+        			Log.d("json", e.getMessage());
+        			h.post(getErrorRunnable("jsonerror", context));
+        		}	
         }
-        catch(Exception e) {
-	    	Log.d("except", e.getMessage());
-        }
+		else
+			h.post(getErrorRunnable(get, context));
 	}
 }

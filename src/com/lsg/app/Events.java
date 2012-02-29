@@ -98,7 +98,7 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 				}
 				public void run() {
 					Looper.prepare();
-			    	Functions.refreshEvents(Events.this);
+			    	Functions.refreshEvents(Events.this, handler);
 			    	Functions.getClass(Events.this);
 			    	Message msg = handler.obtainMessage();
 			    	msg.arg1 = 1;

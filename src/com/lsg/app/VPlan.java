@@ -146,7 +146,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				}
 				public void run() {
 					Looper.prepare();
-			    	Functions.refreshVPlan(VPlan.this);
+			    	Functions.refreshVPlan(VPlan.this, handler);
 			    	Functions.getClass(VPlan.this);
 			    	Message msg = handler.obtainMessage();
 			    	msg.arg1 = 1;
