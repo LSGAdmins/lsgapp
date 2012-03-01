@@ -27,10 +27,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class Functions {
-	public static final String UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
-	public static final String VP_URL     = "http://linux.lsg.musin.de/cp/vp_app.php";
-	public static final String EVENT_URL  = "http://linux.lsg.musin.de/cp/termine_app.php";
-	public static final String CLASS_URL  = "http://linux.lsg.musin.de/cp/getClass.php";
+	public static final String   UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
+	public static final String   VP_URL     = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String   EVENT_URL  = "http://linux.lsg.musin.de/cp/termine_app.php";
+	public static final String   CLASS_URL  = "http://linux.lsg.musin.de/cp/getClass.php";
+	
+	public static final String   class_key  = "class";
+	public static final String[] exclude    = {"Q11", "Q12"};
 	
 	public static final String helpabout = "helpabout";
 	public static final String help      = "help";
@@ -50,6 +53,10 @@ public class Functions {
 	public static final String DB_VERTRETUNGSTEXT = "vertretungstext";
 	public static final String DB_FACH            = "fach";
 	public static final String DB_DATE            = "date";
+	//exclude & include
+	public static final String EXCLUDE_TABLE      = "exclude";
+	public static final String INCLUDE_TABLE      = "include";
+	public static final String DB_NEEDS_SYNC      = "needssync";
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
@@ -72,6 +79,11 @@ public class Functions {
 			lv.setDivider(sage);
 			lv.setDividerHeight(2);
 		}
+	}
+	
+	public static String getFach(String title) {
+		String[] split = title.split("\\(");
+		return split[1].split("\\)")[0];
 	}
 	
 	public static String getData(String urlString, Context context, boolean login) {
@@ -201,6 +213,16 @@ public class Functions {
     	    	    + Functions.DB_FACH               + " text,"
     	    	    + Functions.DB_DATE               + " text"
     				+");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.EXCLUDE_TABLE + " ("
+    				+ Functions.DB_ROWID + " integer primary key autoincrement,"
+    				+ Functions.DB_FACH + " text,"
+    				+ Functions.DB_NEEDS_SYNC + " text"
+    				+ ");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.INCLUDE_TABLE + " ("
+    				+ Functions.DB_ROWID + " integer primary key autoincrement,"
+    				+ Functions.DB_FACH + " text,"
+    				+ Functions.DB_NEEDS_SYNC + " text"
+    				+ ");");
     		//events
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
     				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"

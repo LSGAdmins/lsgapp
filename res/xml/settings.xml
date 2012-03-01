@@ -11,6 +11,9 @@
         	android:key="password"
         	android:password="true"
         	 />
-
+        <CheckBoxPreference 
+            android:title="@string/showwithoutclass"
+            android:key="showwithoutclass"
+            android:defaultValue="true" />
     </PreferenceCategory>
 </PreferenceScreen>

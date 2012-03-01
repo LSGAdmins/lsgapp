@@ -51,7 +51,7 @@ public class lsgapp extends ListActivity {
         	String get = "";
     		try {
     			String data = "";
-            	URL url = new URL("http://linux.lsg.musin.de/cp/checkUpdate.php?version=" + getString(R.string.versioncode));
+            	URL url = new URL("http://linux.lsg.musin.de/cp/checkUpdate.php?version=" + getString(R.string.versionname));
             	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
             	conn.setDoOutput(true);

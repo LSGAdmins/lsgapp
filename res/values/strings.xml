@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, lsgapp!</string>
-    <string name="versioncode">alpha1</string>
+    <string name="versionname">alpha2</string>
     <string name="app_name">LSGäpp</string>
     <string name="act_version">Aktuelle Version</string>
     <string name="your_version">Deine Version</string>
@@ -24,6 +24,15 @@
     <string name="downloading">Lade Update herunter</string>
     <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
     <string name="no_class"></string>
+    <string name="showwithoutclass">Vertretungen ohne Klassenbezeichnung</string>
+    <string name="excludesubject">Fach ausblenden</string>
+    <string name="no_excludesubject">Fach nicht mehr ausblenden</string>
+    <string name="really_exclude">Fach wirklich ausblenden? \n Kann in Einstellungen > Blacklist geändert werden</string>
+    <string name="includesubject">Fach immer anzeigen</string>
+    <string name="no_includesubject">Fach nicht immer anzeigen</string>
+    <string name="really_include">Fach wirklich immer anzeigen? \n Kann in Einstellungen > Whitelist geändert werden</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
     <string name="all">Alle Vertretungen</string>
