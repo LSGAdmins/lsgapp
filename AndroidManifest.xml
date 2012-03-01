@@ -4,7 +4,7 @@
     android:versionCode="2"
     android:versionName="@string/versionname" android:installLocation="preferExternal">
 
-    <uses-sdk android:minSdkVersion="7" />
+    <uses-sdk android:minSdkVersion="3" />
     <uses-permission android:name="android.permission.INTERNET"/>
     
     <supports-screens android:resizeable="true"
@@ -32,6 +32,7 @@
         <activity android:name="HelpAbout"></activity>
         <activity android:label="@string/smvblog" android:name="SMVBlog"></activity>
         <activity android:label="@string/updatecheck" android:name="UpdateCheck"></activity>
+        <activity android:name="BlackWhiteList"></activity>
     </application>
 
 </manifest>

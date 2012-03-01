@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,11 +27,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	private String[] where_conds = new String[4];
@@ -88,6 +89,11 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
 		updateCondLists();
 		
+		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_TABLE);
+		long count = num_rows.simpleQueryForLong();
+		if(count == 0)
+			updateVP();
+		
 		vcursor = new VertretungCursor(this, c);
 		getListView().setAdapter(vcursor);
 		updateCursor(mine);
@@ -144,8 +150,6 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
 				where_conds, null, null, null);
-		if(c.getCount() == 0)
-			updateVP();
 		vcursor.changeCursor(c);
 		Log.d("asdf", where_cond);
 	}

@@ -11,9 +11,20 @@
         	android:key="password"
         	android:password="true"
         	 />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/vplan" >
         <CheckBoxPreference 
             android:title="@string/showwithoutclass"
             android:key="showwithoutclass"
             android:defaultValue="true" />
+        <Preference
+                android:title="@string/blacklist"
+                android:summary="@string/blacklist_summary"
+                android:key="blacklist" />
+        <Preference
+                android:title="@string/whitelist"
+                android:summary="@string/whitelist_summary"
+                android:key="whitelist" />
     </PreferenceCategory>
 </PreferenceScreen>
