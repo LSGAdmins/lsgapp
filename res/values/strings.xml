@@ -7,6 +7,7 @@
     <string name="your_version">Deine Version</string>
     <string name="your_version_is_act">Deine Version ist aktuell</string>
     <string name="vplan">Vertretungsplan</string>
+    <string name="vplan_summary">Einstellungen für den Vertretungsplan</string>
     <string name="events">Termine</string>
     <string name="settings">Einstellungen</string>
     <string name="blacklist">Blacklist</string>
@@ -16,6 +17,7 @@
     <string name="list_remove">Von Liste entfernen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="login">Zugangsdaten</string>
+    <string name="login_summary">Benutzername &amp; Passwort für den Vertretungsplan</string>
     <string name="password">Passwort</string>
     <string name="username">Benutzername</string>
     <string name="at">bei</string>

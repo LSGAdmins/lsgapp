@@ -1,20 +1,23 @@
 package com.lsg.app;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.view.KeyEvent;
-import android.widget.Toast;
 
 public class Settings extends PreferenceActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.settings);
+		
+		Functions.setTheme(false, false, this);
+		getWindow().setBackgroundDrawableResource(R.layout.background);
+		
+        addPreferencesFromResource(R.xml.login_settings);
+        addPreferencesFromResource(R.xml.vplan_settings);
+        addPreferencesFromResource(R.xml.list_settings);
         
         Preference blacklist = (Preference) findPreference("blacklist");
         blacklist.setOnPreferenceClickListener(new OnPreferenceClickListener() {

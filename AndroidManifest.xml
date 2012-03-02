@@ -33,6 +33,7 @@
         <activity android:label="@string/smvblog" android:name="SMVBlog"></activity>
         <activity android:label="@string/updatecheck" android:name="UpdateCheck"></activity>
         <activity android:name="BlackWhiteList"></activity>
+        <activity android:name="SettingsAdvanced" android:label="@string/settings" android:theme="@android:style/Theme.Holo.Light"></activity>
     </application>
 
 </manifest>

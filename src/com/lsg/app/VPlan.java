@@ -221,7 +221,11 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.settings:
-	    	Intent settings = new Intent(this, Settings.class);
+	    	Intent settings;
+	    	if(Functions.getSDK() >= 11)
+	    		settings = new Intent(this, SettingsAdvanced.class);
+	    	else
+	    		settings = new Intent(this, Settings.class);
 	    	startActivity(settings);
 	        return true;
 	    case R.id.refresh:

@@ -1,0 +1,10 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/vplan" >
+        <CheckBoxPreference 
+            android:title="@string/showwithoutclass"
+            android:key="showwithoutclass"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

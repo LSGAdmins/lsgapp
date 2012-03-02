@@ -81,7 +81,7 @@ public class lsgapp extends ListActivity {
             					       .setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
             					           public void onClick(DialogInterface dialog, int id) {
             					       		Toast.makeText(lsgapp.this, getString(R.string.downloading), Toast.LENGTH_LONG).show();
-            					        	   if(Build.VERSION.SDK_INT >= 9) {
+            					        	   if(Functions.getSDK() >= 9) {
             					        		   down.download();
             					        	   }
             					        	   else {
@@ -120,7 +120,7 @@ public class lsgapp extends ListActivity {
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_listitem, actions));
         Functions.styleListView(getListView(), this);
         
-        if(Build.VERSION.SDK_INT >= 9)
+        if(Functions.getSDK() >= 9)
  		   down = new Download(lsgapp.this);
         
         UpdateCheck uCheck = new UpdateCheck(handler);
@@ -155,13 +155,13 @@ public class lsgapp extends ListActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		if(Build.VERSION.SDK_INT >= 9)
+		if(Functions.getSDK() >= 9)
 			unregisterReceiver(down.downloadReceiver);
 	}
 	@Override
 	public void onResume() {
 		super.onResume();
-		if(Build.VERSION.SDK_INT >= 9) {
+		if(Functions.getSDK() >= 9) {
 			IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
 			registerReceiver(down.downloadReceiver, intentFilter);
 		}

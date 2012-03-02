@@ -1,0 +1,11 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <Preference
+                android:title="@string/blacklist"
+                android:summary="@string/blacklist_summary"
+                android:key="blacklist" />
+        <Preference
+                android:title="@string/whitelist"
+                android:summary="@string/whitelist_summary"
+                android:key="whitelist" />
+</PreferenceScreen>

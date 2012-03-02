@@ -65,7 +65,7 @@ public class Functions {
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
-		if(Build.VERSION.SDK_INT >= 11) {
+		if(Functions.getSDK() >= 11) {
 			theme = android.R.style.Theme_Holo_Light;
 			if(dialog)
 				theme = android.R.style.Theme_Holo_Light_Dialog;
@@ -75,7 +75,7 @@ public class Functions {
 			}
 		}
 		act.setTheme(theme);
-		if(homeasup && Build.VERSION.SDK_INT >= 11) {
+		if(homeasup && Functions.getSDK() >= 11) {
 			try {
 				Advanced.homeasup(act);
 			} catch (Exception e) {
@@ -88,6 +88,13 @@ public class Functions {
 			lv.setDivider(sage);
 			lv.setDividerHeight(2);
 		}
+	}
+	
+	public static int getSDK() {
+		if(Build.VERSION.SDK.equals("3"))
+			return 3;
+		else
+			return Build.VERSION.SDK_INT;
 	}
 	
 	public static String getFach(String title) {

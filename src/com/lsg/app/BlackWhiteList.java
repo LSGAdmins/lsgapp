@@ -1,24 +1,19 @@
 package com.lsg.app;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class BlackWhiteList extends ListActivity {
 	private SQLiteDatabase myDB;
@@ -30,6 +25,8 @@ public class BlackWhiteList extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		Functions.setTheme(false, true, this);
+		Functions.styleListView(getListView(), this);
+		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
 		myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
 		
