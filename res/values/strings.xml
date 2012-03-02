@@ -13,6 +13,7 @@
     <string name="blacklist_summary">Die Blacklist bearbeiten</string>
     <string name="whitelist">Whitelist</string>
     <string name="whitelist_summary">Die Whitelist bearbeiten</string>
+    <string name="list_remove">Von Liste entfernen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="login">Zugangsdaten</string>
     <string name="password">Passwort</string>

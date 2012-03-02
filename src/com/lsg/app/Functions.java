@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -74,8 +75,12 @@ public class Functions {
 			}
 		}
 		act.setTheme(theme);
-		if(homeasup && Build.VERSION.SDK_INT >= 11)
-			Advanced.homeasup(act);
+		if(homeasup && Build.VERSION.SDK_INT >= 11) {
+			try {
+				Advanced.homeasup(act);
+			} catch (Exception e) {
+			}
+		}
 	}
 	public static void styleListView(ListView lv, Context context) {
 		if(Build.VERSION.SDK_INT >= 11) {
