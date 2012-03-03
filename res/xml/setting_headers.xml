@@ -2,21 +2,21 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header android:fragment="com.lsg.app.SettingsAdvanced$LoginFragment"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@drawable/ic_login"
             android:title="@string/login"
             android:summary="@string/login_summary" />
     <header android:fragment="com.lsg.app.SettingsAdvanced$VPlanFragment"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@drawable/ic_vplan"
             android:title="@string/vplan"
             android:summary="@string/vplan_summary" />
     <header android:fragment="com.lsg.app.SettingsAdvanced$BlackWhiteListFragment"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@drawable/ic_blacklist"
             android:title="@string/blacklist"
             android:summary="@string/blacklist_summary" >
             	<extra android:name="list" android:value="blacklist" />
             </header>
     <header android:fragment="com.lsg.app.SettingsAdvanced$BlackWhiteListFragment"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@drawable/ic_whitelist"
             android:title="@string/whitelist"
             android:summary="@string/whitelist_summary" >
             	<extra android:name="list" android:value="whitelist" />
