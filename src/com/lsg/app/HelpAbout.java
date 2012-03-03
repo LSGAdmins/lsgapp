@@ -25,10 +25,6 @@ public class HelpAbout extends Activity {
 			setContentView(R.layout.about);
 			setTitle(getString(R.string.about));
 		}
-		if(Build.VERSION.SDK_INT >=11) {
-			ActionBar actionBar = getActionBar();
-		    actionBar.setDisplayHomeAsUpEnabled(true); //click on logo should go back to device selection
-		}
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

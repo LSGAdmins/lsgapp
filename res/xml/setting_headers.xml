@@ -12,7 +12,7 @@
     <header android:fragment="com.lsg.app.SettingsAdvanced$BlackWhiteListFragment"
             android:icon="@drawable/ic_launcher"
             android:title="@string/blacklist"
-            android:summary="@string/vplan_summary" >
+            android:summary="@string/blacklist_summary" >
             	<extra android:name="list" android:value="blacklist" />
             </header>
     <header android:fragment="com.lsg.app.SettingsAdvanced$BlackWhiteListFragment"

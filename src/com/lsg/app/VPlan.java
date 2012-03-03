@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,7 +30,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	private String[] where_conds = new String[4];
@@ -74,7 +72,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
 		//set header search bar
-		if(Build.VERSION.SDK_INT < 11) {
+		if(Functions.getSDK() < 11) {
 			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
 			View search = inflater.inflate(R.layout.search, null);
 			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
@@ -82,8 +80,12 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 			getListView().addHeaderView(search);
 		}
         
-		if(Build.VERSION.SDK_INT >= 11) {
-			Advanced.dropDownNav(this);
+		if(Functions.getSDK() >= 11) {
+			try {
+				AdvancedWrapper actHelper = new AdvancedWrapper();
+				actHelper.dropDownNav(this);
+			} catch (Exception e) { Log.d("asdf", e.getMessage()); }
+			
 		}
 		
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
@@ -196,9 +198,9 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.vplan, menu);
-	    if(Build.VERSION.SDK_INT >= 11) {
-	    	Advanced search = new Advanced();
-	    	search.searchBarInit(menu, this);
+	    if(Functions.getSDK() >= 11) {
+	    	AdvancedWrapper ahelp = new AdvancedWrapper();
+	    	ahelp.searchBar(menu, this);
 	    }
 	    else
 	    	menu.removeItem(R.id.search);
@@ -208,7 +210,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.removeItem(R.id.all);
 		menu.removeItem(R.id.mine);
-	    if(Build.VERSION.SDK_INT < 11) {
+	    if(Functions.getSDK() < 11) {
 	    	if(mine)
 	    		menu.add(0, R.id.all, Menu.NONE, R.string.all);
 	    	else
@@ -315,7 +317,6 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	  final CharSequence title = ((TextView) info.targetView.findViewById(R.id.vertretung_title)).getText();
 	  int menuItemIndex = item.getItemId(); //das ist die nummer der ausgewählten option, wenn mehr als eine verfügbar ist
 	  if(menuItemIndex == 0) {
-		  Toast.makeText(getApplicationContext(), "exclude", Toast.LENGTH_LONG).show();
 		  DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {
@@ -337,7 +338,6 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 			.setNegativeButton(this.getString(R.string.no), dialogClickListener).show();
 	  }
 	  if(menuItemIndex == 1) {
-		  Toast.makeText(getApplicationContext(), "exclude", Toast.LENGTH_LONG).show();
 		  DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {

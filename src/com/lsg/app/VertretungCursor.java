@@ -40,6 +40,8 @@ public class VertretungCursor extends CursorAdapter {
 			holder.vtext = (TextView) rowView.findViewById(R.id.vertretung_text);
 			holder.bottom = (TextView) rowView.findViewById(R.id.vertretung_bottom);
 			holder.webv = (WebView) rowView.findViewById(R.id.standard_webview);
+			if(Functions.getSDK() < 11)
+				holder.klasse.setBackgroundResource(R.layout.divider_gradient);
 			rowView.setTag(holder);
 			return rowView;
 			}

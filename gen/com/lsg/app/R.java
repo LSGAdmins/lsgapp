@@ -66,13 +66,14 @@ public final class R {
     public static final class layout {
         public static final int about=0x7f030000;
         public static final int background=0x7f030001;
-        public static final int events_item=0x7f030002;
-        public static final int help=0x7f030003;
-        public static final int main_listitem=0x7f030004;
-        public static final int search=0x7f030005;
-        public static final int standard=0x7f030006;
-        public static final int updatecheck=0x7f030007;
-        public static final int vertretung_item=0x7f030008;
+        public static final int divider_gradient=0x7f030002;
+        public static final int events_item=0x7f030003;
+        public static final int help=0x7f030004;
+        public static final int main_listitem=0x7f030005;
+        public static final int search=0x7f030006;
+        public static final int standard=0x7f030007;
+        public static final int updatecheck=0x7f030008;
+        public static final int vertretung_item=0x7f030009;
     }
     public static final class menu {
         public static final int events=0x7f080000;

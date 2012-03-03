@@ -53,7 +53,7 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
 		//set header search bar
-		if(Build.VERSION.SDK_INT < 11) {
+		if(Functions.getSDK() < 11) {
 			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
 			View search = inflater.inflate(R.layout.search, null);
 			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
@@ -111,9 +111,11 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.events, menu);
-	    if(Build.VERSION.SDK_INT >= 11) {
-	    	Advanced search = new Advanced();
-	    	search.searchBarInit(menu, this);
+	    if(Functions.getSDK() >= 11) {
+	    	/*Advanced search = new Advanced();
+	    	search.searchBarInit(menu, this);*/
+	    	AdvancedWrapper advWrapper = new AdvancedWrapper();
+	    	advWrapper.searchBar(menu, this);
 	    }
 	    else
 	    	menu.removeItem(R.id.search);

@@ -75,15 +75,17 @@ public class Functions {
 			}
 		}
 		act.setTheme(theme);
+		
 		if(homeasup && Functions.getSDK() >= 11) {
 			try {
-				Advanced.homeasup(act);
+				AdvancedWrapper advWrapper = new AdvancedWrapper();
+				advWrapper.homeasup(act);
 			} catch (Exception e) {
 			}
 		}
 	}
 	public static void styleListView(ListView lv, Context context) {
-		if(Build.VERSION.SDK_INT >= 11) {
+		if(Functions.getSDK() >= 11) {
 			ColorDrawable sage = new ColorDrawable(context.getResources().getColor(R.color.seperatorgrey));
 			lv.setDivider(sage);
 			lv.setDividerHeight(2);
@@ -91,10 +93,11 @@ public class Functions {
 	}
 	
 	public static int getSDK() {
-		if(Build.VERSION.SDK.equals("3"))
+		return new Integer(Build.VERSION.SDK);
+		/*if(Build.VERSION.SDK.equals("3"))
 			return 3;
 		else
-			return Build.VERSION.SDK_INT;
+			return Build.VERSION.SDK_INT;*/
 	}
 	
 	public static String getFach(String title) {
@@ -142,7 +145,11 @@ public class Functions {
 			Runnable r = new Runnable (){
 					public void run() {
 						Toast.makeText(context, context.getString(R.string.loginerror), Toast.LENGTH_LONG).show();
-						Intent intent = new Intent(context, Settings.class);
+						Intent intent;
+						if(Functions.getSDK() >= 11)
+							intent = new Intent(context, SettingsAdvanced.class);
+						else
+							intent = new Intent(context, Settings.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 						context.startActivity(intent);
 					}

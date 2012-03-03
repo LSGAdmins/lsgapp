@@ -29,6 +29,10 @@ public class EventCursor extends CursorAdapter {
 			holder.title = (TextView) rowView.findViewById(R.id.event_title);
 			holder.date = (TextView) rowView.findViewById(R.id.event_date);
 			holder.place = (TextView) rowView.findViewById(R.id.event_place);
+			
+
+			if(Functions.getSDK() < 11)
+				holder.month.setBackgroundResource(R.layout.divider_gradient);
 			rowView.setTag(holder);
 			return rowView;
 			}

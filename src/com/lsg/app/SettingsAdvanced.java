@@ -3,6 +3,7 @@ package com.lsg.app;
 import java.util.List;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -117,5 +118,18 @@ public class SettingsAdvanced extends PreferenceActivity {
     	    }
     	}
     }
-
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+        case android.R.id.home:
+            // app icon in action bar clicked; go home
+            Intent intent = new Intent(this, VPlan.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+	}
 }
