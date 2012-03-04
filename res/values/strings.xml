@@ -17,6 +17,7 @@
     <string name="whitelist_summary">Die Whitelist bearbeiten</string>
     <string name="list_remove">Von Liste entfernen</string>
     <string name="refresh">Aktualisieren</string>
+    <string name="noact">Keine Aktualisierung der Vertretungen notwendig</string>
     <string name="login">Zugangsdaten</string>
     <string name="login_summary">Benutzername &amp; Passwort für den Vertretungsplan</string>
     <string name="password">Passwort</string>

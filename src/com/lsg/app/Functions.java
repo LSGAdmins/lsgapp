@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -17,7 +18,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -32,10 +32,11 @@ public class Functions {
 	public static final String   BLACKLIST      = "blacklist";
 	public static final String   WHITELIST      = "whitelist";
 	
-	public static final String   UPDATE_URL = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
-	public static final String   VP_URL     = "http://linux.lsg.musin.de/cp/vp_app.php";
-	public static final String   EVENT_URL  = "http://linux.lsg.musin.de/cp/termine_app.php";
-	public static final String   CLASS_URL  = "http://linux.lsg.musin.de/cp/getClass.php";
+	public static final String   UPDATE_URL  = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
+	public static final String   VP_URL      = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String   EVENT_URL   = "http://linux.lsg.musin.de/cp/termine_app.php";
+	public static final String   CLASS_URL   = "http://linux.lsg.musin.de/cp/getClass.php";
+	public static final String   API_VERSION = "2";
 	
 	public static final String   class_key  = "class";
 	public static final String[] exclude    = {"Q11", "Q12"};
@@ -101,16 +102,12 @@ public class Functions {
 			return Build.VERSION.SDK_INT;*/
 	}
 	
-	/*public static String getFach(String title) {
-		String[] split = title.split("\\(");
-		return split[1].split("\\)")[0];
-	}*/
-	
-	public static String getData(String urlString, Context context, boolean login) {
+	public static String getData(String urlString, Context context, boolean login, String add) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
-			String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("username", ""), "UTF-8");
-        	data       += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("password", ""), "UTF-8");
+			String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("username", ""), "UTF-8")
+					+ "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("password", ""), "UTF-8")
+					+ "&" + URLEncoder.encode("api", "UTF-8") + "=" + URLEncoder.encode(Functions.API_VERSION, "UTF-8") + add;
         	URL url = new URL(urlString);
         	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
@@ -128,6 +125,7 @@ public class Functions {
         	while ((line = reader.readLine()) != null) {
         		get += line;
         		}
+        	Log.d("get", get);
         	return get;
 		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage()); return "networkerror";}
 	}
@@ -169,15 +167,21 @@ public class Functions {
 	
 	public static boolean refreshVPlan(final Context context, Handler h) {
 		Functions.testDB(context);
-		String get = Functions.getData(Functions.VP_URL, context, true);
-		if(!get.equals("networkerror") && !get.equals("loginerror")) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		String add = "";
+		try {
+			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("date", ""), "UTF-8")
+					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("time", ""), "UTF-8");
+		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+		String get = Functions.getData(Functions.VP_URL, context, true, add);
+		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
 			try {
         		JSONArray jArray = new JSONArray(get);
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
     			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
     			myDB.delete(Functions.DB_TABLE, null, null); //clear vertretungen
-        		while(i < jArray.length()) {
+        		while(i < jArray.length() - 1) {
         			JSONObject jObject = jArray.getJSONObject(i);
         			ContentValues values = new ContentValues();
         			values.put(Functions.DB_KLASSENSTUFE, jObject.getString("klassenstufe"));
@@ -194,6 +198,13 @@ public class Functions {
             		myDB.insert(Functions.DB_TABLE, null, values);
         			i++;
         			}
+        		JSONObject jObject            = jArray.getJSONObject(i);
+        		String date                   = jObject.getString("date");
+        		String time                   = jObject.getString("time");
+        		SharedPreferences.Editor edit = prefs.edit();
+        		edit.putString("date", date);
+        		edit.putString("time", time);
+        		edit.commit();
         		myDB.close();
         		} catch(JSONException e) {
         			Log.d("json", e.getMessage());
@@ -201,6 +212,15 @@ public class Functions {
         			return false;
         		}
 			}
+		else if(get.equals("noact")) {
+			Runnable r = new Runnable() {
+				public void run() {
+					Toast.makeText(context, context.getString(R.string.noact), Toast.LENGTH_SHORT).show();
+				}
+			};
+			h.post(r);
+			return true;
+		}
 		else {
 			h.post(getErrorRunnable(get, context));
 			return false;
@@ -211,7 +231,7 @@ public class Functions {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
 			Functions.testDB(context);
-			String get = Functions.getData(Functions.CLASS_URL, context, true);
+			String get = Functions.getData(Functions.CLASS_URL, context, true, "");
         	SharedPreferences.Editor editor = prefs.edit();
         	editor.putString("class", get);
         	editor.commit();
@@ -288,7 +308,7 @@ public class Functions {
 	public static final String DB_VENUE           = "venue";
 	public static boolean refreshEvents(Context context, Handler h) {
 		Functions.testDB(context);
-		String get = Functions.getData(Functions.EVENT_URL, context, false);
+		String get = Functions.getData(Functions.EVENT_URL, context, false, "");
 		if(!get.equals("networkerror")) {
 			try {
         		JSONArray jArray = new JSONArray(get);
