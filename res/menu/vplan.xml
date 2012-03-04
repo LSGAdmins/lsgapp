@@ -19,4 +19,7 @@
         <item android:id="@+id/all"
             android:icon="@drawable/ic_launcher"
             android:title="@string/all" />
+        <item android:id="@+id/subjects"
+            android:icon="@drawable/ic_launcher"
+            android:title="@string/subjectlist" />
     </menu>

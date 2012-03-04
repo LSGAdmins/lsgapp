@@ -83,6 +83,9 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 		}
 		ecursor.changeCursor(d);
 	}
+	public void updateList() {
+		updateCursor();
+	}
 	public void updateEvents() {
 		if(!update_locked) {
 			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events), true);

@@ -130,7 +130,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		while(i < include.getCount()) {
 			String fach = include.getString(include.getColumnIndex(Functions.DB_FACH));
 			include_cond += connector + Functions.DB_FACH + " LIKE '%" + fach + "%' ";
-			connector = "OR";
+			connector = " OR ";
 			include.moveToNext();
 			i++;
 		}
@@ -173,6 +173,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		updateCursor(mine);
 	}
 	public void updateList() {
+		updateCondLists();
 		updateCursor(this.mine);
 	}
 	@Override
@@ -249,6 +250,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	    case R.id.all:
 	    	updateCursor(false);
 	    	return true;
+	    case R.id.subjects:
+            Intent subjects = new Intent(this, SubjectList.class);
+            startActivity(subjects);
+	    	return true;
         case android.R.id.home:
             // app icon in action bar clicked; go home
             Intent intent = new Intent(this, lsgapp.class);
@@ -276,112 +281,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		Cursor cur = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-				new String[] {new Long(info.id).toString()}, null, null, null);
-		cur.moveToFirst();
-		
-		String klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
-		String rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-		String fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
-		cur.close();
-		
-		int conmenu = 0;
-		int i = 0;
-		while(i < Functions.exclude.length) {
-			if(klasse.contains(Functions.exclude[i]))
-				conmenu = 1;
-			i++;
-			}
-		if(klasse.equals("null"))
-			conmenu = 1;
-		
-		Cursor exclude = myDB.query(Functions.EXCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_FACH + " LIKE ?",
-				new String[] {rawfach}, null, null, null);
-		if(exclude.getCount() > 0)
-			conmenu = 2;
-
-		Cursor include = myDB.query(Functions.INCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_FACH + " LIKE ?",
-				new String[] {rawfach}, null, null, null);
-		if(include.getCount() > 0)
-			conmenu = 3;
-		
-		if(conmenu == 1) {
-			menu.setHeaderTitle(fach + " (" + rawfach + ")");
-			menu.add(Menu.NONE, 0, 0, this.getString(R.string.excludesubject));
-			menu.add(Menu.NONE, 1, 0, this.getString(R.string.includesubject));
-		}
-		else if(conmenu == 2) {
-			menu.setHeaderTitle(fach + " (" + rawfach + ")");
-			menu.add(Menu.NONE, 2, 0, this.getString(R.string.no_excludesubject));
-		}
-		else if(conmenu == 3) {
-			menu.setHeaderTitle(fach + " (" + rawfach + ")");
-			menu.add(Menu.NONE, 3, 0, this.getString(R.string.no_includesubject));
-		}
+		Functions.createContextMenu(menu, v, menuInfo, myDB, this);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-	  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-	  
-	  Cursor cur = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-			  new String[] {new Long(info.id).toString()}, null, null, null);
-	  cur.moveToFirst();
-	  
-	  //final String klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
-	  final String rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-	  final String fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
-	  cur.close();
-	  final String prompt;
-	  final String table;
-		
-	  //final CharSequence title = ((TextView) info.targetView.findViewById(R.id.vertretung_title)).getText();
-	  int menuItemIndex = item.getItemId();
-	  if(menuItemIndex == 0) {
-		  prompt = getString(R.string.really_exclude);
-		  table  = Functions.EXCLUDE_TABLE;
-	  }
-	  else if(menuItemIndex == 1) {
-		  prompt = getString(R.string.really_include);
-		  table  = Functions.INCLUDE_TABLE;
-	  }
-	  else {
-		  //this code shouldnt be executed, its just for the compiler not to complain :-)
-		  prompt = "";
-		  table = "";
-	  }
-	  if(menuItemIndex == 0 || menuItemIndex == 1) {
-		  DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        switch (which){
-			        case DialogInterface.BUTTON_POSITIVE:
-			        	ContentValues vals = new ContentValues();
-			        	vals.put(Functions.DB_FACH, fach);
-			        	vals.put(Functions.DB_RAW_FACH, rawfach);
-			        	vals.put(Functions.DB_NEEDS_SYNC, "true");
-			        	VPlan.this.myDB.insert(table, null, vals);
-			        	updateCondLists();
-			        	updateList();
-			            break;
-			        }
-			    }
-			};
-		  AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(prompt)
-			.setPositiveButton(this.getString(R.string.yes), dialogClickListener)
-			.setNegativeButton(this.getString(R.string.no), dialogClickListener).show();
-	  }
-	  if(menuItemIndex == 2) {
-		  myDB.delete(Functions.EXCLUDE_TABLE, Functions.DB_RAW_FACH + " = ?", new String[] {rawfach});
-		  updateCondLists();
-		  updateList();
-	  }
-	  if(menuItemIndex == 3) {
-		  myDB.delete(Functions.INCLUDE_TABLE, Functions.DB_RAW_FACH + " = ?", new String[] {rawfach});
-		  updateCondLists();
-		  updateList();
-	  }
-	  return true;
+		return Functions.contextMenuSelect(item, myDB, this, this);
 	}
 }
