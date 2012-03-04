@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -18,6 +17,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -57,6 +57,7 @@ public class Functions {
 	public static final String DB_ART             = "art";
 	public static final String DB_VERTRETUNGSTEXT = "vertretungstext";
 	public static final String DB_FACH            = "fach";
+	public static final String DB_RAW_FACH        = "rawfach";
 	public static final String DB_DATE            = "date";
 	//exclude & include
 	public static final String EXCLUDE_TABLE      = "exclude";
@@ -100,10 +101,10 @@ public class Functions {
 			return Build.VERSION.SDK_INT;*/
 	}
 	
-	public static String getFach(String title) {
+	/*public static String getFach(String title) {
 		String[] split = title.split("\\(");
 		return split[1].split("\\)")[0];
-	}
+	}*/
 	
 	public static String getData(String urlString, Context context, boolean login) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -188,6 +189,7 @@ public class Functions {
         			values.put(Functions.DB_ART, jObject.getString("art"));
         			values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
         			values.put(Functions.DB_FACH, jObject.getString("fach"));
+        			values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
         			values.put(Functions.DB_DATE, jObject.getString("date"));
             		myDB.insert(Functions.DB_TABLE, null, values);
         			i++;
@@ -256,10 +258,22 @@ public class Functions {
     	    	    + Functions.DB_TITLE              + " text,"
     	    	    + Functions.DB_VENUE              + " text"
     				+");");
+    		/*Cursor c = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_RAW_FACH}, null, null, null, null, null);
+    		if(c.getColumnIndex(Functions.DB_RAW_FACH) != -1)
+    			myDB.setVersion(1);*/
     		//upgrades for table
-    		/*if(myDB.getVersion() == 0) {
+    		if(myDB.getVersion() == 0) {
+    			Log.d(Functions.DB_TABLE, "adding column " + Functions.DB_RAW_FACH);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
     			myDB.setVersion(1);
-    		}*/
+    		}
+    		if(myDB.getVersion() == 1) {
+    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
+    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
+    			Log.d(Functions.INCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
+    			myDB.execSQL("ALTER TABLE " + Functions.INCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
+    			myDB.setVersion(2);
+    		}
     		myDB.close();
         } catch (Exception e) { Log.d("db", e.getMessage());}
 	}

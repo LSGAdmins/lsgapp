@@ -8,6 +8,7 @@
     <string name="your_version_is_act">Deine Version ist aktuell</string>
     <string name="vplan">Vertretungsplan</string>
     <string name="vplan_summary">Einstellungen für den Vertretungsplan</string>
+    <string name="vplan_empty">Keine Vertretungen!</string>
     <string name="events">Termine</string>
     <string name="settings">Einstellungen</string>
     <string name="blacklist">Blacklist</string>
@@ -31,13 +32,16 @@
     <string name="downloading">Lade Update herunter</string>
     <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
     <string name="no_class"></string>
-    <string name="showwithoutclass">Vertretungen ohne Klassenbezeichnung</string>
+    <string name="showwithoutclass">Vertretungen ohne Klassenbezeichnung anzeigen</string>
+    <string name="showonlywhitelist">Nur Vertretungen aus Whitelist anzeigen</string>
     <string name="excludesubject">Fach ausblenden</string>
     <string name="no_excludesubject">Fach nicht mehr ausblenden</string>
     <string name="really_exclude">Fach wirklich ausblenden? \n Kann in Einstellungen > Blacklist geändert werden</string>
+    <string name="exclude_empty">Keine Fächer in der Blacklist</string>
     <string name="includesubject">Fach immer anzeigen</string>
     <string name="no_includesubject">Fach nicht immer anzeigen</string>
     <string name="really_include">Fach wirklich immer anzeigen? \n Kann in Einstellungen > Whitelist geändert werden</string>
+    <string name="include_empty">Keine Fächer in die Whitelist</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="classes">Klassen</string>

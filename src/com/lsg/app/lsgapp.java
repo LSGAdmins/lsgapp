@@ -1,7 +1,6 @@
 package com.lsg.app;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -14,25 +13,19 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ListActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.ParcelFileDescriptor;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -112,6 +105,7 @@ public class lsgapp extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	super.onCreate(savedInstanceState);
         Functions.setTheme(false, false, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
         super.onCreate(savedInstanceState);

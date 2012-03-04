@@ -23,6 +23,7 @@ public class BlackWhiteList extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.list);
 		
 		Functions.setTheme(false, true, this);
 		Functions.styleListView(getListView(), this);
@@ -41,7 +42,7 @@ public class BlackWhiteList extends ListActivity {
 			table = new String(Functions.INCLUDE_TABLE);
 		}
 		
-		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH, Functions.DB_NEEDS_SYNC},
+		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
 				null, null, null, null, null);
 		
 		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
@@ -49,9 +50,17 @@ public class BlackWhiteList extends ListActivity {
 		setListAdapter(adap);
 		
 		registerForContextMenu(getListView());
+		
+		//info if listview empty
+        getListView().setEmptyView(findViewById(R.id.list_view_empty));
+        TextView textv = (TextView) findViewById(R.id.list_view_empty);
+        if(table.equals(Functions.EXCLUDE_TABLE))
+        	textv.setText(R.string.exclude_empty);
+        else
+        	textv.setText(R.string.include_empty);
 	}
 	public void updateList() {
-		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH, Functions.DB_NEEDS_SYNC},
+		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
 				null, null, null, null, null);
 		adap.changeCursor(c);
 	}
@@ -67,10 +76,10 @@ public class BlackWhiteList extends ListActivity {
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-		final CharSequence title = ((TextView) info.targetView.findViewById(R.id.main_textview)).getText();
+		long _id          = info.id;
 		int menuItemIndex = item.getItemId();
 		if(menuItemIndex == 0) {
-			myDB.delete(table, Functions.DB_FACH + " LIKE ?", new String[] {(String) title});
+			myDB.delete(table, Functions.DB_ROWID + " = ?", new String[] {new Long(_id).toString()});
 			updateList();
 		}
 		return true;
@@ -88,5 +97,10 @@ public class BlackWhiteList extends ListActivity {
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
+	}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		c.close();
 	}
 }

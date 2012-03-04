@@ -4,16 +4,22 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleCursorAdapter;
@@ -36,8 +42,6 @@ public class SettingsAdvanced extends PreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            
-            // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.login_settings);
         }
     }
@@ -47,6 +51,19 @@ public class SettingsAdvanced extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.vplan_settings);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int i = 0;
+            boolean showonlywhitelist = false;
+            while(i < Functions.exclude.length) {
+            	if(Functions.exclude[i].equals(prefs.getString(Functions.class_key, "")))
+            		showonlywhitelist = true;
+            	i++;
+            }
+            if(!showonlywhitelist) {
+            	PreferenceCategory prefCat = (PreferenceCategory) findPreference(getString(R.string.vplan));
+            	CheckBoxPreference onlywhitelist = (CheckBoxPreference) findPreference("showonlywhitelist");
+            	prefCat.removePreference(onlywhitelist);
+            }
         }
     }
 
@@ -70,7 +87,7 @@ public class SettingsAdvanced extends PreferenceActivity {
     			table = new String(Functions.INCLUDE_TABLE);
     		}
     		
-    		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH, Functions.DB_NEEDS_SYNC},
+    		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
     				null, null, null, null, null);
     		
     		adap = new SimpleCursorAdapter(getActivity(), R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
@@ -78,12 +95,27 @@ public class SettingsAdvanced extends PreferenceActivity {
     		setListAdapter(adap);
     	}
     	@Override
+    	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    		return inflater.inflate(R.layout.list, container, false);
+    		}
+    	@Override
+    	public void onStart() {
+    		super.onStart();
+    		//info if listview empty
+    		TextView textv = (TextView) getActivity().findViewById(R.id.list_view_empty);
+    		if(table.equals(Functions.EXCLUDE_TABLE))
+    			textv.setText(R.string.exclude_empty);
+    		else
+    			textv.setText(R.string.include_empty);
+            getListView().setEmptyView(getActivity().findViewById(R.id.list_view_empty));
+    	}
+    	@Override
     	public void onResume() {
     		super.onResume();
     		registerForContextMenu(getListView());
     	}
     	public void updateList() {
-    		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH, Functions.DB_NEEDS_SYNC},
+    		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
     				null, null, null, null, null);
     		adap.changeCursor(c);
     	}
@@ -99,10 +131,10 @@ public class SettingsAdvanced extends PreferenceActivity {
     	@Override
     	public boolean onContextItemSelected(final MenuItem item) {
     		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-    		final CharSequence title = ((TextView) info.targetView.findViewById(R.id.main_textview)).getText();
+    		long _id          = info.id;
     		int menuItemIndex = item.getItemId();
     		if(menuItemIndex == 0) {
-    			myDB.delete(table, Functions.DB_FACH + " LIKE ?", new String[] {(String) title});
+    			myDB.delete(table, Functions.DB_ROWID + " = ?", new String[] {new Long(_id).toString()});
     			updateList();
     		}
     		return true;
@@ -116,6 +148,11 @@ public class SettingsAdvanced extends PreferenceActivity {
     	    default:
     	        return super.onOptionsItemSelected(item);
     	    }
+    	}
+    	@Override
+    	public void onDestroy() {
+    		super.onDestroy();
+    		c.close();
     	}
     }
 	@Override

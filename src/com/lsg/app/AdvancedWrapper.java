@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import android.app.Activity;
 import android.view.Menu;
+import android.webkit.WebView;
 
 public class AdvancedWrapper {
 	public void dropDownNav(VPlan vplan) {
@@ -13,5 +14,8 @@ public class AdvancedWrapper {
 		}
 	public void homeasup(Activity act) {
 		Advanced.homeasup(act);
+	}
+	public void postUrl(WebView webv, String url, byte[] data) {
+		webv.postUrl(url, data);
 	}
 	}

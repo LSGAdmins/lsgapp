@@ -40,8 +40,12 @@ public class SMVBlog extends Activity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String postData = "log=" + prefs.getString("username", "")
 				+ "&pwd=" + prefs.getString("password", "") + "&redirect_to=http://www.lsg.musin.de/smv/aktuelles/";
-		if(Functions.getSDK() >= 5)
-			webview.postUrl("http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
+		if(Functions.getSDK() >= 5) {
+			AdvancedWrapper advWrapper = new AdvancedWrapper();
+			advWrapper.postUrl(webview, "http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
+			advWrapper = null;
+			//webview.postUrl("http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
+		}
 		else
 			webview.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
 	}
