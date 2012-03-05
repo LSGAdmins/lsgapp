@@ -58,7 +58,6 @@ public final class R {
         public static final int settings=0x7f090016;
         public static final int standard_rellayout=0x7f090007;
         public static final int standard_webview=0x7f09000f;
-        public static final int subjects=0x7f090019;
         public static final int updatecheck_actversion=0x7f090011;
         public static final int updatecheck_yourversion=0x7f090010;
         public static final int vertretung_bottom=0x7f09000e;

@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -250,6 +251,45 @@ public class Functions {
 	    	Log.d("except", e.getMessage());
         }
 	}
+	public static void cleanDB(Context context) {
+		Date now  = new Date();
+		int year_now  = now.getYear();
+		int month_now = now.getMonth();
+		int day_now   = now.getDay();
+		SQLiteDatabase myDB;
+		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+		Cursor result = myDB.rawQuery("SELECT DISTINCT " + Functions.DB_DATE + " FROM " + Functions.DB_TABLE, null);
+		result.moveToFirst();
+		int i = 0;
+		while(i < result.getCount()) {
+			String date = result.getString(result.getColumnIndex(Functions.DB_DATE));
+			String[] splitdate = date.split("\\.");
+			int year  = new Integer(splitdate[2]);
+			int month = new Integer(splitdate[1]);
+			int day   = new Integer(splitdate[0]);
+			
+			boolean isvalid = false;
+			if(!(year < year_now+1)) {
+				isvalid = true;
+				}
+			else if(year == year_now) {
+				if(!(month < month_now+1)) {
+					isvalid = true;
+					}
+				else if(month == month_now) {
+					if(!(day < day_now)) {
+						isvalid = true;
+						}
+					}
+				}
+			if(!isvalid) {
+				myDB.execSQL("DELETE FROM " + Functions.DB_TABLE + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
+				}
+			i++;
+		}
+		result.close();
+		myDB.close();
+	}
 	public static void testDB(Context context) {
     	try {
     		SQLiteDatabase myDB;
@@ -306,6 +346,7 @@ public class Functions {
     		}
     		myDB.close();
         } catch (Exception e) { Log.d("db", e.getMessage());}
+    	Functions.cleanDB(context);
 	}
 	
 	//Termine

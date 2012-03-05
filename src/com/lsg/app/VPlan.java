@@ -250,10 +250,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	    case R.id.all:
 	    	updateCursor(false);
 	    	return true;
-	    case R.id.subjects:
+	    /*case R.id.subjects:
             Intent subjects = new Intent(this, SubjectList.class);
             startActivity(subjects);
-	    	return true;
+	    	return true;*/
         case android.R.id.home:
             // app icon in action bar clicked; go home
             Intent intent = new Intent(this, lsgapp.class);
