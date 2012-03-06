@@ -5,8 +5,4 @@
             android:title="@string/search"
             android:showAsAction="ifRoom|withText"
             android:actionViewClass="android.widget.SearchView" />
-        <item android:id="@+id/refresh"
-            android:icon="@android:drawable/ic_menu_rotate"
-            android:title="@string/refresh"
-            android:showAsAction="ifRoom|withText" />
     </menu>

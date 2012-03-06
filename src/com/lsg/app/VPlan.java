@@ -1,10 +1,7 @@
 package com.lsg.app;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -25,8 +22,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -51,6 +46,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
         	if(msg.arg1 == 2) {
         		loading.cancel();
         		update_locked = false;
+        	}
+        	if(msg.arg1 == 3) {
+        		loading.cancel();
+    			loading = ProgressDialog.show(VPlan.this, "", getString(msg.arg2), true);
         	}
         }
     };
@@ -193,8 +192,23 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				public void run() {
 					Looper.prepare();
 					boolean update = Functions.refreshVPlan(VPlan.this, handler);
-					Functions.getClass(VPlan.this);
+					
 					Message msg = handler.obtainMessage();
+					msg.arg1 = 3;
+					msg.arg2 = R.string.loading_class;
+					handler.sendMessage(msg);
+					
+					Functions.getClass(VPlan.this);
+					
+
+					msg = handler.obtainMessage();
+					msg.arg1 = 3;
+					msg.arg2 = R.string.loading_subjects;
+					handler.sendMessage(msg);
+					
+					Functions.updateSubjectList(VPlan.this, handler);
+					
+					msg = handler.obtainMessage();
 					msg.arg1 = 1;
 					if(!update)
 						msg.arg1 = 2;
@@ -250,10 +264,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	    case R.id.all:
 	    	updateCursor(false);
 	    	return true;
-	    /*case R.id.subjects:
+	    case R.id.subjects:
             Intent subjects = new Intent(this, SubjectList.class);
             startActivity(subjects);
-	    	return true;*/
+	    	return true;
         case android.R.id.home:
             // app icon in action bar clicked; go home
             Intent intent = new Intent(this, lsgapp.class);

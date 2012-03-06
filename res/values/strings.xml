@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, lsgapp!</string>
-    <string name="versionname">alpha2</string>
+    <string name="versionname">alpha3</string>
     <string name="app_name">LSGäpp</string>
     <string name="act_version">Aktuelle Version</string>
     <string name="your_version">Deine Version</string>
@@ -12,6 +12,7 @@
     <string name="events">Termine</string>
     <string name="settings">Einstellungen</string>
     <string name="subjectlist">Fächerübersicht</string>
+    <string name="subjectlist_empty">Fächerübersicht leer</string>
     <string name="blacklist">Blacklist</string>
     <string name="blacklist_summary">Die Blacklist bearbeiten</string>
     <string name="whitelist">Whitelist</string>
@@ -19,6 +20,7 @@
     <string name="list_remove">Von Liste entfernen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="noact">Keine Aktualisierung der Vertretungen notwendig</string>
+    <string name="noact_subjects">Keine Aktualisierung der Fächerliste notwendig</string>
     <string name="login">Zugangsdaten</string>
     <string name="login_summary">Benutzername &amp; Passwort für den Vertretungsplan</string>
     <string name="password">Passwort</string>
@@ -31,6 +33,8 @@
     <string name="loginerror">Login-Fehler \n Bitte korrigieren Sie Benutzernamen und Passwort</string>
     <string name="loading_vertretungen">Lade Vertretungen&#8230;</string>
     <string name="loading_events">Lade Termine&#8230;</string>
+    <string name="loading_class">Lade Klasse&#8230;</string>
+    <string name="loading_subjects">Lade Fächerliste&#8230;</string>
     <string name="downloading">Lade Update herunter</string>
     <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
     <string name="no_class"></string>

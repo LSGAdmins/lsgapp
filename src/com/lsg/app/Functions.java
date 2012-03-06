@@ -47,6 +47,7 @@ public class Functions {
 	public static final String   VP_URL      = "http://linux.lsg.musin.de/cp/vp_app.php";
 	public static final String   EVENT_URL   = "http://linux.lsg.musin.de/cp/termine_app.php";
 	public static final String   CLASS_URL   = "http://linux.lsg.musin.de/cp/getClass.php";
+	public static final String   SUBJECT_URL = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
 	public static final String   API_VERSION = "2";
 	
 	public static final String   class_key  = "class";
@@ -75,11 +76,13 @@ public class Functions {
 	public static final String EXCLUDE_TABLE      = "exclude";
 	public static final String INCLUDE_TABLE      = "include";
 	public static final String DB_NEEDS_SYNC      = "needssync";
+	//subjects
+	public static final String DB_SUBJECT_TABLE   = "subjects";
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
 		if(Functions.getSDK() >= 11) {
-			theme = android.R.style.Theme_Holo_Light;
+			theme = android.R.style.Theme_Holo_Light_DarkActionBar;
 			if(dialog)
 				theme = android.R.style.Theme_Holo_Light_Dialog;
 		} else {
@@ -238,6 +241,54 @@ public class Functions {
 		}
 		return true;
 		}
+	public static boolean updateSubjectList(final Context context, Handler h) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		String add = "";
+		try {
+			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("subject_update_time", ""), "UTF-8");
+		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+		String get = Functions.getData(Functions.SUBJECT_URL, context, true, add);
+		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noupdate")) {
+			try {
+        		JSONArray jArray = new JSONArray(get);
+        		int i = 0;
+    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+    			myDB.delete(Functions.DB_SUBJECT_TABLE, null, null); //clear subjectlist
+        		while(i < jArray.length() - 1) {
+        			JSONObject jObject = jArray.getJSONObject(i);
+        			ContentValues values = new ContentValues();
+        			values.put(Functions.DB_RAW_FACH, jObject.getString("kuerzel"));
+        			values.put(Functions.DB_FACH, jObject.getString("name"));
+            		myDB.insert(Functions.DB_SUBJECT_TABLE, null, values);
+        			i++;
+        			}
+        		JSONObject jObject            = jArray.getJSONObject(i);
+        		String update_time            = jObject.getString("update_time");
+        		SharedPreferences.Editor edit = prefs.edit();
+        		edit.putString("subject_update_time", update_time);
+        		edit.commit();
+        		myDB.close();
+        		} catch(JSONException e) {
+        			Log.d("json", e.getMessage());
+        			h.post(getErrorRunnable("jsonerror", context));
+        			return false;
+        		}
+			}
+		else if(get.equals("noupdate")) {
+			Runnable r = new Runnable() {
+				public void run() {
+					Toast.makeText(context, context.getString(R.string.noact_subjects), Toast.LENGTH_SHORT).show();
+				}
+			};
+			h.post(r);
+			return true;
+		}
+		else {
+			h.post(getErrorRunnable(get, context));
+			return false;
+		}
+		return true;
+	}
 	public static void getClass(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
@@ -308,16 +359,24 @@ public class Functions {
     	    	    + Functions.DB_FACH               + " text,"
     	    	    + Functions.DB_DATE               + " text"
     				+");");
+    		//blacklist
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.EXCLUDE_TABLE + " ("
     				+ Functions.DB_ROWID + " integer primary key autoincrement,"
     				+ Functions.DB_FACH + " text,"
     				+ Functions.DB_NEEDS_SYNC + " text"
     				+ ");");
+    		//whitelist
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.INCLUDE_TABLE + " ("
     				+ Functions.DB_ROWID + " integer primary key autoincrement,"
     				+ Functions.DB_FACH + " text,"
     				+ Functions.DB_NEEDS_SYNC + " text"
     				+ ");");
+    		//subjects
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_SUBJECT_TABLE
+    				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
+    	    		+ Functions.DB_RAW_FACH + " text,"
+    	    	    + Functions.DB_FACH + " text"
+    				+");");
     		//events
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
     				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
@@ -394,7 +453,6 @@ public class Functions {
 	}
 	//handlers for adding / removing items to / from blacklist
 	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, SQLiteDatabase myDB, Context context) {
-
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		Cursor cur = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
 				new String[] {new Long(info.id).toString()}, null, null, null);
