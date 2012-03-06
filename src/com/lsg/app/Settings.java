@@ -37,6 +37,9 @@ public class Settings extends PreferenceActivity {
         	CheckBoxPreference onlywhitelist = (CheckBoxPreference) findPreference("showonlywhitelist");
         	prefCat.removePreference(onlywhitelist);
         }
+    	PreferenceCategory prefCat = (PreferenceCategory) findPreference(getString(R.string.vplan));
+    	CheckBoxPreference onlywhitelist = (CheckBoxPreference) findPreference("dark_actionbar");
+    	prefCat.removePreference(onlywhitelist);
         
         Preference blacklist = (Preference) findPreference("blacklist");
         blacklist.setOnPreferenceClickListener(new OnPreferenceClickListener() {

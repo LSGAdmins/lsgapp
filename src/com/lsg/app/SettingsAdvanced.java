@@ -35,6 +35,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 
     @Override
     public void onBuildHeaders(List<Header> target) {
+        Functions.setTheme(false, true, this);
         loadHeadersFromResource(R.xml.setting_headers, target);
     }
 
@@ -50,7 +51,11 @@ public class SettingsAdvanced extends PreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.vplan_settings);
+            if(Functions.getSDK() < 14)
+            	addPreferencesFromResource(R.xml.vplan_settings);
+            else
+            	addPreferencesFromResource(R.xml.advanced_vplan_settings);
+            	
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             int i = 0;
             boolean showonlywhitelist = false;

@@ -4,8 +4,13 @@
     <string name="versionname">alpha3</string>
     <string name="app_name">LSGäpp</string>
     <string name="act_version">Aktuelle Version</string>
-    <string name="your_version">Deine Version</string>
-    <string name="your_version_is_act">Deine Version ist aktuell</string>
+    <string name="dark_actionbar">Dunkle ActionBar</string>
+    <string name="showwithoutclass_off">Vertretungen ohne Klassen nicht angezeigt</string>
+    <string name="showwithoutclass_on">Vertretungen ohne Klassen angezeigt</string>
+    <string name="showonlywhitelist_off">Alle Vertretungen angezeigt</string>
+    <string name="showonlywhitelist_on">Nur Vertretungen aus Whitelist angezeigt</string>
+    <string name="on">An</string>
+    <string name="off">Aus</string>
     <string name="vplan">Vertretungsplan</string>
     <string name="vplan_summary">Einstellungen für den Vertretungsplan</string>
     <string name="vplan_empty">Keine Vertretungen!</string>

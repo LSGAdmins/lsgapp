@@ -2,6 +2,8 @@ package com.lsg.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
@@ -14,8 +16,9 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 	public static void dropDownNav(final VPlan act) {
-		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(act, R.array.action_vertretungen,
-		          android.R.layout.simple_spinner_dropdown_item);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
+		int spinner = (!prefs.getBoolean("dark_actionbar", false)) ? android.R.layout.simple_spinner_dropdown_item : R.layout.spinner_dropdown_black_actionbar;
+		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(act, R.array.action_vertretungen, spinner);
 		ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {

@@ -32,7 +32,6 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	private Cursor c;
 	public VertretungCursor vcursor;
 	private boolean mine = true;
-	private boolean update_locked = false;
 	private String exclude_cond;
 	private String include_cond;
 
@@ -41,11 +40,9 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
         	if(msg.arg1 == 1) {
         		loading.cancel();
         		updateCursor(mine);
-        		update_locked = false;
         	}
         	if(msg.arg1 == 2) {
         		loading.cancel();
-        		update_locked = false;
         	}
         	if(msg.arg1 == 3) {
         		loading.cancel();
@@ -90,7 +87,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
 		updateCondLists();
 		
-		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_TABLE);
+		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TABLE);
 		long count = num_rows.simpleQueryForLong();
 		if(count == 0)
 			updateVP();
@@ -159,7 +156,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 		if(mine)
 			where_cond += exclude_cond;
-		c = myDB.query(Functions.DB_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+		c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
 				where_conds, null, null, null);
@@ -181,44 +178,40 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		super.onResume();
 	}
 	public void updateVP() {
-		if(!update_locked) {
-			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vertretungen), true);
-			update_locked = true;
-			class ProgressThread extends Thread {
-				Handler handler;
-				ProgressThread(Handler h) {
-					handler = h;
-					}
-				public void run() {
-					Looper.prepare();
-					boolean update = Functions.refreshVPlan(VPlan.this, handler);
-					
-					Message msg = handler.obtainMessage();
-					msg.arg1 = 3;
-					msg.arg2 = R.string.loading_class;
-					handler.sendMessage(msg);
-					
-					Functions.getClass(VPlan.this);
-					
-
-					msg = handler.obtainMessage();
-					msg.arg1 = 3;
-					msg.arg2 = R.string.loading_subjects;
-					handler.sendMessage(msg);
-					
-					Functions.updateSubjectList(VPlan.this, handler);
-					
-					msg = handler.obtainMessage();
-					msg.arg1 = 1;
-					if(!update)
-						msg.arg1 = 2;
-					handler.sendMessage(msg);
-					}
+		loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vertretungen), true);
+		class ProgressThread extends Thread {
+			Handler handler;
+			ProgressThread(Handler h) {
+				handler = h;
 				}
-			ProgressThread progress = new ProgressThread(handler);
-			progress.start();
+			public void run() {
+				Looper.prepare();
+				boolean update = Functions.refreshVPlan(VPlan.this, handler);
+				
+				Message msg = handler.obtainMessage();
+				msg.arg1 = 3;
+				msg.arg2 = R.string.loading_class;
+				handler.sendMessage(msg);
+				
+				Functions.getClass(VPlan.this);
+				
+				msg = handler.obtainMessage();
+				msg.arg1 = 3;
+				msg.arg2 = R.string.loading_subjects;
+				handler.sendMessage(msg);
+				
+				Functions.updateSubjectList(VPlan.this, handler);
+				
+				msg = handler.obtainMessage();
+				msg.arg1 = 1;
+				if(!update)
+					msg.arg1 = 2;
+				handler.sendMessage(msg);
+				}
 			}
-	}
+		ProgressThread progress = new ProgressThread(handler);
+		progress.start();
+		}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -295,10 +288,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, myDB, this);
+		Functions.createContextMenu(menu, v, menuInfo, myDB, this, Functions.DB_VPLAN_TABLE);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, myDB, this, this);
+		return Functions.contextMenuSelect(item, myDB, this, this, Functions.DB_VPLAN_TABLE);
 	}
 }

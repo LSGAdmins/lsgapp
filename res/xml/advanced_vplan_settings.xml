@@ -1,0 +1,27 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/vplan"
+        android:key="@string/vplan" >
+        <SwitchPreference 
+            android:title="@string/showwithoutclass"
+            android:key="showwithoutclass"
+            android:summaryOff="@string/showwithoutclass_off"
+            android:summaryOn="@string/showwithoutclass_on"
+            android:switchTextOff="@string/off"
+            android:switchTextOn="@string/on"
+            android:defaultValue="true" />
+        <SwitchPreference 
+            android:title="@string/showonlywhitelist"
+            android:key="showonlywhitelist"
+            android:summaryOff="@string/showonlywhitelist_off"
+            android:summaryOn="@string/showonlywhitelist_on"
+            android:switchTextOff="@string/off"
+            android:switchTextOn="@string/on"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:title="@string/dark_actionbar"
+            android:key="dark_actionbar"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

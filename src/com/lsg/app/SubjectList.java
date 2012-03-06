@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -86,15 +88,15 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
-	/*@Override
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, myDB, this);
+		Functions.createContextMenu(menu, v, menuInfo, myDB, this, Functions.DB_SUBJECT_TABLE);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, myDB, this, this);
-	}*/
+		return Functions.contextMenuSelect(item, myDB, this, this, Functions.DB_SUBJECT_TABLE);
+	}
 	public void updateCursor() {
 		c = myDB.query(Functions.DB_SUBJECT_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_FACH}, where_cond, where_conds, null, null, null);
 	}

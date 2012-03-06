@@ -60,7 +60,7 @@ public class Functions {
 	public static final String DB_ROWID           = "_id";
 	public static final String DB_NAME            = "lsgapp";
 	//VPlan
-	public static final String DB_TABLE           = "vertretungen";
+	public static final String DB_VPLAN_TABLE           = "vertretungen";
 	public static final String DB_KLASSENSTUFE    = "klassenstufe";
 	public static final String DB_KLASSE          = "klasse";
 	public static final String DB_STUNDE          = "stunde";
@@ -82,7 +82,11 @@ public class Functions {
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
 		if(Functions.getSDK() >= 11) {
-			theme = android.R.style.Theme_Holo_Light_DarkActionBar;
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
+			if(Functions.getSDK() >= 14 && prefs.getBoolean("dark_actionbar", false))
+				theme = android.R.style.Theme_Holo_Light_DarkActionBar;
+			else
+				theme = android.R.style.Theme_Holo_Light;
 			if(dialog)
 				theme = android.R.style.Theme_Holo_Light_Dialog;
 		} else {
@@ -179,7 +183,7 @@ public class Functions {
 					}
 	}
 	
-	public static boolean refreshVPlan(final Context context, Handler h) {
+	public static synchronized boolean refreshVPlan(final Context context, Handler h) {
 		Functions.testDB(context);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String add = "";
@@ -194,7 +198,7 @@ public class Functions {
         		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
     			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-    			myDB.delete(Functions.DB_TABLE, null, null); //clear vertretungen
+    			myDB.delete(Functions.DB_VPLAN_TABLE, null, null); //clear vertretungen
         		while(i < jArray.length() - 1) {
         			JSONObject jObject = jArray.getJSONObject(i);
         			ContentValues values = new ContentValues();
@@ -209,7 +213,7 @@ public class Functions {
         			values.put(Functions.DB_FACH, jObject.getString("fach"));
         			values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
         			values.put(Functions.DB_DATE, jObject.getString("date"));
-            		myDB.insert(Functions.DB_TABLE, null, values);
+            		myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
         			i++;
         			}
         		JSONObject jObject            = jArray.getJSONObject(i);
@@ -241,7 +245,7 @@ public class Functions {
 		}
 		return true;
 		}
-	public static boolean updateSubjectList(final Context context, Handler h) {
+	public static synchronized boolean updateSubjectList(final Context context, Handler h) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String add = "";
 		try {
@@ -289,7 +293,7 @@ public class Functions {
 		}
 		return true;
 	}
-	public static void getClass(Context context) {
+	public static synchronized void getClass(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
 			Functions.testDB(context);
@@ -309,7 +313,7 @@ public class Functions {
 		int day_now   = now.getDay();
 		SQLiteDatabase myDB;
 		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
-		Cursor result = myDB.rawQuery("SELECT DISTINCT " + Functions.DB_DATE + " FROM " + Functions.DB_TABLE, null);
+		Cursor result = myDB.rawQuery("SELECT DISTINCT " + Functions.DB_DATE + " FROM " + Functions.DB_VPLAN_TABLE, null);
 		result.moveToFirst();
 		int i = 0;
 		while(i < result.getCount()) {
@@ -334,7 +338,7 @@ public class Functions {
 					}
 				}
 			if(!isvalid) {
-				myDB.execSQL("DELETE FROM " + Functions.DB_TABLE + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
+				myDB.execSQL("DELETE FROM " + Functions.DB_VPLAN_TABLE + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
 				}
 			i++;
 		}
@@ -346,7 +350,7 @@ public class Functions {
     		SQLiteDatabase myDB;
     		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
     		//vertretungen
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TABLE
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TABLE
     				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
     	    		+ Functions.DB_KLASSENSTUFE       + " integer,"
     	    	    + Functions.DB_KLASSE	          + " text,"
@@ -392,8 +396,8 @@ public class Functions {
     			myDB.setVersion(1);*/
     		//upgrades for table
     		if(myDB.getVersion() == 0) {
-    			Log.d(Functions.DB_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
+    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_FACH);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
     			myDB.setVersion(1);
     		}
     		if(myDB.getVersion() == 1) {
@@ -452,26 +456,40 @@ public class Functions {
 		return true;
 	}
 	//handlers for adding / removing items to / from blacklist
-	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, SQLiteDatabase myDB, Context context) {
+	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, SQLiteDatabase myDB, Context context, String table) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		Cursor cur = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-				new String[] {new Long(info.id).toString()}, null, null, null);
-		cur.moveToFirst();
-		
-		String klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
-		String rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-		String fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
-		cur.close();
-		
+		String klasse  = "";
+		String rawfach = "";
+		String fach    = "";
 		int conmenu = 0;
-		int i = 0;
-		while(i < Functions.exclude.length) {
-			if(klasse.contains(Functions.exclude[i]))
+		if(table.equals(Functions.DB_VPLAN_TABLE)) {
+			Cursor cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
+					new String[] {new Long(info.id).toString()}, null, null, null);
+			cur.moveToFirst();
+			
+			klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
+			rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
+			fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+			cur.close();
+			
+			int i = 0;
+			while(i < Functions.exclude.length) {
+				if(klasse.contains(Functions.exclude[i]))
+					conmenu = 1;
+				i++;
+				}
+			if(klasse.equals("null"))
 				conmenu = 1;
-			i++;
-			}
-		if(klasse.equals("null"))
-			conmenu = 1;
+			} else if(table.equals(Functions.DB_SUBJECT_TABLE)) {
+				Cursor cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
+						new String[] {new Long(info.id).toString()}, null, null, null);
+				cur.moveToFirst();
+				
+				rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
+				fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+				cur.close();
+				conmenu = 1;
+				}
 		
 		Cursor exclude = myDB.query(Functions.EXCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_RAW_FACH + " LIKE ?",
 				new String[] {rawfach}, null, null, null);
@@ -497,11 +515,17 @@ public class Functions {
 			menu.add(Menu.NONE, 3, 0, context.getString(R.string.no_includesubject));
 		}
 	}
-	public static boolean contextMenuSelect(MenuItem item, final SQLiteDatabase myDB, Context context, final SQLlist list) {
+	public static boolean contextMenuSelect(MenuItem item, final SQLiteDatabase myDB, Context context, final SQLlist list, String table) {
 		  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 		  
-		  Cursor cur = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-				  new String[] {new Long(info.id).toString()}, null, null, null);
+		  Cursor cur;
+		  if(table.equals(Functions.DB_VPLAN_TABLE)) {
+			  cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
+					  new String[] {new Long(info.id).toString()}, null, null, null);
+		  } else { //table.equals(Functions.DB_SUBJECT_TABLE)
+			  cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
+					  new String[] {new Long(info.id).toString()}, null, null, null);
+		  }
 		  cur.moveToFirst();
 		  
 		  //final String klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
@@ -509,22 +533,22 @@ public class Functions {
 		  final String fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
 		  cur.close();
 		  final String prompt;
-		  final String table;
+		  final String listtable;
 			
 		  //final CharSequence title = ((TextView) info.targetView.findViewById(R.id.vertretung_title)).getText();
 		  int menuItemIndex = item.getItemId();
 		  if(menuItemIndex == 0) {
 			  prompt = context.getString(R.string.really_exclude);
-			  table  = Functions.EXCLUDE_TABLE;
+			  listtable  = Functions.EXCLUDE_TABLE;
 		  }
 		  else if(menuItemIndex == 1) {
 			  prompt = context.getString(R.string.really_include);
-			  table  = Functions.INCLUDE_TABLE;
+			  listtable  = Functions.INCLUDE_TABLE;
 		  }
 		  else {
-			  //this code shouldnt be executed, its just for the compiler not to complain :-)
+			  //this code should never be executed, its just for the compiler not to complain :-)
 			  prompt = "";
-			  table = "";
+			  listtable = "";
 		  }
 		  if(menuItemIndex == 0 || menuItemIndex == 1) {
 			  DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -536,7 +560,7 @@ public class Functions {
 				        	vals.put(Functions.DB_FACH, fach);
 				        	vals.put(Functions.DB_RAW_FACH, rawfach);
 				        	vals.put(Functions.DB_NEEDS_SYNC, "true");
-				        	myDB.insert(table, null, vals);
+				        	myDB.insert(listtable, null, vals);
 				        	list.updateList();
 				            break;
 				        }
