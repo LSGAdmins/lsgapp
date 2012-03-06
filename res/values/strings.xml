@@ -76,22 +76,21 @@
         Wer keinen Launchpad-Account hat, kann Wünsche, Kritik und Fehler an lsgadmins@googlegroups.com mailen.
         </string>
     <string name="help">Hilfe</string>
-    <string name="helptext">
-		----- Vertretungsplan -----\n
-	    Beim ersten Aufruf des Vertretungsplans öffnen sich automatisch die Einstellungen, wo ihr euch mit euren normalen Schulaccounts anmelden könnt. \n 
-	    Bei Android 3.0+ Geräten gibt es in der Actionbar ein Knopf zum aktualisieren und einer um die Suchleiste zu öffnen. Zudem kann dort zwischen
+    <string name="help_vplan_head">Vertretungsplan</string>
+    <string name="help_vplan_content">Beim ersten Aufruf des Vertretungsplans öffnen sich automatisch die Einstellungen, wo ihr euch mit euren normalen Schulaccounts
+        anmelden könnt. \n Bei Android 3.0+ Geräten gibt es in der Actionbar ein Knopf zum aktualisieren und einer um die Suchleiste zu öffnen. Zudem kann dort zwischen
 	    \"Meine Vertretungen\" und \"Alle Vertretungen\" gewechselt werden. \n
-	    Bei Android 1.5 - 2.3.6 geschieht das über ein Menü, das über die Menü-Taste aufgerufen werden kann. \n
+	    Bei Android 1.5 - 2.3.7 geschieht das über ein Menü, das über die Menü-Taste aufgerufen werden kann. \n
 	    Des weiteren gibt es im Menü die Option  \"Einstellungen\". In den Einstellungen finden sich eine \"Whitelist\" und eine \"Blacklist\".
 	    Vertretungen von Kursen auf diesen Listen werden nicht mehr bzw. immer bei \"Meine Vertretungen\" angezeigt. Kurse zu diesen Listen hinzufügen könnt ihr am
-	    leichtesten indem ihr beim Vertretungsplan lange auf eine Vertretung drückt oder unter Menü > Fächerübersicht auf ein Fach. \n
-	    \n 
-	    ----- Termine ----- \n
-	    Hier könnt ihr euch die Termine anzeigen lassen, die sich auch auf der Homepage unter Termine befinden. Mit der Suchleiste könnt ihr die Termine filtern. \n
-	    \n
-	    ----- SMV-Blog ----- \n
-	    Hier wird der SMV-Blog angezeigt. Wenn ihr in den Einstellungen euren Account angegeben habt, werdet ihr hier automatisch angemeldet \n
-	    \n
+	    leichtesten indem ihr beim Vertretungsplan lange auf eine Vertretung drückt oder unter Menü > Fächerübersicht auf ein Fach.</string>
+    <string name="help_events_head">Termine</string>
+    <string name="help_events_content">Hier könnt ihr euch die Termine anzeigen lassen, die sich auch auf der Homepage unter Termine befinden.
+        Mit der Suchleiste könnt ihr die Termine filtern.</string>
+    <string name="help_smvblog_head">SMVBlog</string>
+    <string name="help_smvblog_content">Hier wird der SMV-Blog angezeigt. Wenn ihr in den Einstellungen euren Account angegeben habt,
+        werdet ihr hier automatisch angemeldet.</string>
+    <string name="help_bottom">
 	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden
 	</string>
 </resources>

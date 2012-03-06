@@ -106,7 +106,13 @@ public final class R {
         public static final int excludesubject=0x7f07002d;
         public static final int hello=0x7f070000;
         public static final int help=0x7f070045;
-        public static final int helptext=0x7f070046;
+        public static final int help_bottom=0x7f07004c;
+        public static final int help_events_content=0x7f070049;
+        public static final int help_events_head=0x7f070048;
+        public static final int help_smvblog_content=0x7f07004b;
+        public static final int help_smvblog_head=0x7f07004a;
+        public static final int help_vplan_content=0x7f070047;
+        public static final int help_vplan_head=0x7f070046;
         public static final int hour=0x7f07001f;
         public static final int include_empty=0x7f070034;
         public static final int includesubject=0x7f070031;
