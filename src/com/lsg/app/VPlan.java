@@ -150,7 +150,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		else
 			include_cond = " OR ( " + include_cond + " )";
 	}
-	public void getCursor(boolean mine) {
+	public void getCursor() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if(mine) {
 			String klasse = prefs.getString("class", "");
@@ -167,12 +167,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 		if(mine)
 			where_cond += exclude_cond;
-		if(!mine)
 			second_c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 					Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
 					where_conds, null, null, null);
-		else
 			c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 					Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
@@ -191,8 +189,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		}
 		vFlip.showNext();
 		this.mine = mine;
-		getCursor(true);
-		getCursor(false);
+		getCursor();
 		vcursor.changeCursor(c);
 		vcursor_second.changeCursor(second_c);
 	}
