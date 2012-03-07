@@ -18,6 +18,7 @@
         <EditTextPreference
             android:title="@string/autopull_intervall"
             android:hint="@string/min"
+            android:defaultValue="30"
             android:key="autopull_intervall"
             android:inputType="number" />
     </PreferenceCategory>

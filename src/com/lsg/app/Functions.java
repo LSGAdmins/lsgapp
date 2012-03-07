@@ -109,12 +109,31 @@ public class Functions {
 	}
 	public static void setAlarm(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		int time_add = new Integer(prefs.getString("autopull_intervall", "60"));
+		if(!prefs.getBoolean("autopullvplan", false)) {
+			Log.d("Functions.java", "no auto pull");
+			return;
+		}
+		else
+			Log.d("Functions.java", "setAlarm");
+		int time_add = 30;
+		try {
+			time_add = new Integer(prefs.getString("autopull_intervall", "60"));
+		} catch(NumberFormatException e) {
+			Log.d("NumberFormatException", e.getMessage());
+		}
 		if(time_add == 0)
 			time_add = 1;
-		
+		Functions.setAlarm(context, time_add);
+	}
+	public static void setAlarm(Context context, int time_add) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if(!prefs.getBoolean("autopullvplan", false)) {
+			Log.d("Functions.java", "no auto pull");
+			return;
+		}
+		Log.d("time", new Integer((time_add*1000*60)).toString());
 		Intent intent = new Intent(context, UpdateBroadcastReceiver.class);
-		intent.putExtra("update", "vplan");
+		intent.putExtra("action", "update_vplan");
 		PendingIntent sender = PendingIntent.getBroadcast(context, 192837, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (time_add*1000*60), sender);

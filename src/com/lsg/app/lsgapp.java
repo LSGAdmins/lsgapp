@@ -25,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -105,6 +104,10 @@ public class lsgapp extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+		Functions.setAlarm(this, 0);
+    	Functions.setAlarm(this);
+    	
+    	
     	super.onCreate(savedInstanceState);
         Functions.setTheme(false, false, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
@@ -172,6 +175,14 @@ public class lsgapp extends ListActivity {
 	    	Intent about = new Intent(this, HelpAbout.class);
 	    	about.putExtra(Functions.helpabout, Functions.about);
 	    	startActivity(about);
+	    	return true;
+	    case R.id.settings:
+	    	Intent settings;
+	    	if(Functions.getSDK() < 11)
+	    		settings = new Intent(this, Settings.class);
+	    	else
+	    		settings = new Intent(this, SettingsAdvanced.class);
+	    	startActivity(settings);
 	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);

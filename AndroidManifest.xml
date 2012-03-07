@@ -6,6 +6,7 @@
 
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="15" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     
     <supports-screens android:resizeable="true"
                   android:smallScreens="true"
@@ -34,6 +35,11 @@
         <activity android:label="@string/subjectlist" android:name="SubjectList"></activity>
         <activity android:name="BlackWhiteList"></activity>
         <activity android:name="SettingsAdvanced" android:label="@string/settings" android:theme="@android:style/Theme.Holo.Light"></activity>
+          <intent-filter>
+              <action android:name="ACTION_BOOT_COMPLETED" />
+              <category android:name="com.lsg.app" />
+          </intent-filter>
+        <receiver android:name="UpdateBroadcastReceiver"></receiver>
     </application>
 
 </manifest>

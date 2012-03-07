@@ -42,32 +42,34 @@ public final class R {
         public static final int ic_whitelist=0x7f020004;
     }
     public static final class id {
-        public static final int about=0x7f090014;
-        public static final int all=0x7f090018;
+        public static final int about=0x7f090016;
+        public static final int all=0x7f09001a;
         public static final int event_date=0x7f090002;
         public static final int event_month=0x7f090000;
         public static final int event_place=0x7f090003;
         public static final int event_title=0x7f090001;
-        public static final int help=0x7f090015;
+        public static final int help=0x7f090017;
         public static final int list_view_empty=0x7f090004;
-        public static final int main_textview=0x7f090005;
-        public static final int mine=0x7f090017;
-        public static final int refresh=0x7f090013;
-        public static final int search=0x7f090012;
-        public static final int search_edit=0x7f090006;
-        public static final int settings=0x7f090016;
-        public static final int standard_rellayout=0x7f090007;
-        public static final int standard_webview=0x7f09000f;
-        public static final int subjects=0x7f090019;
-        public static final int updatecheck_actversion=0x7f090011;
-        public static final int updatecheck_yourversion=0x7f090010;
-        public static final int vertretung_bottom=0x7f09000e;
-        public static final int vertretung_class=0x7f090009;
-        public static final int vertretung_date=0x7f090008;
-        public static final int vertretung_text=0x7f09000d;
-        public static final int vertretung_title=0x7f09000a;
-        public static final int vertretung_type=0x7f09000b;
-        public static final int vertretung_when=0x7f09000c;
+        public static final int main_textview=0x7f090007;
+        public static final int mine=0x7f090019;
+        public static final int refresh=0x7f090015;
+        public static final int search=0x7f090014;
+        public static final int search_edit=0x7f090008;
+        public static final int second_list=0x7f090006;
+        public static final int settings=0x7f090018;
+        public static final int standard_rellayout=0x7f090009;
+        public static final int standard_webview=0x7f090011;
+        public static final int subjects=0x7f09001b;
+        public static final int updatecheck_actversion=0x7f090013;
+        public static final int updatecheck_yourversion=0x7f090012;
+        public static final int vertretung_bottom=0x7f090010;
+        public static final int vertretung_class=0x7f09000b;
+        public static final int vertretung_date=0x7f09000a;
+        public static final int vertretung_text=0x7f09000f;
+        public static final int vertretung_title=0x7f09000c;
+        public static final int vertretung_type=0x7f09000d;
+        public static final int vertretung_when=0x7f09000e;
+        public static final int viewflipper=0x7f090005;
     }
     public static final class layout {
         public static final int about=0x7f030000;
@@ -76,12 +78,13 @@ public final class R {
         public static final int events_item=0x7f030003;
         public static final int help=0x7f030004;
         public static final int list=0x7f030005;
-        public static final int main_listitem=0x7f030006;
-        public static final int search=0x7f030007;
-        public static final int spinner_dropdown_black_actionbar=0x7f030008;
-        public static final int standard=0x7f030009;
-        public static final int updatecheck=0x7f03000a;
-        public static final int vertretung_item=0x7f03000b;
+        public static final int list_viewflipper=0x7f030006;
+        public static final int main_listitem=0x7f030007;
+        public static final int search=0x7f030008;
+        public static final int spinner_dropdown_black_actionbar=0x7f030009;
+        public static final int standard=0x7f03000a;
+        public static final int updatecheck=0x7f03000b;
+        public static final int vertretung_item=0x7f03000c;
     }
     public static final class menu {
         public static final int events=0x7f080000;

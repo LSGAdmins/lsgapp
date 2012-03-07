@@ -23,14 +23,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	private String[] where_conds = new String[4];
 	private ProgressDialog loading;
 	private SQLiteDatabase myDB;
 	private Cursor c;
-	public VertretungCursor vcursor;
+	private Cursor second_c;
+	private VertretungCursor vcursor_second;
+	private VertretungCursor vcursor;
 	private boolean mine = true;
 	private String exclude_cond;
 	private String include_cond;
@@ -63,7 +67,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
         
 		Functions.setTheme(false, true, this);
 		
-		setContentView(R.layout.list);
+		setContentView(R.layout.list_viewflipper);
 		
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
@@ -80,8 +84,9 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 			try {
 				AdvancedWrapper actHelper = new AdvancedWrapper();
 				actHelper.dropDownNav(this);
-			} catch (Exception e) { Log.d("error", e.getMessage()); }
-			
+				} catch (Exception e) {
+					Log.d("error", e.getMessage());
+					}
 		}
 		
 		myDB = this.openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
@@ -94,7 +99,6 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		
 		vcursor = new VertretungCursor(this, c);
 		getListView().setAdapter(vcursor);
-		updateCursor(mine);
         Functions.styleListView(getListView(), this);
         registerForContextMenu(getListView());
         
@@ -102,6 +106,14 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
         getListView().setEmptyView(findViewById(R.id.list_view_empty));
         TextView textv = (TextView) findViewById(R.id.list_view_empty);
         textv.setText(R.string.vplan_empty);
+        
+        //second listview, with all
+        ListView all = (ListView) findViewById(R.id.second_list);
+        vcursor_second = new VertretungCursor(this, second_c);
+        all.setAdapter(vcursor_second);
+        Functions.styleListView(all, this);
+        registerForContextMenu(all);
+		updateCursor(mine);
 	}
 	public void updateCondLists() {
 		exclude_cond = new String();
@@ -138,8 +150,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		else
 			include_cond = " OR ( " + include_cond + " )";
 	}
-	public void updateCursor(boolean mine) {
-		this.mine = mine;
+	public void getCursor(boolean mine) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if(mine) {
 			String klasse = prefs.getString("class", "");
@@ -156,11 +167,34 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 				+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 		if(mine)
 			where_cond += exclude_cond;
-		c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
-				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
-				where_conds, null, null, null);
+		if(!mine)
+			second_c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
+					Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
+					where_conds, null, null, null);
+		else
+			c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
+					Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
+					where_conds, null, null, null);
+	}
+	public void updateCursor(boolean mine) {
+		ViewFlipper vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
+		if(this.mine != mine) {
+			vFlip.setInAnimation(this, android.R.anim.slide_in_left);
+			vFlip.setOutAnimation(this, android.R.anim.slide_out_right);
+			if(vFlip.getDisplayedChild() != 0)
+				vFlip.showPrevious();
+			else
+				vFlip.showNext();
+			Log.d("flip", new Integer(vFlip.getDisplayedChild()).toString());
+		}
+		vFlip.showNext();
+		this.mine = mine;
+		getCursor(true);
+		getCursor(false);
 		vcursor.changeCursor(c);
+		vcursor_second.changeCursor(second_c);
 	}
 	public void updateWhereCond(String searchText) {
 		where_conds[1] = "%" + searchText + "%";
