@@ -23,5 +23,14 @@
             android:title="@string/dark_actionbar"
             android:key="dark_actionbar"
             android:defaultValue="false" />
+        <CheckBoxPreference 
+            android:title="@string/autopullvplan"
+            android:key="autopullvplan"
+            android:defaultValue="false" />
+        <EditTextPreference
+            android:title="@string/autopull_intervall"
+            android:hint="@string/min"
+            android:key="autopull_intervall"
+            android:inputType="number" />
     </PreferenceCategory>
 </PreferenceScreen>

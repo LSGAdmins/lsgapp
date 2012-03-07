@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONArray;
@@ -15,7 +16,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -104,6 +107,18 @@ public class Functions {
 			}
 		}
 	}
+	public static void setAlarm(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		int time_add = new Integer(prefs.getString("autopull_intervall", "60"));
+		if(time_add == 0)
+			time_add = 1;
+		
+		Intent intent = new Intent(context, UpdateBroadcastReceiver.class);
+		intent.putExtra("update", "vplan");
+		PendingIntent sender = PendingIntent.getBroadcast(context, 192837, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (time_add*1000*60), sender);
+		}
 	public static void styleListView(ListView lv, Context context) {
 		if(Functions.getSDK() >= 11) {
 			ColorDrawable sage = new ColorDrawable(context.getResources().getColor(R.color.seperatorgrey));
