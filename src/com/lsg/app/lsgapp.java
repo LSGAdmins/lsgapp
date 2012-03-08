@@ -16,10 +16,12 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -104,7 +106,11 @@ public class lsgapp extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-		Functions.setAlarm(this, 0);
+    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	if(prefs.getBoolean("updatevplanonstart", false)) {
+    		UpdateBroadcastReceiver.ProgressThread upd = new UpdateBroadcastReceiver.ProgressThread(new Handler(), this);
+    		upd.start();
+    	}
     	Functions.setAlarm(this);
     	
     	

@@ -35,11 +35,12 @@
         <activity android:label="@string/subjectlist" android:name="SubjectList"></activity>
         <activity android:name="BlackWhiteList"></activity>
         <activity android:name="SettingsAdvanced" android:label="@string/settings" android:theme="@android:style/Theme.Holo.Light"></activity>
+        <receiver android:name="UpdateBroadcastReceiver" android:process=":remote" >
           <intent-filter>
-              <action android:name="ACTION_BOOT_COMPLETED" />
-              <category android:name="com.lsg.app" />
+              <action android:name="android.intent.action.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE" />
+			  <category android:name="android.intent.category.HOME" />
           </intent-filter>
-        <receiver android:name="UpdateBroadcastReceiver"></receiver>
+    </receiver>
     </application>
 
 </manifest>

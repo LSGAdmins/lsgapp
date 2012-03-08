@@ -210,37 +210,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	}
 	public void updateVP() {
 		loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vertretungen), true);
-		class ProgressThread extends Thread {
-			Handler handler;
-			ProgressThread(Handler h) {
-				handler = h;
-				}
-			public void run() {
-				Looper.prepare();
-				boolean update = Functions.refreshVPlan(VPlan.this, handler);
-				
-				Message msg = handler.obtainMessage();
-				msg.arg1 = 3;
-				msg.arg2 = R.string.loading_class;
-				handler.sendMessage(msg);
-				
-				Functions.getClass(VPlan.this);
-				
-				msg = handler.obtainMessage();
-				msg.arg1 = 3;
-				msg.arg2 = R.string.loading_subjects;
-				handler.sendMessage(msg);
-				
-				Functions.updateSubjectList(VPlan.this, handler);
-				
-				msg = handler.obtainMessage();
-				msg.arg1 = 1;
-				if(!update)
-					msg.arg1 = 2;
-				handler.sendMessage(msg);
-				}
-			}
-		ProgressThread progress = new ProgressThread(handler);
+		UpdateBroadcastReceiver.ProgressThread progress = new UpdateBroadcastReceiver.ProgressThread(handler, this);
 		progress.start();
 		}
 	@Override

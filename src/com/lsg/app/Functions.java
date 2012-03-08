@@ -133,7 +133,9 @@ public class Functions {
 		}
 		Log.d("time", new Integer((time_add*1000*60)).toString());
 		Intent intent = new Intent(context, UpdateBroadcastReceiver.class);
-		intent.putExtra("action", "update_vplan");
+		intent.setAction("update_vplan");
+		boolean alarmUp = (PendingIntent.getBroadcast(context, 192837, intent, PendingIntent.FLAG_NO_CREATE) != null);
+		Log.d("alarmUp", new Boolean(alarmUp).toString());
 		PendingIntent sender = PendingIntent.getBroadcast(context, 192837, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (time_add*1000*60), sender);
@@ -179,7 +181,7 @@ public class Functions {
         		}
         	Log.d("get", get);
         	return get;
-		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage()); return "networkerror";}
+		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage() + " "); e.printStackTrace(); return "networkerror";}
 	}
 	
 	public static Runnable getErrorRunnable(String error, final Context context) {

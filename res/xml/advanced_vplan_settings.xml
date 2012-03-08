@@ -24,6 +24,10 @@
             android:key="dark_actionbar"
             android:defaultValue="false" />
         <CheckBoxPreference 
+            android:title="@string/updatevplanonstart"
+            android:key="updatevplanonstart"
+            android:defaultValue="false" />
+        <CheckBoxPreference 
             android:title="@string/autopullvplan"
             android:key="autopullvplan"
             android:defaultValue="false" />

@@ -14,6 +14,7 @@
     <string name="vplan">Vertretungsplan</string>
     <string name="autopullvplan">Vertretungsplan im Hintergrund aktualisieren</string>
     <string name="autopull_intervall">Zeitintervall für die Aktualisierung (min)</string>
+    <string name="updatevplanonstart">Vertretungsplan beim Appstart aktualisieren</string>
     <string name="min">Minuten</string>
     <string name="vplan_summary">Einstellungen für den Vertretungsplan</string>
     <string name="vplan_empty">Keine Vertretungen!</string>
