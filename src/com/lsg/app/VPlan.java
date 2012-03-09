@@ -9,11 +9,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -21,13 +21,16 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
+public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouchListener  {
 	private String[] where_conds = new String[4];
 	private ProgressDialog loading;
 	private SQLiteDatabase myDB;
@@ -38,6 +41,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 	private boolean mine = true;
 	private String exclude_cond;
 	private String include_cond;
+	private float lastX, lastY;
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -68,6 +72,10 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		Functions.setTheme(false, true, this);
 		
 		setContentView(R.layout.list_viewflipper);
+		//findViewById(R.id.first).setOnTouchListener(this);
+		//findViewById(R.id.second).setOnTouchListener(this);
+		findViewById(R.id.second_list).setOnTouchListener(this);
+		getListView().setOnTouchListener(this);
 		
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
@@ -181,17 +189,54 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist  {
 		if(this.mine != mine) {
 			vFlip.setInAnimation(this, android.R.anim.slide_in_left);
 			vFlip.setOutAnimation(this, android.R.anim.slide_out_right);
-			if(vFlip.getDisplayedChild() != 0)
+			if(vFlip.getDisplayedChild() != 0) {
 				vFlip.showPrevious();
+			}
 			else
 				vFlip.showNext();
 			Log.d("flip", new Integer(vFlip.getDisplayedChild()).toString());
 		}
-		vFlip.showNext();
+        
 		this.mine = mine;
 		getCursor();
 		vcursor.changeCursor(c);
 		vcursor_second.changeCursor(second_c);
+	}
+	@Override
+	public boolean onTouch(View v, MotionEvent motionEvent) {
+		Log.d("asdf", "onTouch");
+		switch (motionEvent.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			lastX = motionEvent.getX();
+			lastY = motionEvent.getY();
+			break;
+		case MotionEvent.ACTION_UP:
+			break;
+	    case MotionEvent.ACTION_MOVE:
+	    	if(lastX - motionEvent.getX() > 3 || lastX - motionEvent.getX() < -3) {
+	    		int move = (int)(lastX - motionEvent.getX());
+	    		ViewFlipper vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
+	    		final View currentView = vFlip.getCurrentView();
+	    	    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(currentView.getLayoutParams());
+	            lp.setMargins(-move, 0, move, 0);
+	            currentView.setLayoutParams(lp);
+	            currentView.invalidate();
+	            
+	            DisplayMetrics metrics = new DisplayMetrics();
+	            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+	            final View nextView = vFlip.getChildAt(vFlip.getDisplayedChild() + 1);
+	    	    FrameLayout.LayoutParams lp_sec = new FrameLayout.LayoutParams(nextView.getLayoutParams());
+	            lp_sec.setMargins(((int) metrics.widthPixels) - move, 0, move - ((int) metrics.widthPixels), 0);
+	            nextView.setLayoutParams(lp_sec);
+	            nextView.setVisibility(View.VISIBLE);
+	            nextView.invalidate();
+	    	}
+	    	else if(lastY - motionEvent.getY() > 3) {
+	    		Log.d("asdf", "Y");
+	    	}
+	    	break;
+	  }
+	  return false;
 	}
 	public void updateWhereCond(String searchText) {
 		where_conds[1] = "%" + searchText + "%";
