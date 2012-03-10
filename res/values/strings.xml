@@ -11,6 +11,11 @@
     <string name="showonlywhitelist_on">Nur Vertretungen aus Whitelist angezeigt</string>
     <string name="on">An</string>
     <string name="off">Aus</string>
+    <string name="vplan_info">Info</string>
+    <string name="ok">OK</string>
+    <string name="number_all">Anzahl der Vertretungen:</string>
+    <string name="number_mine">Vertretungen, die mich betreffen:</string>
+    <string name="actdate">Aktualisierungsdatum:</string>
     <string name="vplan">Vertretungsplan</string>
     <string name="autopullvplan">Vertretungsplan im Hintergrund aktualisieren</string>
     <string name="autopull_intervall">Zeitintervall für die Aktualisierung (min)</string>

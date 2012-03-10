@@ -41,21 +41,58 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			handler.sendMessage(msg);
 			}
 		}
+	private static class IDSender extends Thread {
+		Context context;
+		String registration_id;
+		IDSender(Context c, String id) {
+			context = c;
+			registration_id = id;
+		}
+		public void run() {
+//			Looper.prepare();
+			Functions.sendClientId(registration_id, context);
+		}
+	}
 	@Override
 	public void onReceive(final Context context, Intent intent) {
 		try {
-			Log.d("asdf", "UpdateBroadcastReceiver");
 			String action = intent.getAction();
-			Log.d("asdfaction", action);
-			Handler h = new Handler();
-			if(action.equals("update_vplan")) {
-				ProgressThread progress = new ProgressThread(h, context);
-				progress.start();
-			}
+			if (action.equals("com.google.android.c2dm.intent.REGISTRATION")) {
+				handleRegistration(context, intent);
+				} else if (action.equals("com.google.android.c2dm.intent.RECEIVE")) {
+					handleMessage(context, intent);
+					} else if(action.equals("update_vplan")) {
+						updateVP(context);
+						}
 			Functions.setAlarm(context);
 			} catch (Exception e) {
 				Log.d("error", e.getMessage());
 				e.printStackTrace();
 				}
 		}
+	private void updateVP(Context context) {
+		Log.d("UpdateBroadcastReceiver", "update VPlan");
+		Handler h = new Handler();
+		ProgressThread progress = new ProgressThread(h, context);
+		progress.start();
+	}
+	private void handleRegistration(Context context, Intent intent) {
+		    String registration = intent.getStringExtra("registration_id"); 
+		    if (intent.getStringExtra("error") != null) {
+		        Log.d("c2dm", "registration failed");
+		    } else if (intent.getStringExtra("unregistered") != null) {
+		    	Log.d("c2dm", "unregistered");
+		    } else if (registration != null) {
+		    	final String registrationId = intent.getStringExtra("registration_id");
+		    	IDSender idsend = new IDSender(context, registrationId);
+		    	idsend.start();
+		    	Log.d("regID", registrationId);
+		    }
+		}
+	private void handleMessage(Context context, Intent intent) {
+		final String action = intent.getStringExtra("action");
+		Log.d("c2dm message", action);
+		if(action.equals("update_vplan"))
+			updateVP(context);
+	}
 	}

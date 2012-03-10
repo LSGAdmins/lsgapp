@@ -6,7 +6,15 @@
 
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="15" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    
+    <!-- Only this application can receive the messages and registration result --> 
+   <permission android:name="com.lsg.app.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+   <uses-permission android:name="com.lsg.app.permission.C2D_MESSAGE" />
+
+   <!-- This app has permission to register and receive message -->
+   <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     
     <supports-screens android:resizeable="true"
                   android:smallScreens="true"
@@ -39,6 +47,16 @@
           <intent-filter>
               <action android:name="android.intent.action.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE" />
 			  <category android:name="android.intent.category.HOME" />
+          </intent-filter>
+          <!-- Receive the actual message -->
+          <intent-filter>
+              <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+              <category android:name="com.lsg.app" />
+          </intent-filter>
+          <!-- Receive the registration id -->
+          <intent-filter>
+              <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+              <category android:name="com.lsg.app" />
           </intent-filter>
     </receiver>
     </application>

@@ -1,7 +1,9 @@
 package com.lsg.app;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -31,6 +33,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouchListener  {
@@ -365,6 +368,21 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	    case R.id.subjects:
             Intent subjects = new Intent(this, SubjectList.class);
             startActivity(subjects);
+	    	return true;
+	    case R.id.info:
+	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    	builder.setMessage(getString(R.string.number_all) + " " + new Integer(c.getCount()).toString() + "\n"
+	    			+ getString(R.string.number_mine) + " " + new Integer(second_c.getCount()).toString() + "\n"
+	    			+ getString(R.string.actdate) + prefs.getString("date", "") + " / " + prefs.getString("time", ""))
+	    	       .setCancelable(true)
+	    	       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+	    	           public void onClick(DialogInterface dialog, int id) {
+	    	                dialog.cancel();
+	    	           }
+	    	       });
+	    	AlertDialog alert = builder.create();
+	    	alert.show();
 	    	return true;
         case android.R.id.home:
             // app icon in action bar clicked; go home

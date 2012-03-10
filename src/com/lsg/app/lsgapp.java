@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ListActivity;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -108,10 +109,15 @@ public class lsgapp extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	if(prefs.getBoolean("updatevplanonstart", false)) {
-    		UpdateBroadcastReceiver.ProgressThread upd = new UpdateBroadcastReceiver.ProgressThread(new Handler(), this);
-    		upd.start();
+    		//UpdateBroadcastReceiver.ProgressThread upd = new UpdateBroadcastReceiver.ProgressThread(new Handler(), this);
+    		//upd.start();
     	}
     	Functions.setAlarm(this);
+    	
+    	Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
+    	registrationIntent.putExtra("app", PendingIntent.getBroadcast(this, 0, new Intent(), 0)); // boilerplate
+    	registrationIntent.putExtra("sender", Functions.EMAIL);
+    	startService(registrationIntent);
     	
     	
     	super.onCreate(savedInstanceState);

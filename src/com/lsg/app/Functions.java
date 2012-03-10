@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONArray;
@@ -46,12 +45,16 @@ public class Functions {
 	public static final String   BLACKLIST      = "blacklist";
 	public static final String   WHITELIST      = "whitelist";
 	
-	public static final String   UPDATE_URL  = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
-	public static final String   VP_URL      = "http://linux.lsg.musin.de/cp/vp_app.php";
-	public static final String   EVENT_URL   = "http://linux.lsg.musin.de/cp/termine_app.php";
-	public static final String   CLASS_URL   = "http://linux.lsg.musin.de/cp/getClass.php";
-	public static final String   SUBJECT_URL = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
-	public static final String   API_VERSION = "2";
+	//c2dm
+	public static final String   EMAIL       = "noreply.lsg@googlemail.com";
+	
+	public static final String   UPDATE_URL       = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
+	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String   EVENT_URL        = "http://linux.lsg.musin.de/cp/termine_app.php";
+	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php";
+	public static final String   SUBJECT_URL      = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
+	public static final String   REGISTRATION_URL = "http://linux.lsg.musin.de/cp/register_client.php";
+	public static final String   API_VERSION      = "2";
 	
 	public static final String   class_key  = "class";
 	public static final String[] exclude    = {"Q11", "Q12"};
@@ -616,5 +619,18 @@ public class Functions {
 			  list.updateList();
 		  }
 		  return true;
+	}
+	public static void sendClientId(String id, Context context) {
+		String add = "";
+		try {
+			add = "&" + URLEncoder.encode("client_id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
+		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+		String get = Functions.getData(Functions.REGISTRATION_URL, context, true, add);
+		if(!get.equals("networkerror")) {
+			Log.d("c2dm", get);
+			}
+		else {
+			Log.d("sendId", "networkerror");
+		}
 	}
 }
