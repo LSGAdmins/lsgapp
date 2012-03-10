@@ -47,6 +47,9 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	private float lastX, lastY, moveX, moveY;
 	private ViewFlipper vFlip;
 	private LinearLayout left, right;
+	private boolean noAnim;
+	private boolean lock;
+    DisplayMetrics metrics = new DisplayMetrics();
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -82,6 +85,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 		vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
 		left  = (LinearLayout) findViewById(R.id.first);
 		right = (LinearLayout) findViewById(R.id.second);//vFlip.getChildAt(vFlip.getDisplayedChild() + 1);
+	    getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
@@ -92,6 +96,8 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
 			searchEdit.addTextChangedListener(this);
 			getListView().addHeaderView(search);
+			ListView sec = (ListView) findViewById(R.id.second_list);
+			sec.addHeaderView(search);
 		}
         
 		if(Functions.getSDK() >= 11) {
@@ -191,9 +197,12 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 			vFlip.setOutAnimation(this, android.R.anim.slide_out_right);
 			if(vFlip.getDisplayedChild() != 0) {
 				vFlip.showPrevious();
+				mine = true;
 			}
-			else
+			else {
 				vFlip.showNext();
+				mine = false;
+			}
 			Log.d("flip", new Integer(vFlip.getDisplayedChild()).toString());
 		}
         
@@ -204,57 +213,83 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	}
 	@Override
 	public boolean onTouch(View v, MotionEvent motionEvent) {
-		Log.d("asdf", "onTouch");
 		switch (motionEvent.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			lastX = motionEvent.getX();
 			lastY = motionEvent.getY();
 			break;
 		case MotionEvent.ACTION_UP:
-            DisplayMetrics metrics_sec = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics_sec);
-            float movez;
-			if(lastX-motionEvent.getX() > (metrics_sec.widthPixels / 2))
-	            movez = metrics_sec.widthPixels - (lastX - motionEvent.getX());
-			else
-				movez = (lastX - motionEvent.getX());
-			TranslateAnimation ta = new TranslateAnimation(Animation.ABSOLUTE, movez, Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0);
-			ta.setDuration(100);
-			FrameLayout.LayoutParams lp_up = new FrameLayout.LayoutParams(left.getLayoutParams());
-			lp_up.setMargins(0, 0, 0, 0);
-			if(lastX-motionEvent.getX() > (metrics_sec.widthPixels / 2)) {
-
-				right.startAnimation(ta);
-				right.setLayoutParams(lp_up);
-				right.invalidate();
-				left.setVisibility(View.GONE);
-			}
-			else {
-				left.startAnimation(ta);
+			if(!noAnim) {
+				float movez;
+				if(lastX-motionEvent.getX() > (metrics.widthPixels / 2))
+					movez = metrics.widthPixels - (lastX - motionEvent.getX());
+				else
+					movez = (lastX - motionEvent.getX());
+				TranslateAnimation ta = new TranslateAnimation(Animation.ABSOLUTE, movez, Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0);
+				ta.setDuration(100);
+				FrameLayout.LayoutParams lp_up = new FrameLayout.LayoutParams(left.getLayoutParams());
+				lp_up.setMargins(0, 0, 0, 0);
+				if((lastX-motionEvent.getX() > (metrics.widthPixels / 5) && mine) || (!mine && lastX+motionEvent.getX() < (metrics.widthPixels / 4))) {
+					right.startAnimation(ta);
+					right.invalidate();
+					left.setVisibility(View.GONE);
+					mine = false;
+					if(Functions.getSDK() >= 11) {
+						AdvancedWrapper adv = new AdvancedWrapper();
+						adv.selectedItem(1, this);
+					}
+					} else {
+						left.startAnimation(ta);
+						left.invalidate();
+						right.setVisibility(View.GONE);
+						mine = true;
+						if(Functions.getSDK() >= 11) {
+							AdvancedWrapper adv = new AdvancedWrapper();
+							adv.selectedItem(0, this);
+						}
+						}
 				left.setLayoutParams(lp_up);
-				left.invalidate();
-				right.setVisibility(View.GONE);
+				right.setLayoutParams(lp_up);
 			}
+			lock = false;
 			break;
 	    case MotionEvent.ACTION_MOVE:
-	    	if(moveX - motionEvent.getX() > 10 || moveX - motionEvent.getX() < -10/*lastX - motionEvent.getX() > 3 || lastX - motionEvent.getX() < -3*/) {
+	    	if((moveX - motionEvent.getX() > 5 || moveX - motionEvent.getX() < -5) && !lock) {
+	            left.setVisibility(View.VISIBLE);
+	            right.setVisibility(View.VISIBLE);
+	            
 	    		int move = (int)(lastX - motionEvent.getX());
 	    	    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(left.getLayoutParams());
 	            lp.setMargins(-move, 0, move, 0);
-	            left.setLayoutParams(lp);
-	            left.setVisibility(View.VISIBLE);
-	            left.invalidate();
 	            
-	            DisplayMetrics metrics = new DisplayMetrics();
-	            getWindowManager().getDefaultDisplay().getMetrics(metrics);
 	    	    FrameLayout.LayoutParams lp_sec = new FrameLayout.LayoutParams(right.getLayoutParams());
 	            lp_sec.setMargins(((int) metrics.widthPixels) - move, 0, move - ((int) metrics.widthPixels), 0);
-	            right.setLayoutParams(lp_sec);
-	            right.setVisibility(View.VISIBLE);
+	            if(!mine) {
+	            	lp_sec.setMargins((-move - metrics.widthPixels), 0, metrics.widthPixels + move, 0);
+	            }
+	            
+	            
+	            if((mine && move < 0) || (!mine && move > 0)) {
+	            	lp_sec.setMargins(metrics.widthPixels, 0, 0, 0);
+	            	lp.setMargins(0, 0, 0, 0);
+	            	noAnim = true;
+	            }
+	            else
+	            	noAnim = false;
+	            if(mine) {
+	            	right.setLayoutParams(lp_sec);
+	            	left.setLayoutParams(lp);
+	            }
+	            else {
+	            	left.setLayoutParams(lp_sec);
+	            	right.setLayoutParams(lp);
+	            }
+	            left.invalidate();
 	            right.invalidate();
 	    	}
 	    	else if(lastY - motionEvent.getY() > 3) {
-	    		Log.d("asdf", "Y");
+	    		lock = true;
+	    		noAnim = true;
 	    	}
 	    	moveX = motionEvent.getX();
 	    	moveY = motionEvent.getY();

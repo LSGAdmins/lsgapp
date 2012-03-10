@@ -15,6 +15,10 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	    ActionBar actionBar = act.getActionBar();
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	}
+	public static void selectedItem(int position, Activity act) {
+		ActionBar bar = act.getActionBar();
+		bar.setSelectedNavigationItem(position);
+	}
 	public static void dropDownNav(final VPlan act) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
 		int spinner = (!prefs.getBoolean("dark_actionbar", false)) ? android.R.layout.simple_spinner_dropdown_item : R.layout.spinner_dropdown_black_actionbar;

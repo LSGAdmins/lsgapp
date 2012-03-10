@@ -8,6 +8,9 @@ public class AdvancedWrapper {
 	public void dropDownNav(VPlan vplan) {
 		Advanced.dropDownNav(vplan);
 		}
+	public void selectedItem(int position, Activity act) {
+		Advanced.selectedItem(position, act);
+	}
 	public void searchBar(Menu menu, SQLlist list) {
 		Advanced adv = new Advanced();
 		adv.searchBarInit(menu, list);
