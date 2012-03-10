@@ -24,8 +24,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -41,7 +44,9 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	private boolean mine = true;
 	private String exclude_cond;
 	private String include_cond;
-	private float lastX, lastY;
+	private float lastX, lastY, moveX, moveY;
+	private ViewFlipper vFlip;
+	private LinearLayout left, right;
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -72,10 +77,11 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 		Functions.setTheme(false, true, this);
 		
 		setContentView(R.layout.list_viewflipper);
-		//findViewById(R.id.first).setOnTouchListener(this);
-		//findViewById(R.id.second).setOnTouchListener(this);
 		findViewById(R.id.second_list).setOnTouchListener(this);
 		getListView().setOnTouchListener(this);
+		vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
+		left  = (LinearLayout) findViewById(R.id.first);
+		right = (LinearLayout) findViewById(R.id.second);//vFlip.getChildAt(vFlip.getDisplayedChild() + 1);
 		
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
@@ -160,29 +166,23 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	}
 	public void getCursor() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if(mine) {
-			String klasse = prefs.getString("class", "");
-			where_conds[0] =  "%" + klasse + "%";
-		}
-		else
-			where_conds[0] = "%";
-		String where_cond = "( " + Functions.DB_KLASSE + " LIKE ? ";
-		if(mine)
-			where_cond += include_cond;
+		String klasse = prefs.getString("class", "");
+		where_conds[0] =  "%" + klasse + "%";
+		String first = "( " + Functions.DB_KLASSE + " LIKE ? ";
+		String sec = "";
 		if(prefs.getBoolean("showwithoutclass", true))
-			where_cond += "OR " + Functions.DB_KLASSE + " LIKE 'null'";
-		where_cond += " OR " + Functions.DB_KLASSE + " LIKE 'infotext') AND ( " + Functions.DB_KLASSE
+			sec = "OR " + Functions.DB_KLASSE + " LIKE 'null'";
+		sec += " OR " + Functions.DB_KLASSE + " LIKE 'infotext') AND ( " + Functions.DB_KLASSE
 				+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
-		if(mine)
-			where_cond += exclude_cond;
-			second_c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-					Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
-					where_conds, null, null, null);
-			c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-					Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, where_cond,
-					where_conds, null, null, null);
+		String mine_cond = first + include_cond +  sec + exclude_cond;
+		String all_cond = first + sec;
+		second_c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
+				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, mine_cond, where_conds, null, null, null);
+		where_conds[0] = "%";
+		c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
+				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, all_cond, where_conds, null, null, null);
 	}
 	public void updateCursor(boolean mine) {
 		ViewFlipper vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
@@ -211,29 +211,53 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 			lastY = motionEvent.getY();
 			break;
 		case MotionEvent.ACTION_UP:
+            DisplayMetrics metrics_sec = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics_sec);
+            float movez;
+			if(lastX-motionEvent.getX() > (metrics_sec.widthPixels / 2))
+	            movez = metrics_sec.widthPixels - (lastX - motionEvent.getX());
+			else
+				movez = (lastX - motionEvent.getX());
+			TranslateAnimation ta = new TranslateAnimation(Animation.ABSOLUTE, movez, Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0);
+			ta.setDuration(100);
+			FrameLayout.LayoutParams lp_up = new FrameLayout.LayoutParams(left.getLayoutParams());
+			lp_up.setMargins(0, 0, 0, 0);
+			if(lastX-motionEvent.getX() > (metrics_sec.widthPixels / 2)) {
+
+				right.startAnimation(ta);
+				right.setLayoutParams(lp_up);
+				right.invalidate();
+				left.setVisibility(View.GONE);
+			}
+			else {
+				left.startAnimation(ta);
+				left.setLayoutParams(lp_up);
+				left.invalidate();
+				right.setVisibility(View.GONE);
+			}
 			break;
 	    case MotionEvent.ACTION_MOVE:
-	    	if(lastX - motionEvent.getX() > 3 || lastX - motionEvent.getX() < -3) {
+	    	if(moveX - motionEvent.getX() > 10 || moveX - motionEvent.getX() < -10/*lastX - motionEvent.getX() > 3 || lastX - motionEvent.getX() < -3*/) {
 	    		int move = (int)(lastX - motionEvent.getX());
-	    		ViewFlipper vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
-	    		final View currentView = vFlip.getCurrentView();
-	    	    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(currentView.getLayoutParams());
+	    	    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(left.getLayoutParams());
 	            lp.setMargins(-move, 0, move, 0);
-	            currentView.setLayoutParams(lp);
-	            currentView.invalidate();
+	            left.setLayoutParams(lp);
+	            left.setVisibility(View.VISIBLE);
+	            left.invalidate();
 	            
 	            DisplayMetrics metrics = new DisplayMetrics();
 	            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-	            final View nextView = vFlip.getChildAt(vFlip.getDisplayedChild() + 1);
-	    	    FrameLayout.LayoutParams lp_sec = new FrameLayout.LayoutParams(nextView.getLayoutParams());
+	    	    FrameLayout.LayoutParams lp_sec = new FrameLayout.LayoutParams(right.getLayoutParams());
 	            lp_sec.setMargins(((int) metrics.widthPixels) - move, 0, move - ((int) metrics.widthPixels), 0);
-	            nextView.setLayoutParams(lp_sec);
-	            nextView.setVisibility(View.VISIBLE);
-	            nextView.invalidate();
+	            right.setLayoutParams(lp_sec);
+	            right.setVisibility(View.VISIBLE);
+	            right.invalidate();
 	    	}
 	    	else if(lastY - motionEvent.getY() > 3) {
 	    		Log.d("asdf", "Y");
 	    	}
+	    	moveX = motionEvent.getX();
+	    	moveY = motionEvent.getY();
 	    	break;
 	  }
 	  return false;
