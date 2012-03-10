@@ -4,6 +4,10 @@
         android:title="@string/vplan"
         android:key="@string/vplan" >
         <CheckBoxPreference 
+            android:title="@string/swipeforpaul"
+            android:key="swipewithgesture"
+            android:defaultValue="false" />
+        <CheckBoxPreference 
             android:title="@string/showwithoutclass"
             android:key="showwithoutclass"
             android:defaultValue="true" />

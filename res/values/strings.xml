@@ -11,6 +11,9 @@
     <string name="showonlywhitelist_on">Nur Vertretungen aus Whitelist angezeigt</string>
     <string name="on">An</string>
     <string name="off">Aus</string>
+    <string name="swipeforpaul">Swipen für Paul</string>
+    <string name="swipeforpaul_on">Swipen per Geste</string>
+    <string name="swipeforpaul_off">Normal swipen</string>
     <string name="vplan_info">Info</string>
     <string name="ok">OK</string>
     <string name="number_all">Anzahl der Vertretungen:</string>

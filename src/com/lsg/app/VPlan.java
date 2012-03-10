@@ -1,5 +1,6 @@
 package com.lsg.app;
 
+import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -9,6 +10,13 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.Prediction;
+import android.gesture.GestureOverlayView.OnGesturePerformedListener;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,10 +41,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouchListener  {
+public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouchListener, OnGesturePerformedListener  {
 	private String[] where_conds = new String[4];
 	private ProgressDialog loading;
 	private SQLiteDatabase myDB;
@@ -53,6 +60,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	private boolean noAnim;
 	private boolean lock;
     DisplayMetrics metrics = new DisplayMetrics();
+	private GestureLibrary gestLib;
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -81,10 +89,26 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 		Functions.testDB(this);
         
 		Functions.setTheme(false, true, this);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		Boolean swipeforpaul = prefs.getBoolean("swipewithgesture", false);
+		Log.d("swipe", new Boolean(swipeforpaul).toString());
 		
-		setContentView(R.layout.list_viewflipper);
-		findViewById(R.id.second_list).setOnTouchListener(this);
-		getListView().setOnTouchListener(this);
+		if(swipeforpaul) {
+			GestureOverlayView gestureOverlayView = new GestureOverlayView(this);
+			View inflate = getLayoutInflater().inflate(R.layout.list_viewflipper, null);
+			gestureOverlayView.addView(inflate);
+			gestureOverlayView.addOnGesturePerformedListener(this);
+			gestureOverlayView.setGestureColor(Color.TRANSPARENT);
+			gestureOverlayView.setUncertainGestureColor(Color.TRANSPARENT);
+			gestLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
+			gestLib.load();
+			setContentView(gestureOverlayView);
+		}
+		else {
+			setContentView(R.layout.list_viewflipper);
+			findViewById(R.id.second_list).setOnTouchListener(this);
+			getListView().setOnTouchListener(this);
+		}
 		vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
 		left  = (LinearLayout) findViewById(R.id.first);
 		right = (LinearLayout) findViewById(R.id.second);//vFlip.getChildAt(vFlip.getDisplayedChild() + 1);
@@ -300,6 +324,35 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	  }
 	  return false;
 	}
+	@Override
+	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+		ArrayList<Prediction> predictions = gestLib.recognize(gesture);
+		for (Prediction prediction : predictions) {
+			if (prediction.score > 1.0) {
+				vFlip.setInAnimation(this, android.R.anim.slide_in_left);
+				vFlip.setOutAnimation(this, android.R.anim.slide_out_right);
+				Log.d("prediction", prediction.name);
+				if(prediction.name.equals("left") && mine) {
+					vFlip.showNext();
+					right.setVisibility(View.VISIBLE);
+					left.setVisibility(View.GONE);
+					if(Functions.getSDK() >= 11) {
+						AdvancedWrapper adv = new AdvancedWrapper();
+						adv.selectedItem(1, this);
+					}
+					}
+				if(prediction.name.equals("right") && !mine) {
+					vFlip.showPrevious();
+					left.setVisibility(View.VISIBLE);
+					right.setVisibility(View.GONE);
+					if(Functions.getSDK() >= 11) {
+						AdvancedWrapper adv = new AdvancedWrapper();
+						adv.selectedItem(0, this);
+					}
+					}
+				}
+			}
+		}
 	public void updateWhereCond(String searchText) {
 		where_conds[1] = "%" + searchText + "%";
 		where_conds[2] = "%" + searchText + "%";
