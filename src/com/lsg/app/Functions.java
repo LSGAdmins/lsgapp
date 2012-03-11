@@ -364,7 +364,6 @@ public class Functions {
 		int i = 0;
 		while(i < result.getCount()) {
 			String date = result.getString(result.getColumnIndex(Functions.DB_DATE));
-			Log.d("date", date);
 			String[] splitdate = date.split("\\.");
 			int year  = new Integer(splitdate[2]);
 			int month = new Integer(splitdate[1]);
