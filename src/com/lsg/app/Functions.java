@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONArray;
@@ -222,7 +223,7 @@ public class Functions {
 					}
 	}
 	
-	public static synchronized boolean refreshVPlan(final Context context, Handler h) {
+	public static synchronized boolean refreshVPlan(final Context context, Handler h, boolean notify) {
 		Functions.testDB(context);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String add = "";
@@ -265,7 +266,8 @@ public class Functions {
         		myDB.close();
         		} catch(JSONException e) {
         			Log.d("json", e.getMessage());
-        			h.post(getErrorRunnable("jsonerror", context));
+        			if(notify)
+        				h.post(getErrorRunnable("jsonerror", context));
         			return false;
         		}
 			}
@@ -275,16 +277,18 @@ public class Functions {
 					Toast.makeText(context, context.getString(R.string.noact), Toast.LENGTH_SHORT).show();
 				}
 			};
-			h.post(r);
+			if(notify)
+				h.post(r);
 			return true;
 		}
 		else {
-			h.post(getErrorRunnable(get, context));
+			if(notify)
+				h.post(getErrorRunnable(get, context));
 			return false;
 		}
 		return true;
 		}
-	public static synchronized boolean updateSubjectList(final Context context, Handler h) {
+	public static synchronized boolean updateSubjectList(final Context context, Handler h, boolean notify) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String add = "";
 		try {
@@ -313,7 +317,8 @@ public class Functions {
         		myDB.close();
         		} catch(JSONException e) {
         			Log.d("json", e.getMessage());
-        			h.post(getErrorRunnable("jsonerror", context));
+        			if(notify)
+        				h.post(getErrorRunnable("jsonerror", context));
         			return false;
         		}
 			}
@@ -323,11 +328,13 @@ public class Functions {
 					Toast.makeText(context, context.getString(R.string.noact_subjects), Toast.LENGTH_SHORT).show();
 				}
 			};
-			h.post(r);
+			if(notify)
+				h.post(r);
 			return true;
 		}
 		else {
-			h.post(getErrorRunnable(get, context));
+			if(notify)
+				h.post(getErrorRunnable(get, context));
 			return false;
 		}
 		return true;
@@ -346,17 +353,18 @@ public class Functions {
         }
 	}
 	public static void cleanDB(Context context) {
-		Date now  = new Date();
-		int year_now  = now.getYear();
-		int month_now = now.getMonth();
-		int day_now   = now.getDay();
+		Calendar now  = Calendar.getInstance();
+		int year_now  = now.get(Calendar.YEAR);
+		int month_now = now.get(Calendar.MONTH)+1;
+		int day_now   = now.get(Calendar.DAY_OF_MONTH);
 		SQLiteDatabase myDB;
 		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
-		Cursor result = myDB.rawQuery("SELECT DISTINCT " + Functions.DB_DATE + " FROM " + Functions.DB_VPLAN_TABLE, null);
+		Cursor result = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_DATE}, null, null, null, null, null);
 		result.moveToFirst();
 		int i = 0;
 		while(i < result.getCount()) {
 			String date = result.getString(result.getColumnIndex(Functions.DB_DATE));
+			Log.d("date", date);
 			String[] splitdate = date.split("\\.");
 			int year  = new Integer(splitdate[2]);
 			int month = new Integer(splitdate[1]);
@@ -367,7 +375,7 @@ public class Functions {
 				isvalid = true;
 				}
 			else if(year == year_now) {
-				if(!(month < month_now+1)) {
+				if(!(month < month_now+2)) {
 					isvalid = true;
 					}
 				else if(month == month_now) {

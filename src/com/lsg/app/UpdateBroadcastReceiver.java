@@ -12,13 +12,20 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	public static class ProgressThread extends Thread {
 		Handler handler;
 		Context context;
+		boolean notify;
 		ProgressThread(Handler h, Context c) {
 			handler = h;
 			context = c;
+			notify = true;
+			}
+		ProgressThread(Handler h, Context c, boolean notify) {
+			handler = h;
+			context = c;
+			this.notify = notify;
 			}
 		public void run() {
 			Looper.prepare();
-			boolean update = Functions.refreshVPlan(context, handler);
+			boolean update = Functions.refreshVPlan(context, handler, notify);
 			
 			Message msg = handler.obtainMessage();
 			msg.arg1 = 3;
@@ -32,7 +39,7 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			msg.arg2 = R.string.loading_subjects;
 			handler.sendMessage(msg);
 			
-			Functions.updateSubjectList(context, handler);
+			Functions.updateSubjectList(context, handler, notify);
 			
 			msg = handler.obtainMessage();
 			msg.arg1 = 1;
@@ -49,7 +56,6 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			registration_id = id;
 		}
 		public void run() {
-//			Looper.prepare();
 			Functions.sendClientId(registration_id, context);
 		}
 	}
@@ -57,6 +63,7 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	public void onReceive(final Context context, Intent intent) {
 		try {
 			String action = intent.getAction();
+			Log.d("action", action);
 			if (action.equals("com.google.android.c2dm.intent.REGISTRATION")) {
 				handleRegistration(context, intent);
 				} else if (action.equals("com.google.android.c2dm.intent.RECEIVE")) {
@@ -73,7 +80,7 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	private void updateVP(Context context) {
 		Log.d("UpdateBroadcastReceiver", "update VPlan");
 		Handler h = new Handler();
-		ProgressThread progress = new ProgressThread(h, context);
+		ProgressThread progress = new ProgressThread(h, context, false);
 		progress.start();
 	}
 	private void handleRegistration(Context context, Intent intent) {
