@@ -2,8 +2,10 @@ package com.lsg.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
@@ -11,7 +13,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
-public class Settings extends PreferenceActivity {
+public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,7 +58,27 @@ public class Settings extends PreferenceActivity {
         				return true;
         				}
         	});
+        prefs.registerOnSharedPreferenceChangeListener(this);
+    	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
+    	pull(!prefs.getBoolean("useac2dm", false));
 	}
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if(key.equals("useac2dm")) {
+        	pull(!prefs.getBoolean("useac2dm", false));
+        }
+        if(key.equals("updatevplanonstart") || key.equals("autopullvplan")) {
+        	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
+        }
+    }
+    private void push(boolean enabled) {
+    	(findPreference("useac2dm")).setEnabled(enabled);
+    }
+    private void pull(boolean enabled) {
+    	((CheckBoxPreference) findPreference("updatevplanonstart")).setEnabled(enabled);
+    	((CheckBoxPreference) findPreference("autopullvplan")).setEnabled(enabled);
+    	((EditTextPreference) findPreference("autopull_intervall")).setEnabled(enabled);
+    }
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {

@@ -43,7 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouchListener, OnGesturePerformedListener  {
+public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouchListener {
 	private String[] where_conds = new String[4];
 	private ProgressDialog loading;
 	private SQLiteDatabase myDB;
@@ -54,6 +54,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	private boolean mine = true;
 	private String exclude_cond;
 	private String include_cond;
+	private boolean swipeforpaul;
 	private float lastX, lastY, moveX, moveY;
 	private ViewFlipper vFlip;
 	private LinearLayout left, right;
@@ -90,25 +91,13 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
         
 		Functions.setTheme(false, true, this);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		Boolean swipeforpaul = prefs.getBoolean("swipewithgesture", false);
+		swipeforpaul = prefs.getBoolean("swipewithgesture", false);
 		Log.d("swipe", new Boolean(swipeforpaul).toString());
 		
-		if(swipeforpaul) {
-			GestureOverlayView gestureOverlayView = new GestureOverlayView(this);
-			View inflate = getLayoutInflater().inflate(R.layout.list_viewflipper, null);
-			gestureOverlayView.addView(inflate);
-			gestureOverlayView.addOnGesturePerformedListener(this);
-			gestureOverlayView.setGestureColor(Color.TRANSPARENT);
-			gestureOverlayView.setUncertainGestureColor(Color.TRANSPARENT);
-			gestLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
-			gestLib.load();
-			setContentView(gestureOverlayView);
-		}
-		else {
 			setContentView(R.layout.list_viewflipper);
 			findViewById(R.id.second_list).setOnTouchListener(this);
 			getListView().setOnTouchListener(this);
-		}
+			
 		vFlip = (ViewFlipper) findViewById(R.id.viewflipper);
 		left  = (LinearLayout) findViewById(R.id.first);
 		right = (LinearLayout) findViewById(R.id.second);//vFlip.getChildAt(vFlip.getDisplayedChild() + 1);
@@ -246,7 +235,7 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 			lastY = motionEvent.getY();
 			break;
 		case MotionEvent.ACTION_UP:
-			if(!noAnim) {
+			if(!noAnim && !swipeforpaul) {
 				float movez;
 				if(lastX-motionEvent.getX() > (metrics.widthPixels / 2))
 					movez = metrics.widthPixels - (lastX - motionEvent.getX());
@@ -277,11 +266,18 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 						}
 				left.setLayoutParams(lp_up);
 				right.setLayoutParams(lp_up);
+			} else if(swipeforpaul) {
+				if(lastX - motionEvent.getX() > lastY - motionEvent.getY()) {
+					if(mine)
+						vFlip.showNext();
+					else
+						vFlip.showPrevious();
+				}
 			}
 			lock = false;
 			break;
 	    case MotionEvent.ACTION_MOVE:
-	    	if((moveX - motionEvent.getX() > 5 || moveX - motionEvent.getX() < -5) && !lock) {
+	    	if((moveX - motionEvent.getX() > 5 || moveX - motionEvent.getX() < -5) && !lock && !swipeforpaul) {
 	            left.setVisibility(View.VISIBLE);
 	            right.setVisibility(View.VISIBLE);
 	            
@@ -324,35 +320,6 @@ public class VPlan extends ListActivity implements TextWatcher, SQLlist, OnTouch
 	  }
 	  return false;
 	}
-	@Override
-	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
-		ArrayList<Prediction> predictions = gestLib.recognize(gesture);
-		for (Prediction prediction : predictions) {
-			if (prediction.score > 1.0) {
-				vFlip.setInAnimation(this, android.R.anim.slide_in_left);
-				vFlip.setOutAnimation(this, android.R.anim.slide_out_right);
-				Log.d("prediction", prediction.name);
-				if(prediction.name.equals("left") && mine) {
-					vFlip.showNext();
-					right.setVisibility(View.VISIBLE);
-					left.setVisibility(View.GONE);
-					if(Functions.getSDK() >= 11) {
-						AdvancedWrapper adv = new AdvancedWrapper();
-						adv.selectedItem(1, this);
-					}
-					}
-				if(prediction.name.equals("right") && !mine) {
-					vFlip.showPrevious();
-					left.setVisibility(View.VISIBLE);
-					right.setVisibility(View.GONE);
-					if(Functions.getSDK() >= 11) {
-						AdvancedWrapper adv = new AdvancedWrapper();
-						adv.selectedItem(0, this);
-					}
-					}
-				}
-			}
-		}
 	public void updateWhereCond(String searchText) {
 		where_conds[1] = "%" + searchText + "%";
 		where_conds[2] = "%" + searchText + "%";

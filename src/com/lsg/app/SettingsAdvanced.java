@@ -5,10 +5,12 @@ import java.util.List;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -47,7 +49,7 @@ public class SettingsAdvanced extends PreferenceActivity {
         }
     }
 
-    public static class VPlanFragment extends PreferenceFragment {
+    public static class VPlanFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -69,6 +71,26 @@ public class SettingsAdvanced extends PreferenceActivity {
             	CheckBoxPreference onlywhitelist = (CheckBoxPreference) findPreference("showonlywhitelist");
             	prefCat.removePreference(onlywhitelist);
             }
+            prefs.registerOnSharedPreferenceChangeListener(this);
+        	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
+        	pull(!prefs.getBoolean("useac2dm", false));
+        }
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+            if(key.equals("useac2dm")) {
+            	pull(!prefs.getBoolean("useac2dm", false));
+            }
+            if(key.equals("updatevplanonstart") || key.equals("autopullvplan")) {
+            	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
+            }
+        }
+        private void push(boolean enabled) {
+        	(findPreference("useac2dm")).setEnabled(enabled);
+        }
+        private void pull(boolean enabled) {
+        	((CheckBoxPreference) findPreference("updatevplanonstart")).setEnabled(enabled);
+        	((CheckBoxPreference) findPreference("autopullvplan")).setEnabled(enabled);
+        	((EditTextPreference) findPreference("autopull_intervall")).setEnabled(enabled);
         }
     }
 

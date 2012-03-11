@@ -16,6 +16,10 @@
             android:key="showonlywhitelist"
             android:defaultValue="false" />
         <CheckBoxPreference 
+            android:title="@string/useac2dm"
+            android:key="useac2dm"
+            android:defaultValue="false" />
+        <CheckBoxPreference 
             android:title="@string/updatevplanonstart"
             android:key="updatevplanonstart"
             android:defaultValue="false" />

@@ -14,6 +14,9 @@
     <string name="swipeforpaul">Swipen für Paul</string>
     <string name="swipeforpaul_on">Swipen per Geste</string>
     <string name="swipeforpaul_off">Normal swipen</string>
+    <string name="useac2dm">Vertretungsplan pushen</string>
+    <string name="useac2dm_on">Vertretungsplan wird auf dein Gerät gepusht</string>
+    <string name="useac2dm_off">Vertretungsplan wird nicht gepusht</string>
     <string name="vplan_info">Info</string>
     <string name="ok">OK</string>
     <string name="number_all">Anzahl der Vertretungen:</string>

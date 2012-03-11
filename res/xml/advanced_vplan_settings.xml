@@ -31,6 +31,14 @@
             android:title="@string/dark_actionbar"
             android:key="dark_actionbar"
             android:defaultValue="false" />
+        <SwitchPreference 
+            android:title="@string/useac2dm"
+            android:key="useac2dm"
+            android:summaryOff="@string/useac2dm_off"
+            android:summaryOn="@string/useac2dm_on"
+            android:switchTextOff="@string/off"
+            android:switchTextOn="@string/on"
+            android:defaultValue="false" />
         <CheckBoxPreference 
             android:title="@string/updatevplanonstart"
             android:key="updatevplanonstart"
