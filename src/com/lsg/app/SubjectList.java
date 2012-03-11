@@ -91,11 +91,11 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, myDB, this, Functions.DB_SUBJECT_TABLE);
+		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_SUBJECT_TABLE);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, myDB, this, this, Functions.DB_SUBJECT_TABLE);
+		return Functions.contextMenuSelect(item, this, this, Functions.DB_SUBJECT_TABLE);
 	}
 	public void updateCursor() {
 		c = myDB.query(Functions.DB_SUBJECT_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_FACH}, where_cond, where_conds, null, null, null);

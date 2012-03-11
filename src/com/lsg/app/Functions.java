@@ -495,12 +495,13 @@ public class Functions {
 		return true;
 	}
 	//handlers for adding / removing items to / from blacklist
-	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, SQLiteDatabase myDB, Context context, String table) {
+	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, Context context, String table) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		String klasse  = "";
 		String rawfach = "";
 		String fach    = "";
 		int conmenu = 0;
+		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		if(table.equals(Functions.DB_VPLAN_TABLE)) {
 			Cursor cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
 					new String[] {new Long(info.id).toString()}, null, null, null);
@@ -554,8 +555,9 @@ public class Functions {
 			menu.add(Menu.NONE, 3, 0, context.getString(R.string.no_includesubject));
 		}
 	}
-	public static boolean contextMenuSelect(MenuItem item, final SQLiteDatabase myDB, Context context, final SQLlist list, String table) {
-		  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+	public static boolean contextMenuSelect(MenuItem item, Context context, final SQLlist list, String table) {
+		final SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 		  
 		  Cursor cur;
 		  if(table.equals(Functions.DB_VPLAN_TABLE)) {

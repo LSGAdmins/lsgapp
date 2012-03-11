@@ -28,13 +28,13 @@ public class Advanced implements SearchView.OnQueryTextListener {
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 				switch(itemPosition) {
 				case 0:
-					act.updateCursor(true);
+					act.setPage(0);
 					break;
 				case 1:
-					act.updateCursor(false);
+					act.setPage(1);
 					break;
 					default:
-						act.updateCursor(true);
+						act.setPage(0);
 						break;
 						}
 			return false;

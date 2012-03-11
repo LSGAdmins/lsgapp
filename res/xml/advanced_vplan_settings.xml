@@ -4,14 +4,6 @@
         android:title="@string/vplan"
         android:key="@string/vplan" >
         <SwitchPreference 
-            android:title="@string/swipeforpaul"
-            android:key="swipewithgesture"
-            android:summaryOff="@string/swipeforpaul_off"
-            android:summaryOn="@string/swipeforpaul_on"
-            android:switchTextOff="@string/off"
-            android:switchTextOn="@string/on"
-            android:defaultValue="false" />
-        <SwitchPreference 
             android:title="@string/showwithoutclass"
             android:key="showwithoutclass"
             android:summaryOff="@string/showwithoutclass_off"
