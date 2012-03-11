@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -68,7 +69,7 @@ public class SettingsAdvanced extends PreferenceActivity {
             }
             if(!showonlywhitelist) {
             	PreferenceCategory prefCat = (PreferenceCategory) findPreference(getString(R.string.vplan));
-            	CheckBoxPreference onlywhitelist = (CheckBoxPreference) findPreference("showonlywhitelist");
+            	Preference onlywhitelist = (Preference) findPreference("showonlywhitelist");
             	prefCat.removePreference(onlywhitelist);
             }
             prefs.registerOnSharedPreferenceChangeListener(this);

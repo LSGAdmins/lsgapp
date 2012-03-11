@@ -169,4 +169,9 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	public boolean onContextItemSelected(final MenuItem item) {
 		return Functions.contextMenuSelect(item, this, adapter, Functions.DB_VPLAN_TABLE);
 	}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		adapter.closeCursorsDB();
+	}
 }

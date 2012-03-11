@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class VPlanViewPagerAdapter extends PagerAdapter /*implements TitleProvider*/ implements SQLlist, TextWatcher {
+public class VPlanViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher {
 	private String[] where_conds = new String[4];
 	private SQLiteDatabase myDB;
 	public Cursor c;
@@ -160,7 +160,11 @@ public class VPlanViewPagerAdapter extends PagerAdapter /*implements TitleProvid
 		String search = s + "";
 		updateWhereCond(search);
 	}
-	
+	public void closeCursorsDB() {
+		c.close();
+		second_c.close();
+		myDB.close();
+	}
 	@Override
 	public void destroyItem( View pager, int position, Object view ) {
 		((ViewPager)pager).removeView( (TextView)view );

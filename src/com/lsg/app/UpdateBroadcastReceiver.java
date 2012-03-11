@@ -93,7 +93,6 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 		    	final String registrationId = intent.getStringExtra("registration_id");
 		    	IDSender idsend = new IDSender(context, registrationId);
 		    	idsend.start();
-		    	Log.d("regID", registrationId);
 		    }
 		}
 	private void handleMessage(Context context, Intent intent) {
