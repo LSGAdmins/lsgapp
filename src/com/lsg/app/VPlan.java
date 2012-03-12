@@ -130,8 +130,8 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	    case R.id.info:
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    	builder.setMessage(getString(R.string.number_all) + " " + new Integer(adapter.c.getCount()).toString() + "\n"
-	    			+ getString(R.string.number_mine) + " " + new Integer(adapter.second_c.getCount()).toString() + "\n"
+	    	builder.setMessage(getString(R.string.number_all) + " " + new Integer(adapter.second_c.getCount()).toString() + "\n"
+	    			+ getString(R.string.number_mine) + " " + new Integer(adapter.c.getCount()).toString() + "\n"
 	    			+ getString(R.string.actdate) + prefs.getString("date", "") + " / " + prefs.getString("time", ""))
 	    	       .setCancelable(true)
 	    	       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {

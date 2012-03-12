@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +28,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Handler;
+import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -42,6 +43,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class Functions {
+	public static final String   TAG            = "LSGäpp";
+	
 	public static final String   BLACKWHITELIST = "blackwhitelist";
 	public static final String   BLACKLIST      = "blacklist";
 	public static final String   WHITELIST      = "whitelist";
@@ -177,7 +180,7 @@ public class Functions {
         	wr.close();
         	//get response
         	InputStream response = conn.getInputStream();
-        	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
+        	BufferedReader reader = new BufferedReader(new InputStreamReader(response), 8 * 1024);
         	String line;
         	String get = "";
         	while ((line = reader.readLine()) != null) {
@@ -641,5 +644,16 @@ public class Functions {
 		else {
 			Log.d("sendId", "networkerror");
 		}
+	}
+	public static void registerAC2DM(Context context) {
+		Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
+		registrationIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
+		registrationIntent.putExtra("sender", Functions.EMAIL);
+		context.startService(registrationIntent);
+	}
+	public static void unregisterAC2DM(Context context) {
+		Intent unregIntent = new Intent("com.google.android.c2dm.intent.UNREGISTER");
+		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
+		context.startService(unregIntent);
 	}
 }

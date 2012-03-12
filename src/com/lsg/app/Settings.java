@@ -61,13 +61,22 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         prefs.registerOnSharedPreferenceChangeListener(this);
     	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
     	pull(!prefs.getBoolean("useac2dm", false));
+        if(prefs.getBoolean("disableAC2DM", false)) {
+        	Preference ac2dm = (Preference) findPreference("useac2dm");
+        	prefCat.removePreference(ac2dm);
+        }
 	}
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         if(key.equals("useac2dm")) {
-        	pull(!prefs.getBoolean("useac2dm", false));
+        	boolean useac2dm = prefs.getBoolean("useac2dm", false);
+        	pull(!useac2dm);
+        	if(useac2dm)
+        		Functions.registerAC2DM(this);
+        	else
+        		Functions.unregisterAC2DM(this);
         }
-        if(key.equals("updatevplanonstart") || key.equals("autopullvplan")) {
+        if((key.equals("updatevplanonstart") || key.equals("autopullvplan")) && !prefs.getBoolean("disableAC2DM", false)) {
         	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
         }
     }

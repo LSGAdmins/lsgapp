@@ -67,21 +67,30 @@ public class SettingsAdvanced extends PreferenceActivity {
             		showonlywhitelist = true;
             	i++;
             }
+        	PreferenceCategory prefCat = (PreferenceCategory) findPreference(getString(R.string.vplan));
             if(!showonlywhitelist) {
-            	PreferenceCategory prefCat = (PreferenceCategory) findPreference(getString(R.string.vplan));
             	Preference onlywhitelist = (Preference) findPreference("showonlywhitelist");
             	prefCat.removePreference(onlywhitelist);
             }
             prefs.registerOnSharedPreferenceChangeListener(this);
         	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
         	pull(!prefs.getBoolean("useac2dm", false));
+            if(prefs.getBoolean("disableAC2DM", false)) {
+            	Preference ac2dm = (Preference) findPreference("useac2dm");
+            	prefCat.removePreference(ac2dm);
+            }
         }
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             if(key.equals("useac2dm")) {
-            	pull(!prefs.getBoolean("useac2dm", false));
+            	boolean useac2dm = prefs.getBoolean("useac2dm", false);
+            	pull(!useac2dm);
+            	if(useac2dm)
+            		Functions.registerAC2DM(getActivity());
+            	else
+            		Functions.unregisterAC2DM(getActivity());
             }
-            if(key.equals("updatevplanonstart") || key.equals("autopullvplan")) {
+            if((key.equals("updatevplanonstart") || key.equals("autopullvplan")) && !prefs.getBoolean("disableAC2DM", false)) {
             	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));
             }
         }

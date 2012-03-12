@@ -102,5 +102,6 @@ public class BlackWhiteList extends ListActivity {
 	public void onDestroy() {
 		super.onDestroy();
 		c.close();
+		myDB.close();
 	}
 }

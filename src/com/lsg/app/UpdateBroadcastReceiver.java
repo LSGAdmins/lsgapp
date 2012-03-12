@@ -86,9 +86,9 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	private void handleRegistration(Context context, Intent intent) {
 		    String registration = intent.getStringExtra("registration_id"); 
 		    if (intent.getStringExtra("error") != null) {
-		        Log.d("c2dm", "registration failed");
+		        Log.w(Functions.TAG, "c2dm registration failed");
 		    } else if (intent.getStringExtra("unregistered") != null) {
-		    	Log.d("c2dm", "unregistered");
+		    	Log.d(Functions.TAG, "c2dm unregistered");
 		    } else if (registration != null) {
 		    	final String registrationId = intent.getStringExtra("registration_id");
 		    	IDSender idsend = new IDSender(context, registrationId);

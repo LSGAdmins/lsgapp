@@ -113,13 +113,17 @@ public class lsgapp extends ListActivity {
     		upd.start();
     	}
     	Functions.setAlarm(this);
+		Intent testAC2DM = new Intent("com.google.android.c2dm.intent.REGISTER");
+		if(startService(testAC2DM) == null) {
+			Log.i(Functions.TAG, "c2dm not available; disabling");
+			SharedPreferences.Editor edit = prefs.edit();
+			edit.putBoolean("disableAC2DM", true);
+			edit.putBoolean("useac2dm", false);
+			edit.commit();
+		}
     	if(prefs.getBoolean("useac2dm", false)) {
-    		Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
-    		registrationIntent.putExtra("app", PendingIntent.getBroadcast(this, 0, new Intent(), 0));
-    		registrationIntent.putExtra("sender", Functions.EMAIL);
-    		startService(registrationIntent);
+    		Functions.registerAC2DM(this);
     	}
-    	
     	
     	super.onCreate(savedInstanceState);
         Functions.setTheme(false, false, this);

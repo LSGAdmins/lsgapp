@@ -161,6 +161,7 @@ public class Events extends ListActivity implements SQLlist, TextWatcher{
 	}
 	public void onDestroy() {
 		super.onDestroy();
+		d.close();
 		myDB.close();
 	}
 }
