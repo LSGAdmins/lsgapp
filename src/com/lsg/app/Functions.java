@@ -53,6 +53,7 @@ public class Functions {
 	public static final String   EMAIL       = "noreply.lsg@googlemail.com";
 	
 	public static final String   UPDATE_URL       = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
+	public static final String   UPDATE_CHECK_URL = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
 	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_app.php";
 	public static final String   EVENT_URL        = "http://linux.lsg.musin.de/cp/termine_app.php";
 	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php";

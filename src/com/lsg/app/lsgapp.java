@@ -1,19 +1,11 @@
 package com.lsg.app;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ListActivity;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -45,23 +37,7 @@ public class lsgapp extends ListActivity {
     		Looper.prepare();
         	String get = "";
     		try {
-    			String data = "";
-            	URL url = new URL("http://linux.lsg.musin.de/cp/checkUpdate.php?version=" + getString(R.string.versionname));
-            	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
-            	conn.setDoOutput(true);
-            	conn.setRequestMethod("POST");
-            	OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-            	wr.write(data);
-            	wr.flush();
-            	wr.close();
-            	//get response
-            	InputStream response = conn.getInputStream();
-            	BufferedReader reader = new BufferedReader(new InputStreamReader(response));
-            	String line;
-            	while ((line = reader.readLine()) != null) {
-            		get += line;
-            		}
+    			get = Functions.getData(Functions.UPDATE_CHECK_URL + getString(R.string.versionname), lsgapp.this, false, "");
             	try {
             		JSONObject jObject = new JSONObject(get);
             		if(!jObject.getBoolean("act")) {
@@ -76,7 +52,7 @@ public class lsgapp extends ListActivity {
             					       .setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
             					           public void onClick(DialogInterface dialog, int id) {
             					       		Toast.makeText(lsgapp.this, getString(R.string.downloading), Toast.LENGTH_LONG).show();
-            					        	   if(Functions.getSDK() >= 9) {
+            					        	   if(Functions.getSDK() >= 11) { //could also be 9, but there are some failed downloads on sgs2
             					        		   down.download();
             					        	   }
             					        	   else {
@@ -107,7 +83,7 @@ public class lsgapp extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	if(prefs.getBoolean("updatevplanonstart", false)) {
     		UpdateBroadcastReceiver.ProgressThread upd = new UpdateBroadcastReceiver.ProgressThread(new Handler(), this);
     		upd.start();
@@ -123,6 +99,30 @@ public class lsgapp extends ListActivity {
 		}
     	if(prefs.getBoolean("useac2dm", false)) {
     		Functions.registerAC2DM(this);
+    	} else if(!prefs.getBoolean("disableAC2DM", false) && !prefs.getBoolean("ac2dm_chosen", false)) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(lsgapp.this);
+			builder.setMessage(getString(R.string.enable_AC2DM))
+			       .setCancelable(false)
+			       .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			       		SharedPreferences.Editor edit = prefs.edit();
+			       		edit.putBoolean("useac2dm", true);
+			       		edit.putBoolean("ac2dm_chosen", true);
+			       		edit.commit();
+			       		Functions.registerAC2DM(lsgapp.this);
+			           }
+			       })
+			       .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+				       		SharedPreferences.Editor edit = prefs.edit();
+				       		edit.putBoolean("useac2dm", false);
+				       		edit.putBoolean("ac2dm_chosen", true);
+				       		edit.commit();
+			                dialog.cancel();
+			           }
+			       });
+			AlertDialog alert = builder.create();
+			alert.show();
     	}
     	
     	super.onCreate(savedInstanceState);

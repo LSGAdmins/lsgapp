@@ -11,9 +11,7 @@
     <string name="showonlywhitelist_on">Nur Vertretungen aus Whitelist angezeigt</string>
     <string name="on">An</string>
     <string name="off">Aus</string>
-    <string name="swipeforpaul">Swipen für Paul</string>
-    <string name="swipeforpaul_on">Swipen per Geste</string>
-    <string name="swipeforpaul_off">Normal swipen</string>
+    <string name="enable_AC2DM">Aktiviere Push-Nachrichten, um den Vertretungsplan immer auf dem aktuellen Stand zu halten!</string>
     <string name="useac2dm">Vertretungsplan pushen</string>
     <string name="useac2dm_on">Vertretungsplan wird auf dein Gerät gepusht</string>
     <string name="useac2dm_off">Vertretungsplan wird nicht gepusht</string>
