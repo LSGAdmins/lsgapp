@@ -45,9 +45,9 @@
         <activity android:name="SettingsAdvanced" android:label="@string/settings" android:theme="@android:style/Theme.Holo.Light"></activity>
         <receiver android:name="UpdateBroadcastReceiver" android:process=":remote" >
           <intent-filter>
-              <action android:name="android.intent.action.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE" />
-			  <category android:name="android.intent.category.HOME" />
-          </intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
           <!-- Receive the actual message -->
           <intent-filter>
               <action android:name="com.google.android.c2dm.intent.RECEIVE" />
