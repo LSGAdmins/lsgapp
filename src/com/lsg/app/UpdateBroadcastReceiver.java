@@ -42,6 +42,12 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			Functions.updateSubjectList(context, handler, notify);
 			
 			msg = handler.obtainMessage();
+			msg.arg1 = 3;
+			msg.arg2 = R.string.loading_events;
+			handler.sendMessage(msg);
+			Functions.refreshEvents(context, handler);
+			
+			msg = handler.obtainMessage();
 			msg.arg1 = 1;
 			if(!update)
 				msg.arg1 = 2;

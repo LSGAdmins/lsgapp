@@ -91,7 +91,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-	    	Intent intent = new Intent(this, VPlan.class);
+	    	Intent intent = new Intent(this, lsgapp.class);
 	    	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 	    	startActivity(intent);
 	        return false;

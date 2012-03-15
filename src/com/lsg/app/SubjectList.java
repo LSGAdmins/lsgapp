@@ -80,7 +80,7 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	    	return true;
         case android.R.id.home:
             // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, VPlan.class);
+            Intent intent = new Intent(this, lsgapp.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;

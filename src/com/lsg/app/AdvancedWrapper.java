@@ -5,10 +5,10 @@ import android.view.Menu;
 import android.webkit.WebView;
 
 public class AdvancedWrapper {
-	public void dropDownNav(VPlan vplan) {
-		Advanced.dropDownNav(vplan);
+	public void dropDownNav(lsgapp act) {
+		Advanced.dropDownNav(act);
 		}
-	public void selectedItem(int position, Activity act) {
+	public void selectedItem(int position, lsgapp act) {
 		Advanced.selectedItem(position, act);
 	}
 	public void searchBar(Menu menu, SQLlist list) {

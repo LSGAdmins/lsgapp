@@ -15,11 +15,17 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	    ActionBar actionBar = act.getActionBar();
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	}
-	public static void selectedItem(int position, Activity act) {
+	public static void selectedItem(int position, lsgapp act) {
 		ActionBar bar = act.getActionBar();
-		bar.setSelectedNavigationItem(position);
+		if(position < 2) {
+			Advanced.dropDownNav(act);
+			bar.setSelectedNavigationItem(position);
+		}
+		else if(position == 2) {
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		}
 	}
-	public static void dropDownNav(final VPlan act) {
+	public static void dropDownNav(final lsgapp act) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
 		int spinner = (!prefs.getBoolean("dark_actionbar", false)) ? android.R.layout.simple_spinner_dropdown_item : R.layout.spinner_dropdown_black_actionbar;
 		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(act, R.array.action_vertretungen, spinner);
