@@ -180,11 +180,11 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		String all_cond = first + sec;
 		c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, mine_cond, where_conds, null, null, null);
+				Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, mine_cond, where_conds, null, null, null);
 		where_conds[0] = "%";
 		second_c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-				Functions.DB_KLASSENSTUFE, Functions.DB_DATE}, all_cond, where_conds, null, null, null);
+				Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);
 		vcursor.changeCursor(c);
 		vcursor_second.changeCursor(second_c);
 		

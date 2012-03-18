@@ -54,11 +54,12 @@ public class Functions {
 	
 	public static final String   UPDATE_URL       = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
 	public static final String   UPDATE_CHECK_URL = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
-	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_raw.php";
 	public static final String   EVENT_URL        = "http://linux.lsg.musin.de/cp/termine_app.php";
 	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php";
 	public static final String   SUBJECT_URL      = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
 	public static final String   REGISTRATION_URL = "http://linux.lsg.musin.de/cp/register_client.php";
+	public static final String   TIMETABLE_URL    = "http://linux.lsg.musin.de/cp/timetable.php";
 	public static final String   API_VERSION      = "2";
 	
 	public static final String   class_key  = "class";
@@ -83,12 +84,17 @@ public class Functions {
 	public static final String DB_FACH            = "fach";
 	public static final String DB_RAW_FACH        = "rawfach";
 	public static final String DB_DATE            = "date";
+	public static final String DB_LENGTH          = "length";
 	//exclude & include
 	public static final String EXCLUDE_TABLE      = "exclude";
 	public static final String INCLUDE_TABLE      = "include";
 	public static final String DB_NEEDS_SYNC      = "needssync";
 	//subjects
 	public static final String DB_SUBJECT_TABLE   = "subjects";
+	//timetable
+	public static final String DB_TIME_TABLE      = "timetable";
+	public static final String DB_DAY             = "day";
+	public static final String DB_HOUR            = "hour";
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
@@ -156,12 +162,8 @@ public class Functions {
 		}
 	}
 	
-	public static int getSDK() {
-		return new Integer(Build.VERSION.SDK);
-		/*if(Build.VERSION.SDK.equals("3"))
-			return 3;
-		else
-			return Build.VERSION.SDK_INT;*/
+	public static int getSDK() { //needed for compat with 1.5, no longer supported
+		return Build.VERSION.SDK_INT;
 	}
 	
 	public static String getData(String urlString, Context context, boolean login, String add) {
@@ -232,14 +234,13 @@ public class Functions {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String add = "";
 		try {
-			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("date", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("time", ""), "UTF-8");
+			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_date", ""), "UTF-8")
+					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_time", ""), "UTF-8");
 		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
 		String get = Functions.getData(Functions.VP_URL, context, true, add);
 		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
 			try {
         		JSONArray jArray = new JSONArray(get);
-        		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
     			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
     			myDB.delete(Functions.DB_VPLAN_TABLE, null, null); //clear vertretungen
@@ -254,20 +255,21 @@ public class Functions {
         			values.put(Functions.DB_RAUM, jObject.getString("raum"));
         			values.put(Functions.DB_ART, jObject.getString("art"));
         			values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
-        			values.put(Functions.DB_FACH, jObject.getString("fach"));
+        			values.put(Functions.DB_FACH, jObject.getString("fach")); 
         			values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
         			values.put(Functions.DB_DATE, jObject.getString("date"));
+        			values.put(Functions.DB_LENGTH, jObject.getInt("length"));
             		myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
         			i++;
         			}
+        		myDB.close();
         		JSONObject jObject            = jArray.getJSONObject(i);
         		String date                   = jObject.getString("date");
         		String time                   = jObject.getString("time");
         		SharedPreferences.Editor edit = prefs.edit();
-        		edit.putString("date", date);
-        		edit.putString("time", time);
+        		edit.putString("vplan_date", date);
+        		edit.putString("vplan_time", time);
         		edit.commit();
-        		myDB.close();
         		} catch(JSONException e) {
         			Log.d("json", e.getMessage());
         			if(notify)
@@ -292,6 +294,72 @@ public class Functions {
 		}
 		return true;
 		}
+	public static synchronized boolean updateTimetable(final Context context, Handler h, boolean notify) {
+
+		Functions.testDB(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		String add = "";
+		try {
+			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_date", ""), "UTF-8")
+					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_time", ""), "UTF-8");
+		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+		String get = Functions.getData(Functions.TIMETABLE_URL, context, true, add);
+		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
+			try {
+        		JSONArray jArray = new JSONArray(get);
+        		JSONObject jObject_           = jArray.getJSONObject(0);
+        		String date                   = jObject_.getString("date");
+        		String time                   = jObject_.getString("time");
+        		String one                    = jObject_.getString("one");
+        		String two                    = jObject_.getString("two");
+        		String klasse                 = jObject_.getString("klasse");
+        		SharedPreferences.Editor edit = prefs.edit();
+        		edit.putString("timetable_date", date);
+        		edit.putString("timetable_time", time);
+        		edit.putString("timetable_one", one);
+        		edit.putString("timetable_two", two);
+        		edit.putString("timetable_klasse", klasse);
+        		edit.commit();
+        		int i = 1;
+    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+    			myDB.delete(Functions.DB_TIME_TABLE, null, null); //clear vertretungen
+        		while(i < jArray.length()) {
+        			JSONObject jObject = jArray.getJSONObject(i);
+        			ContentValues values = new ContentValues();
+        			values.put(Functions.DB_LEHRER, jObject.getString("teacher"));
+        			values.put(Functions.DB_FACH,   jObject.getString("subject"));
+        			values.put(Functions.DB_RAUM,   jObject.getString("room"));
+        			values.put(Functions.DB_LENGTH, jObject.getInt   ("length"));
+        			values.put(Functions.DB_DAY,    jObject.getInt   ("day"));
+        			values.put(Functions.DB_HOUR,   jObject.getInt   ("hour"));
+            		myDB.insert(Functions.DB_TIME_TABLE, null, values);
+        			i++;
+        			}
+        		myDB.close();
+        		} catch(JSONException e) {
+        			Log.d("json", e.getMessage());
+        			if(notify)
+        				h.post(getErrorRunnable("jsonerror", context));
+        			return false;
+        		}
+			}
+		else if(get.equals("noact")) {
+			Runnable r = new Runnable() {
+				public void run() {
+					Toast.makeText(context, context.getString(R.string.noact), Toast.LENGTH_SHORT).show();
+				}
+			};
+			if(notify)
+				h.post(r);
+			return true;
+		}
+		else {
+			if(notify)
+				h.post(getErrorRunnable(get, context));
+			return false;
+		}
+		return true;
+	}
 	public static synchronized boolean updateSubjectList(final Context context, Handler h, boolean notify) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String add = "";
@@ -396,69 +464,83 @@ public class Functions {
 		myDB.close();
 	}
 	public static void testDB(Context context) {
+		SQLiteDatabase myDB;
+		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
     	try {
-    		SQLiteDatabase myDB;
-    		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
     		//vertretungen
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TABLE
-    				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
-    	    		+ Functions.DB_KLASSENSTUFE       + " integer,"
-    	    	    + Functions.DB_KLASSE	          + " text,"
-    	    	    + Functions.DB_STUNDE             + " integer,"
-    	    	    + Functions.DB_VERTRETER          + " text,"
-    	     	    + Functions.DB_LEHRER             + " text,"
-    	    	    + Functions.DB_RAUM               + " text,"
-    	    	    + Functions.DB_ART                + " text,"
-    	    	    + Functions.DB_VERTRETUNGSTEXT    + " text,"
-    	    	    + Functions.DB_FACH               + " text,"
-    	    	    + Functions.DB_DATE               + " text"
+    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
+    	    		+ Functions.DB_KLASSENSTUFE       + " INTEGER,"
+    	    	    + Functions.DB_KLASSE	          + " TEXT,"
+    	    	    + Functions.DB_STUNDE             + " INTEGER,"
+    	    	    + Functions.DB_VERTRETER          + " TEXT,"
+    	     	    + Functions.DB_LEHRER             + " TEXT,"
+    	    	    + Functions.DB_RAUM               + " TEXT,"
+    	    	    + Functions.DB_ART                + " TEXT,"
+    	    	    + Functions.DB_VERTRETUNGSTEXT    + " TEXT,"
+    	    	    + Functions.DB_FACH               + " TEXT,"
+    	    	    + Functions.DB_DATE               + " TEXT"
     				+");");
     		//blacklist
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.EXCLUDE_TABLE + " ("
-    				+ Functions.DB_ROWID + " integer primary key autoincrement,"
-    				+ Functions.DB_FACH + " text,"
-    				+ Functions.DB_NEEDS_SYNC + " text"
+    				+ Functions.DB_ROWID + " INTEGER primary key autoincrement,"
+    				+ Functions.DB_FACH + " TEXT,"
+    				+ Functions.DB_NEEDS_SYNC + " TEXT"
     				+ ");");
     		//whitelist
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.INCLUDE_TABLE + " ("
-    				+ Functions.DB_ROWID + " integer primary key autoincrement,"
-    				+ Functions.DB_FACH + " text,"
-    				+ Functions.DB_NEEDS_SYNC + " text"
+    				+ Functions.DB_ROWID + " INTEGER primary key autoincrement,"
+    				+ Functions.DB_FACH + " TEXT,"
+    				+ Functions.DB_NEEDS_SYNC + " TEXT"
     				+ ");");
     		//subjects
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_SUBJECT_TABLE
-    				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
-    	    		+ Functions.DB_RAW_FACH + " text,"
-    	    	    + Functions.DB_FACH + " text"
+    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
+    	    		+ Functions.DB_RAW_FACH + " TEXT,"
+    	    	    + Functions.DB_FACH + " TEXT"
     				+");");
     		//events
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
-    				+ " (" + Functions.DB_ROWID       + " integer primary key autoincrement,"
-    	    	    + Functions.DB_DATES              + " text,"
-    	     	    + Functions.DB_ENDDATES           + " text,"
-    	    	    + Functions.DB_TIMES              + " text,"
-    	    	    + Functions.DB_ENDTIMES           + " text,"
-    	    	    + Functions.DB_TITLE              + " text,"
-    	    	    + Functions.DB_VENUE              + " text"
+    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
+    	    	    + Functions.DB_DATES              + " TEXT,"
+    	     	    + Functions.DB_ENDDATES           + " TEXT,"
+    	    	    + Functions.DB_TIMES              + " TEXT,"
+    	    	    + Functions.DB_ENDTIMES           + " TEXT,"
+    	    	    + Functions.DB_TITLE              + " TEXT,"
+    	    	    + Functions.DB_VENUE              + " TEXT"
     				+");");
-    		/*Cursor c = myDB.query(Functions.DB_TABLE, new String[] {Functions.DB_RAW_FACH}, null, null, null, null, null);
-    		if(c.getColumnIndex(Functions.DB_RAW_FACH) != -1)
-    			myDB.setVersion(1);*/
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE
+    				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
+    	    	    + Functions.DB_LEHRER              + " TEXT,"
+    	     	    + Functions.DB_FACH                + " TEXT,"
+    	    	    + Functions.DB_RAUM                + " TEXT,"
+    	    	    + Functions.DB_LENGTH              + " INTEGER,"
+    	    	    + Functions.DB_DAY                 + " INTEGER,"
+    	    	    + Functions.DB_HOUR                + " INTEGER"
+    				+");");
     		//upgrades for table
     		if(myDB.getVersion() == 0) {
     			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
     			myDB.setVersion(1);
     		}
     		if(myDB.getVersion() == 1) {
     			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
+    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
     			Log.d(Functions.INCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.INCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " text");
+    			myDB.execSQL("ALTER TABLE " + Functions.INCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
     			myDB.setVersion(2);
     		}
+    		if(myDB.getVersion() == 2) {
+    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_LENGTH);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_LENGTH + " INTEGER");
+    			myDB.setVersion(3);
+    		}
     		myDB.close();
-        } catch (Exception e) { Log.d("db", e.getMessage());}
+        } catch (Exception e) {
+        	myDB.close();
+        	Log.d("db", e.getMessage());
+        	}
     	Functions.cleanDB(context);
 	}
 	

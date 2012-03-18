@@ -43,6 +43,13 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			
 			msg = handler.obtainMessage();
 			msg.arg1 = 3;
+			msg.arg2 = R.string.loading_timetable;
+			handler.sendMessage(msg);
+			
+			Functions.updateTimetable(context, handler, notify);
+			
+			msg = handler.obtainMessage();
+			msg.arg1 = 3;
 			msg.arg2 = R.string.loading_events;
 			handler.sendMessage(msg);
 			Functions.refreshEvents(context, handler);

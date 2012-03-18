@@ -77,7 +77,6 @@ public class EventCursor extends CursorAdapter {
 		}
 		String[] oldmonth = olddate.split("\\.");
 		String[] month    = datebeginning.split("\\.");
-		Log.d(oldmonth[1], month[1]);
 		if(!oldmonth[1].equals(month[1])) {
 			holder.month.setVisibility(View.VISIBLE);
 			holder.month.setText(context.getResources().getStringArray(R.array.months)[new Integer(month[1])-1] + " '" + month[2]);

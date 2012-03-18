@@ -2,7 +2,7 @@ package com.lsg.app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,8 +98,17 @@ public class VertretungCursor extends CursorAdapter {
 			String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
 			holder.type.setText(type);
 			
-			String when = cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE));
-			holder.when.setText(when + ". " +context.getString(R.string.hour));
+			Integer lesson = new Integer(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));
+			String when = lesson.toString();
+			int i = 0;
+			int length = cursor.getInt(cursor.getColumnIndex(Functions.DB_LENGTH));
+			while(i < length) {
+				lesson++;
+				when += ", " + lesson.toString();
+				i++;
+			}
+			when += ".";
+			holder.when.setText(when + context.getString(R.string.hour));
 			String vtext = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
 			if(vtext.equals("null"))
 				holder.vtext.setVisibility(View.GONE);

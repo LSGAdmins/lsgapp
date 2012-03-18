@@ -53,6 +53,7 @@
     <string name="loading_events">Lade Termine&#8230;</string>
     <string name="loading_class">Lade Klasse&#8230;</string>
     <string name="loading_subjects">Lade Fächerliste&#8230;</string>
+    <string name="loading_timetable">Lade Stundenplan&#8230;</string>
     <string name="downloading">Lade Update herunter</string>
     <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
     <string name="no_class"></string>
