@@ -17,11 +17,11 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	}
 	public static void selectedItem(int position, lsgapp act) {
 		ActionBar bar = act.getActionBar();
-		if(position < 2) {
+		if(position < 3 && position > 0) {
 			Advanced.dropDownNav(act);
-			bar.setSelectedNavigationItem(position);
+			bar.setSelectedNavigationItem(position - 1);
 		}
-		else if(position == 2) {
+		else if(position >= 3 || position == 0) {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		}
 	}
@@ -34,10 +34,10 @@ public class Advanced implements SearchView.OnQueryTextListener {
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 				switch(itemPosition) {
 				case 0:
-					act.setPage(0);
+					act.setPage(1);
 					break;
 				case 1:
-					act.setPage(1);
+					act.setPage(2);
 					break;
 					default:
 						act.setPage(0);

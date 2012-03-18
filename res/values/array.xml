@@ -18,4 +18,13 @@
         <item>November</item>
         <item>Dezember</item>
     </string-array>
+    <string-array name="days">
+        <item>Montag</item>
+        <item>Dienstag</item>
+        <item>Mittwoch</item>
+        <item>Donnerstag</item>
+        <item>Freitag</item>
+        <item>Samstag</item>
+        <item>Sonntag</item>
+    </string-array>
 </resources>

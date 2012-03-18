@@ -326,12 +326,13 @@ public class Functions {
         		while(i < jArray.length()) {
         			JSONObject jObject = jArray.getJSONObject(i);
         			ContentValues values = new ContentValues();
-        			values.put(Functions.DB_LEHRER, jObject.getString("teacher"));
-        			values.put(Functions.DB_FACH,   jObject.getString("subject"));
-        			values.put(Functions.DB_RAUM,   jObject.getString("room"));
-        			values.put(Functions.DB_LENGTH, jObject.getInt   ("length"));
-        			values.put(Functions.DB_DAY,    jObject.getInt   ("day"));
-        			values.put(Functions.DB_HOUR,   jObject.getInt   ("hour"));
+        			values.put(Functions.DB_LEHRER,   jObject.getString("teacher"));
+        			values.put(Functions.DB_FACH,     jObject.getString("subject"));
+        			values.put(Functions.DB_RAW_FACH, jObject.getString("rawsubject"));
+        			values.put(Functions.DB_RAUM,     jObject.getString("room"));
+        			values.put(Functions.DB_LENGTH,   jObject.getInt   ("length"));
+        			values.put(Functions.DB_DAY,      jObject.getInt   ("day"));
+        			values.put(Functions.DB_HOUR,     jObject.getInt   ("hour"));
             		myDB.insert(Functions.DB_TIME_TABLE, null, values);
         			i++;
         			}
@@ -535,6 +536,11 @@ public class Functions {
     			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_LENGTH);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_LENGTH + " INTEGER");
     			myDB.setVersion(3);
+    		}
+    		if(myDB.getVersion() == 3) {
+    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_RAW_FACH);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
+    			myDB.setVersion(4);
     		}
     		myDB.close();
         } catch (Exception e) {

@@ -1,7 +1,12 @@
 package com.lsg.app;
 
+import java.util.Calendar;
+
 import org.apache.http.util.EncodingUtils;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,10 +17,13 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,13 +33,15 @@ import android.widget.Toast;
 public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher {
 	private String[] where_conds = new String[4];
 	private String[] where_conds_events = new String[6];
-	private SQLiteDatabase myDB;
+	private final SQLiteDatabase myDB;
 	public Cursor c;
 	public Cursor second_c;
 	public Cursor events;
-	private VertretungCursor vcursor_second;
-	private VertretungCursor vcursor;
-	private EventCursor evcursor;
+	public Cursor timetable_c;
+	private VertretungAdapter vadapter_second;
+	private VertretungAdapter vadapter;
+	private TimetableAdapter timetableadap;
+	private EventAdapter evadapter;
 	private String exclude_cond;
 	private String include_cond;
 	private lsgapp act;
@@ -58,9 +68,10 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		long count = num_rows.simpleQueryForLong();
 		if(count == 0)
 			act.updateVP();
-		vcursor = new VertretungCursor(context, c);
-		vcursor_second = new VertretungCursor(context, second_c);
-		evcursor = new EventCursor(context, events);
+		vadapter = new VertretungAdapter(context, c);
+		vadapter_second = new VertretungAdapter(context, second_c);
+		evadapter = new EventAdapter(context, events);
+		timetableadap = new TimetableAdapter(context, timetable_c);
 		updateCursor();
 		}
 	
@@ -73,12 +84,50 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 	
 	@Override
 	public int getCount() {
-		return 4;
+		return 5;
 		}
 	
 	@Override
 	public Object instantiateItem(View pager, int position) {
-		if(position < 3) {
+		if(position == 0) {
+			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LinearLayout lay = (LinearLayout) inflater.inflate(R.layout.list, null);
+			ListView lv = (ListView) lay.findViewById(android.R.id.list);
+			lv.setAdapter(timetableadap);
+			lv.setOnItemClickListener(new OnItemClickListener() {
+				     @Override
+				     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				          Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_HOUR},
+				        		  Functions.DB_ROWID + "=?", new String[] {new Long(id).toString()}, null, null, null);
+				          c.moveToFirst();
+				          String hour = new Integer(c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1).toString();
+				          Cursor d = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_STUNDE, Functions.DB_VERTRETUNGSTEXT, 
+				        		  Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_ART}, Functions.DB_RAW_FACH + "=? AND " + Functions.DB_STUNDE + "=?",
+				        		  new String[] {c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)), hour}, null, null, null);
+				          d.moveToFirst();
+				          if(d.getCount() > 0) {
+				        	  String vtext = (!(d.getString(d.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))).equals("null")) ? d.getString(
+				        			  d.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)) + "\n" : "";
+				  	    	AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				  	    	builder.setTitle(d.getString(d.getColumnIndex(Functions.DB_KLASSE)))
+				  	    		   .setMessage(d.getString(d.getColumnIndex(Functions.DB_FACH)) + " / " + d.getString(d.getColumnIndex(Functions.DB_STUNDE)) + ". "
+				  	    				   + context.getString(R.string.hour)+ "\n" + vtext + d.getString(d.getColumnIndex(Functions.DB_ART)) + " " +context.getString(R.string.at)
+				  	    				   + " " + d.getString(d.getColumnIndex(Functions.DB_LEHRER)))
+				  	    	       .setCancelable(true)
+				  	    	       .setNeutralButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+				  	    	           public void onClick(DialogInterface dialog, int id) {
+				  	    	                dialog.cancel();
+				  	    	           }
+				  	    	       });
+				  	    	AlertDialog alert = builder.create();
+				  	    	alert.show();
+				          }
+				         }
+				});
+			((ViewPager)pager).addView(lay, position);
+			return lay;
+		}
+		else if(position < 4) {
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			LinearLayout lay = (LinearLayout) inflater.inflate(R.layout.list, null);
 			ListView lv = (ListView) lay.findViewById(android.R.id.list);
@@ -89,17 +138,17 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 				searchEdit.addTextChangedListener(this);
 				lv.addHeaderView(search);
 				}
-			if(position == 0)
-				lv.setAdapter(vcursor);
 			if(position == 1)
-				lv.setAdapter(vcursor_second);
+				lv.setAdapter(vadapter);
 			if(position == 2)
-				lv.setAdapter(evcursor);
+				lv.setAdapter(vadapter_second);
+			if(position == 3)
+				lv.setAdapter(evadapter);
 			else
 				act.registerForContextMenu(lv);
 			lv.setEmptyView(lay.findViewById(R.id.list_view_empty));
 			((TextView) lay.findViewById(R.id.list_view_empty)).setText(R.string.vplan_empty);
-			((ViewPager)pager).addView(lay, position);
+			((ViewPager)pager).addView(lay, 0);
 			return lay;
 			}
 		else {
@@ -185,8 +234,8 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		second_c = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 				Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 				Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);
-		vcursor.changeCursor(c);
-		vcursor_second.changeCursor(second_c);
+		vadapter.changeCursor(c);
+		vadapter_second.changeCursor(second_c);
 		
 		String where_cond = " " + Functions.DB_DATES + " LIKE ? OR " + Functions.DB_ENDDATES + " LIKE ? OR "
 		+ Functions.DB_TIMES + " LIKE ? OR " + Functions.DB_ENDTIMES + " LIKE ? OR " + Functions.DB_TITLE + " LIKE ? OR "
@@ -194,7 +243,15 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		events = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
 				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
 				where_conds_events, null, null, null);
-		evcursor.changeCursor(events);
+		evadapter.changeCursor(events);
+		
+		
+		Calendar cal = Calendar.getInstance();
+		String dayofweek = (cal.get(Calendar.DAY_OF_WEEK) < 6) ? new Integer(cal.get(Calendar.DAY_OF_WEEK)).toString() : "0";
+		dayofweek = "0";
+		timetable_c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_ROWID, Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_RAUM, Functions.DB_LENGTH,
+				Functions.DB_HOUR, Functions.DB_DAY, Functions.DB_RAW_FACH}, Functions.DB_DAY + "=?", new String[] { dayofweek }, null, null, null);
+		timetableadap.changeCursor(timetable_c);
 	}
 	public void updateWhereCond(String searchText) {
 		where_conds[1] = "%" + searchText + "%";

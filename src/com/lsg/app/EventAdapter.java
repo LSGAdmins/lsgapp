@@ -10,14 +10,14 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-public class EventCursor extends CursorAdapter {
+public class EventAdapter extends CursorAdapter {
 	static class Standard {
 		public TextView month;
 		public TextView title;
 		public TextView date;
 		public TextView place;
 	}
-	public EventCursor(Context context, Cursor d) {
+	public EventAdapter(Context context, Cursor d) {
 		super(context, d);
 		}
 	@Override

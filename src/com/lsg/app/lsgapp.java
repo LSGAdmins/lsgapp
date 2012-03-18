@@ -152,14 +152,14 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawableResource(R.layout.background);
         
-		if(Functions.getSDK() >= 11) {
+		/*if(Functions.getSDK() >= 11) {
 			try {
 				AdvancedWrapper actHelper = new AdvancedWrapper();
 				actHelper.dropDownNav(this);
 				} catch (Exception e) {
 					Log.d("error", e.getMessage());
 					}
-		}
+		}*/
 	    setContentView(R.layout.viewpager);
 	    adapter = new ViewPagerAdapter(this);
 	    pager = (ViewPager)findViewById( R.id.viewpager );
@@ -316,12 +316,14 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
 			adv.selectedItem(position, this);
 			}
 		if(position == 0)
-			setTitle(R.string.mine);
+			setTitle(R.string.timetable);
 		else if(position == 1)
+			setTitle(R.string.mine);
+		else if(position == 2)
 			setTitle(R.string.all);
-			else if(position == 2)
-				setTitle(R.string.events);
 			else if(position == 3)
+				setTitle(R.string.events);
+			else if(position == 4)
 				setTitle(R.string.smvblog);
 	}
 	@Override

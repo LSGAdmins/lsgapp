@@ -11,7 +11,7 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class VertretungCursor extends CursorAdapter {
+public class VertretungAdapter extends CursorAdapter {
 	static class Standard {
 		public LinearLayout standard;
 		public TextView date;
@@ -23,7 +23,7 @@ public class VertretungCursor extends CursorAdapter {
 		public TextView bottom;
 		public WebView webv;
 	}
-	public VertretungCursor(Context context, Cursor c) {
+	public VertretungAdapter(Context context, Cursor c) {
 		super(context, c);
 		}
 	@Override
