@@ -27,4 +27,13 @@
         <item>Samstag</item>
         <item>Sonntag</item>
     </string-array>
+    <string-array name="religion">
+        <item>Katholisch</item>
+        <item>Evangelisch</item>
+        <item>Ethik</item>
+    </string-array>
+    <string-array name="gender">
+        <item>Männlich</item>
+        <item>Weiblich</item>
+    </string-array>
 </resources>

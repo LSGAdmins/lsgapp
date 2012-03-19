@@ -30,6 +30,9 @@
     <string name="events">Termine</string>
     <string name="settings">Einstellungen</string>
     <string name="timetable">Stundenplan</string>
+    <string name="choose_religion">Wähle deinen Religionsunterricht</string>
+    <string name="your_gender">Dein Geschlecht</string>
+    <string name="your_class">Deine Klasse</string>
     <string name="subjectlist">Fächerübersicht</string>
     <string name="subjectlist_empty">Fächerübersicht leer</string>
     <string name="blacklist">Blacklist</string>

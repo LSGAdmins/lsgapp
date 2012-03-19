@@ -97,13 +97,14 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				     @Override
 				     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				          Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_HOUR},
+				          Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_HOUR, Functions.DB_LEHRER},
 				        		  Functions.DB_ROWID + "=?", new String[] {new Long(id).toString()}, null, null, null);
 				          c.moveToFirst();
 				          String hour = new Integer(c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1).toString();
 				          Cursor d = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_STUNDE, Functions.DB_VERTRETUNGSTEXT, 
-				        		  Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_ART}, Functions.DB_RAW_FACH + "=? AND " + Functions.DB_STUNDE + "=?",
-				        		  new String[] {c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)), hour}, null, null, null);
+				        		  Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_ART}, Functions.DB_RAW_FACH + "=? AND " + Functions.DB_STUNDE + "=? AND "
+				          + Functions.DB_LEHRER + "=?",
+				        		  new String[] {c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)), hour, c.getString(c.getColumnIndex(Functions.DB_LEHRER))}, null, null, null);
 				          d.moveToFirst();
 				          if(d.getCount() > 0) {
 				        	  String vtext = (!(d.getString(d.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))).equals("null")) ? d.getString(

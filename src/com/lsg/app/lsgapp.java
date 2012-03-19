@@ -11,6 +11,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -174,6 +176,76 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
         
         UpdateCheck uCheck = new UpdateCheck(handler);
         uCheck.start();
+        
+        if(prefs.getString(Functions.RELIGION, "-1").equals("-1")) {
+        	final CharSequence[] items = getResources().getStringArray(R.array.religion);
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        	builder.setTitle(R.string.choose_religion);
+        	builder.setItems(items, new DialogInterface.OnClickListener() {
+        	    public void onClick(DialogInterface dialog, int item) {
+        	    	SharedPreferences.Editor edit = prefs.edit();
+        	        switch(item) {
+        	        case 0:
+        	        	edit.putString(Functions.RELIGION, Functions.KATHOLISCH);
+        	        	break;
+        	        case 1:
+        	        	edit.putString(Functions.RELIGION, Functions.EVANGELISCH);
+        	        	default:
+        	        	edit.putString(Functions.RELIGION, Functions.ETHIK);
+        	        }
+        	        edit.commit();
+        	    }
+        	});
+        	AlertDialog alert = builder.create();
+        	alert.show();
+        }
+        if(prefs.getString(Functions.GENDER, "-1").equals("-1")) {
+        	final CharSequence[] items = getResources().getStringArray(R.array.gender);
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        	builder.setTitle(R.string.your_gender);
+        	builder.setItems(items, new DialogInterface.OnClickListener() {
+        	    public void onClick(DialogInterface dialog, int item) {
+        	    	SharedPreferences.Editor edit = prefs.edit();
+        	        switch(item) {
+        	        case 0:
+        	        	edit.putString(Functions.GENDER, "m");
+        	        	break;
+        	        case 1:
+        	        	edit.putString(Functions.GENDER, "w");
+        	        	default:
+        	        	edit.putString(Functions.GENDER, "-1");
+        	        }
+        	        edit.commit();
+        	    }
+        	});
+        	AlertDialog alert = builder.create();
+        	alert.show();
+        }
+        if(prefs.getString(Functions.FULL_CLASS, "-1").equals("-1")) {
+        	SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
+        	Cursor cur = myDB.query(Functions.DB_CLASS_TABLE, new String[] {Functions.DB_CLASS}, Functions.DB_CLASS + " LIKE ?", new String[] {"%"
+        	+ prefs.getString("class", "").toLowerCase() + "%"},
+        			null, null, null);
+        	cur.moveToFirst();
+        	final CharSequence[] items = new CharSequence[cur.getCount()];
+        	int i = 0;
+        	while(i < cur.getCount()) {
+        		items[i] = cur.getString(cur.getColumnIndex(Functions.DB_CLASS));
+        		i++;
+        		cur.moveToNext();
+        	}
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        	builder.setTitle(R.string.your_class);
+        	builder.setItems(items, new DialogInterface.OnClickListener() {
+        	    public void onClick(DialogInterface dialog, int item) {
+        	    	SharedPreferences.Editor edit = prefs.edit();
+        	        edit.putString(Functions.FULL_CLASS, (String) items[item]);
+        	        edit.commit();
+        	    }
+        	});
+        	AlertDialog alert = builder.create();
+        	alert.show();
+        }
     }
 	/*protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);

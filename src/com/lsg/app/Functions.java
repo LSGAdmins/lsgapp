@@ -9,11 +9,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -28,8 +26,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Handler;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -56,7 +52,7 @@ public class Functions {
 	public static final String   UPDATE_CHECK_URL = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
 	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_raw.php";
 	public static final String   EVENT_URL        = "http://linux.lsg.musin.de/cp/termine_app.php";
-	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php";
+	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php?all=true";
 	public static final String   SUBJECT_URL      = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
 	public static final String   REGISTRATION_URL = "http://linux.lsg.musin.de/cp/register_client.php";
 	public static final String   TIMETABLE_URL    = "http://linux.lsg.musin.de/cp/timetable.php";
@@ -72,7 +68,7 @@ public class Functions {
 	public static final String DB_ROWID           = "_id";
 	public static final String DB_NAME            = "lsgapp";
 	//VPlan
-	public static final String DB_VPLAN_TABLE           = "vertretungen";
+	public static final String DB_VPLAN_TABLE     = "vertretungen";
 	public static final String DB_KLASSENSTUFE    = "klassenstufe";
 	public static final String DB_KLASSE          = "klasse";
 	public static final String DB_STUNDE          = "stunde";
@@ -95,6 +91,18 @@ public class Functions {
 	public static final String DB_TIME_TABLE      = "timetable";
 	public static final String DB_DAY             = "day";
 	public static final String DB_HOUR            = "hour";
+	//classes
+	public static final String DB_CLASS_TABLE     = "classes";
+	public static final String DB_CLASS           = "class";
+	
+	public static final String RELIGION           = "religion";
+	public static final String KATHOLISCH         = "K";
+	public static final String EVANGELISCH        = "Ev";
+	public static final String ETHIK              = "Eth";
+	
+	public static final String GENDER             = "gender";
+	
+	public static final String FULL_CLASS         = "full_class";
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
@@ -301,7 +309,8 @@ public class Functions {
 		String add = "";
 		try {
 			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_date", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_time", ""), "UTF-8");
+					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_time", ""), "UTF-8")
+					+ "&" + URLEncoder.encode("class", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.FULL_CLASS, ""), "UTF-8");
 		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
 		String get = Functions.getData(Functions.TIMETABLE_URL, context, true, add);
 		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
@@ -413,15 +422,27 @@ public class Functions {
 		return true;
 	}
 	public static synchronized void getClass(Context context) {
+		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
-			Functions.testDB(context);
 			String get = Functions.getData(Functions.CLASS_URL, context, true, "");
+			JSONArray jArray = new JSONArray(get);
+			int i = 0;
+			myDB.delete(Functions.DB_CLASS_TABLE, null, null);
+			while(i < jArray.length()-1) {
+				ContentValues vals = new ContentValues();
+				vals.put(Functions.DB_CLASS, jArray.getString(i));
+				myDB.insert(Functions.DB_CLASS_TABLE, null, vals);
+				i++;
+			}
         	SharedPreferences.Editor editor = prefs.edit();
-        	editor.putString("class", get);
+        	editor.putString("class", jArray.getString(i));
         	editor.commit();
+        	myDB.close();
+        	Log.d("class", jArray.getString(i));
         }
         catch(Exception e) {
+        	myDB.close();
 	    	Log.d("except", e.getMessage());
         }
 	}
@@ -518,6 +539,10 @@ public class Functions {
     	    	    + Functions.DB_LENGTH              + " INTEGER,"
     	    	    + Functions.DB_DAY                 + " INTEGER,"
     	    	    + Functions.DB_HOUR                + " INTEGER"
+    				+");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_CLASS_TABLE
+    				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
+    	    	    + Functions.DB_CLASS              + " TEXT"
     				+");");
     		//upgrades for table
     		if(myDB.getVersion() == 0) {

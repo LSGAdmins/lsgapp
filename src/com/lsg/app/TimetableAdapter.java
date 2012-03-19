@@ -61,8 +61,9 @@ public class TimetableAdapter extends CursorAdapter {
 			i++;
 		}
 		String rawfach = cursor.getString(cursor.getColumnIndex(Functions.DB_RAW_FACH));
-		Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {}, Functions.DB_STUNDE + "=? AND " + Functions.DB_RAW_FACH + "=?",
-				new String[] {new Integer(hour).toString(), rawfach}, null, null, null);
+		String lehrer = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
+		Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {}, Functions.DB_STUNDE + "=? AND " + Functions.DB_RAW_FACH + "=? AND " + Functions.DB_LEHRER + "=?",
+				new String[] {new Integer(hour).toString(), rawfach, lehrer}, null, null, null);
 		if(c.getCount() > 0)
 			holder.lay.setBackgroundResource(R.layout.background_info);
 		else
