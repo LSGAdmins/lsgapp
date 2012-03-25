@@ -5,11 +5,13 @@
         <EditTextPreference 
         	android:title="@string/username"
         	android:key="username"
+        	android:singleLine="true"
         	 />
         <EditTextPreference 
         	android:title="@string/password"
         	android:key="password"
         	android:password="true"
+        	android:singleLine="true"
         	 />
     </PreferenceCategory>
 </PreferenceScreen>

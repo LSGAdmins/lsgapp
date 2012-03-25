@@ -1,5 +1,6 @@
 package com.lsg.app;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import android.widget.SpinnerAdapter;
 
+@TargetApi(11)
 public class Advanced implements SearchView.OnQueryTextListener {
 	private SQLlist list;
 	public static void homeasup(Activity act) {

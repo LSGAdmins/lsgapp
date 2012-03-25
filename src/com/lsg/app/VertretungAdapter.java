@@ -2,7 +2,6 @@ package com.lsg.app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ public class VertretungAdapter extends CursorAdapter {
 		public WebView webv;
 	}
 	public VertretungAdapter(Context context, Cursor c) {
-		super(context, c);
+		super(context, c, false);
 		}
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -85,7 +84,7 @@ public class VertretungAdapter extends CursorAdapter {
 			else {
 				holder.klasse.setVisibility(View.VISIBLE);
 				}
-			if(new Integer(klassenstufe) < 14)
+			if(Integer.valueOf(klassenstufe) < 14)
 				holder.klasse.setText(klassenstufe + ". " + context.getString(R.string.classes));
 			else
 				holder.klasse.setText(context.getString(R.string.no_classes));
@@ -98,7 +97,7 @@ public class VertretungAdapter extends CursorAdapter {
 			String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
 			holder.type.setText(type);
 			
-			Integer lesson = new Integer(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));
+			Integer lesson = Integer.valueOf(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));
 			String when = lesson.toString();
 			int i = 0;
 			int length = cursor.getInt(cursor.getColumnIndex(Functions.DB_LENGTH));

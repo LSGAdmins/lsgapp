@@ -139,7 +139,7 @@ public class Functions {
 			Log.d("Functions.java", "setAlarm");
 		int time_add = 30;
 		try {
-			time_add = new Integer(prefs.getString("autopull_intervall", "60"));
+			time_add = Integer.valueOf(prefs.getString("autopull_intervall", "60"));
 		} catch(NumberFormatException e) {
 			Log.d("NumberFormatException", e.getMessage());
 		}
@@ -153,11 +153,11 @@ public class Functions {
 			Log.d("Functions.java", "no auto pull");
 			return;
 		}
-		Log.d("time", new Integer((time_add*1000*60)).toString());
+		Log.d("time", Integer.valueOf((time_add*1000*60)).toString());
 		Intent intent = new Intent(context, UpdateBroadcastReceiver.class);
 		intent.setAction("update_vplan");
 		boolean alarmUp = (PendingIntent.getBroadcast(context, 192837, intent, PendingIntent.FLAG_NO_CREATE) != null);
-		Log.d("alarmUp", new Boolean(alarmUp).toString());
+		Log.d("alarmUp", Boolean.valueOf(alarmUp).toString());
 		PendingIntent sender = PendingIntent.getBroadcast(context, 192837, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (time_add*1000*60), sender);
@@ -459,9 +459,9 @@ public class Functions {
 		while(i < result.getCount()) {
 			String date = result.getString(result.getColumnIndex(Functions.DB_DATE));
 			String[] splitdate = date.split("\\.");
-			int year  = new Integer(splitdate[2]);
-			int month = new Integer(splitdate[1]);
-			int day   = new Integer(splitdate[0]);
+			int year  = Integer.valueOf(splitdate[2]);
+			int month = Integer.valueOf(splitdate[1]);
+			int day   = Integer.valueOf(splitdate[0]);
 			
 			boolean isvalid = false;
 			if(!(year < year_now+1)) {
@@ -589,7 +589,6 @@ public class Functions {
 		if(!get.equals("networkerror")) {
 			try {
         		JSONArray jArray = new JSONArray(get);
-        		Toast.makeText(context, new Integer(jArray.length()).toString(), Toast.LENGTH_LONG).show();
         		int i = 0;
     			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
     			myDB.delete(Functions.DB_EVENTS_TABLE, null, null); //clear termine

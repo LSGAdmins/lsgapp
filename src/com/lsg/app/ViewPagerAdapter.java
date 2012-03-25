@@ -17,7 +17,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -100,7 +99,7 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 				          Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_HOUR, Functions.DB_LEHRER},
 				        		  Functions.DB_ROWID + "=?", new String[] {new Long(id).toString()}, null, null, null);
 				          c.moveToFirst();
-				          String hour = new Integer(c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1).toString();
+				          String hour = Integer.valueOf(c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1).toString();
 				          Cursor d = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_STUNDE, Functions.DB_VERTRETUNGSTEXT, 
 				        		  Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_ART}, Functions.DB_RAW_FACH + "=? AND " + Functions.DB_STUNDE + "=? AND "
 				          + Functions.DB_LEHRER + "=?",
@@ -248,7 +247,7 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		
 		
 		Calendar cal = Calendar.getInstance();
-		String dayofweek = (cal.get(Calendar.DAY_OF_WEEK) < 6) ? new Integer(cal.get(Calendar.DAY_OF_WEEK)).toString() : "0";
+		String dayofweek = (cal.get(Calendar.DAY_OF_WEEK) < 6) ? Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)).toString() : "0";
 		dayofweek = "0";
 		timetable_c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_ROWID, Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_RAUM, Functions.DB_LENGTH,
 				Functions.DB_HOUR, Functions.DB_DAY, Functions.DB_RAW_FACH}, Functions.DB_DAY + "=?", new String[] { dayofweek }, null, null, null);

@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +29,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+@TargetApi(11)
 public class SettingsAdvanced extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

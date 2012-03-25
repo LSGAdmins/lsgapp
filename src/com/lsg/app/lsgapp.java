@@ -38,15 +38,15 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
         	if(msg.arg1 == 1) {
-        		loading.cancel();
+//        		loading.cancel();
         		adapter.updateCursor();
         	}
         	if(msg.arg1 == 2) {
-        		loading.cancel();
+//        		loading.cancel();
         	}
         	if(msg.arg1 == 3) {
-        		loading.cancel();
-    			loading = ProgressDialog.show(lsgapp.this, "", getString(msg.arg2), true);
+//        		loading.cancel();
+//    			loading = ProgressDialog.show(lsgapp.this, "", getString(msg.arg2), true);
         	}
         }
     };
@@ -245,6 +245,8 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
         	});
         	AlertDialog alert = builder.create();
         	alert.show();
+        	myDB.close();
+        	cur.close();
         }
     }
 	/*protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -299,7 +301,7 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
 	    }
 	}*/
     public void updateVP() {
-		loading = ProgressDialog.show(lsgapp.this, "", getString(R.string.loading_vertretungen), true);
+//		loading = ProgressDialog.show(lsgapp.this, "", getString(R.string.loading_vertretungen), true);
 		UpdateBroadcastReceiver.ProgressThread progress = new UpdateBroadcastReceiver.ProgressThread(handler, this);
 		progress.start();
 		}
@@ -358,9 +360,9 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
 	    case R.id.info:
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    	builder.setMessage(getString(R.string.number_all) + " " + new Integer(adapter.second_c.getCount()).toString() + "\n"
-	    			+ getString(R.string.number_mine) + " " + new Integer(adapter.c.getCount()).toString() + "\n"
-	    			+ getString(R.string.actdate) + prefs.getString("date", "") + " / " + prefs.getString("time", ""))
+	    	builder.setMessage(getString(R.string.number_all) + " " + Integer.valueOf(adapter.second_c.getCount()).toString() + "\n"
+	    			+ getString(R.string.number_mine) + " " + Integer.valueOf(adapter.c.getCount()).toString() + "\n"
+	    			+ getString(R.string.actdate) + prefs.getString("vplan_date", "") + " / " + prefs.getString("vplan_time", ""))
 	    	       .setCancelable(true)
 	    	       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
 	    	           public void onClick(DialogInterface dialog, int id) {

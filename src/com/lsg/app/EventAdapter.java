@@ -3,7 +3,6 @@ package com.lsg.app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ public class EventAdapter extends CursorAdapter {
 		public TextView place;
 	}
 	public EventAdapter(Context context, Cursor d) {
-		super(context, d);
+		super(context, d, false);
 		}
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -79,7 +78,7 @@ public class EventAdapter extends CursorAdapter {
 		String[] month    = datebeginning.split("\\.");
 		if(!oldmonth[1].equals(month[1])) {
 			holder.month.setVisibility(View.VISIBLE);
-			holder.month.setText(context.getResources().getStringArray(R.array.months)[new Integer(month[1])-1] + " '" + month[2]);
+			holder.month.setText(context.getResources().getStringArray(R.array.months)[Integer.valueOf(month[1])-1] + " '" + month[2]);
 		}
 		else
 			holder.month.setVisibility(View.GONE);

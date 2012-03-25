@@ -15,7 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
@@ -44,7 +44,7 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 		
 		updateCursor();
 		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
-				new int[] {R.id.main_textview});
+				new int[] {R.id.main_textview}, 0);
 		setListAdapter(adap);
 		
 		registerForContextMenu(getListView());

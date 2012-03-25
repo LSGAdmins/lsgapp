@@ -1,5 +1,6 @@
 package com.lsg.app;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -13,6 +14,8 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
+//code for old devices -> deprecated
+@SuppressLint("deprecated")
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import java.io.File;
 
+import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,11 +11,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+@TargetApi(9)
 public class Download {
 	private DownloadManager downloadManager;
 	private SharedPreferences prefs;
@@ -22,7 +23,7 @@ public class Download {
 	public Download(Context context) {
 		this.context = context;
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        downloadManager = (DownloadManager) context.getSystemService(context.DOWNLOAD_SERVICE);
+        downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
 	}
 	public void download() {
 		Uri downloadUri = Uri.parse(Functions.UPDATE_URL);
@@ -44,7 +45,7 @@ public class Download {
     			int status = cursor.getInt(columnIndex);
     			if(status == DownloadManager.STATUS_SUCCESSFUL){
     				//Retrieve the saved request id
-    				long downloadID = prefs.getLong("downid", 0);
+    				//long downloadID = prefs.getLong("downid", 0);
     				if(Build.VERSION.SDK_INT >= 11) {
     					String localFileName = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
     					//Toast.makeText(context, localFileName, Toast.LENGTH_LONG).show();

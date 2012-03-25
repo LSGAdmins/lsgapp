@@ -22,7 +22,7 @@ public class TimetableAdapter extends CursorAdapter {
 		public TextView timetable_room;
 	}
 	public TimetableAdapter(Context context, Cursor c) {
-		super(context, c);
+		super(context, c, false);
 		myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		}
 	@Override
@@ -53,22 +53,22 @@ public class TimetableAdapter extends CursorAdapter {
 		else
 			holder.timetable_day.setVisibility(View.GONE);
 		int hour = cursor.getInt(cursor.getColumnIndex(Functions.DB_HOUR)) + 1;
-		String when = new Integer(hour).toString();
+		String when = Integer.valueOf(hour).toString();
 		int i = 1;
 		int length = cursor.getInt(cursor.getColumnIndex(Functions.DB_LENGTH));
 		while(i < length) {
-			when += ", " + new Integer(hour + i).toString();
+			when += ", " + Integer.valueOf(hour + i).toString();
 			i++;
 		}
 		String rawfach = cursor.getString(cursor.getColumnIndex(Functions.DB_RAW_FACH));
 		String lehrer = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
 		Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {}, Functions.DB_STUNDE + "=? AND " + Functions.DB_RAW_FACH + "=? AND " + Functions.DB_LEHRER + "=?",
-				new String[] {new Integer(hour).toString(), rawfach, lehrer}, null, null, null);
+				new String[] {Integer.valueOf(hour).toString(), rawfach, lehrer}, null, null, null);
 		if(c.getCount() > 0)
 			holder.lay.setBackgroundResource(R.layout.background_info);
 		else
 			holder.lay.setBackgroundResource(R.layout.background);
-		Log.d("laenge " + rawfach, new Integer(c.getCount()).toString());
+		Log.d("laenge " + rawfach, Integer.valueOf(c.getCount()).toString());
 		
 		holder.timetable_hour.setText(when + ". " + context.getString(R.string.hour));
 		holder.timetable_subject.setText(cursor.getString(cursor.getColumnIndex(Functions.DB_FACH)));
