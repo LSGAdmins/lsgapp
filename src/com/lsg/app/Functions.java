@@ -769,5 +769,4 @@ public class Functions {
 		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
 		context.startService(unregIntent);
 	}
-	
 }

@@ -1,25 +1,35 @@
 
     <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <!-- search -->
         <item android:id="@+id/search"
             android:icon="@android:drawable/ic_menu_search"
             android:title="@string/search"
             android:showAsAction="ifRoom|withText"
             android:actionViewClass="android.widget.SearchView" />
-        <item android:id="@+id/refresh"
-            android:icon="@android:drawable/ic_menu_rotate"
-            android:title="@string/refresh"
-            android:showAsAction="ifRoom|withText" />
-        <item android:id="@+id/settings"
-            android:icon="@android:drawable/ic_menu_manage"
-            android:title="@string/settings"
-            android:showAsAction="ifRoom|withText" />
-        <item android:id="@+id/mine"
-            android:title="@string/mine" />
-        <item android:id="@+id/all"
-            android:title="@string/all" />
-        <item android:id="@+id/subjects"
-            android:title="@string/subjectlist" />
+        <!-- info -->
         <item android:id="@+id/info"
             android:icon="@android:drawable/ic_menu_info_details"
-            android:title="@string/vplan_info" />
+            android:title="@string/vplan_info"
+            android:showAsAction="ifRoom|withText" />
+        <!-- refresh -->
+        <item android:id="@+id/refresh"
+            android:icon="@android:drawable/ic_menu_rotate"
+            android:title="@string/refresh" />
+        <!-- settings -->
+        <item android:id="@+id/settings"
+            android:icon="@android:drawable/ic_menu_manage"
+            android:title="@string/settings" />
+        <!-- timetable -->
+        <item android:id="@+id/timetable"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/timetable" />
+        <!-- switch to mine - removed if >= Honeycomb -->
+        <item android:id="@+id/mine"
+            android:title="@string/mine" />
+        <!-- switch to mine - removed if >= Honeycomb -->
+        <item android:id="@+id/all"
+            android:title="@string/all" />
+        <!-- subjectlist -->
+        <item android:id="@+id/subjects"
+            android:title="@string/subjectlist" />
     </menu>

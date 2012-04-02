@@ -3,7 +3,6 @@ package com.lsg.app;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,11 +67,13 @@ public class TimetableAdapter extends CursorAdapter {
 			holder.lay.setBackgroundResource(R.layout.background_info);
 		else
 			holder.lay.setBackgroundResource(R.layout.background);
-		Log.d("laenge " + rawfach, Integer.valueOf(c.getCount()).toString());
 		
 		holder.timetable_hour.setText(when + ". " + context.getString(R.string.hour));
 		holder.timetable_subject.setText(cursor.getString(cursor.getColumnIndex(Functions.DB_FACH)));
 		holder.timetable_teacher.setText(cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER)));
 		holder.timetable_room.setText(context.getString(R.string.room) + " " + cursor.getString(cursor.getColumnIndex(Functions.DB_RAUM)));
 		}
+	public void close() {
+		myDB.close();
+	}
 }

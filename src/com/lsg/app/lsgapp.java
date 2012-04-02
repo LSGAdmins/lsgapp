@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -31,15 +30,16 @@ import android.widget.Toast;
 
 public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener {
 	Download down;
-	private ProgressDialog loading;
 	private ViewPagerAdapter adapter;
 	private ViewPager pager;
+	private SharedPreferences prefs;
+	private SharedPreferences.Editor edit;
 
 	final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
         	if(msg.arg1 == 1) {
 //        		loading.cancel();
-        		adapter.updateCursor();
+        		//adapter.updateCursor();
         	}
         	if(msg.arg1 == 2) {
 //        		loading.cancel();
@@ -105,7 +105,15 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	super.onCreate(savedInstanceState);
+        Functions.setTheme(false, false, this);
+        Functions.testDB(this);
+		getWindow().setBackgroundDrawableResource(R.layout.background);
+        super.onCreate(savedInstanceState);
+        getWindow().setBackgroundDrawableResource(R.layout.background);
+        
+    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	edit = prefs.edit();
     	if(prefs.getBoolean("updatevplanonstart", false)) {
     		UpdateBroadcastReceiver.ProgressThread upd = new UpdateBroadcastReceiver.ProgressThread(new Handler(), this);
     		upd.start();
@@ -114,54 +122,114 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
 		Intent testAC2DM = new Intent("com.google.android.c2dm.intent.REGISTER");
 		if(startService(testAC2DM) == null) {
 			Log.i(Functions.TAG, "c2dm not available; disabling");
-			SharedPreferences.Editor edit = prefs.edit();
 			edit.putBoolean("disableAC2DM", true);
 			edit.putBoolean("useac2dm", false);
 			edit.commit();
 		}
-    	if(prefs.getBoolean("useac2dm", false)) {
-    		Functions.registerAC2DM(this);
-    	} else if(!prefs.getBoolean("disableAC2DM", false) && !prefs.getBoolean("ac2dm_chosen", false)) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(lsgapp.this);
-			builder.setMessage(getString(R.string.enable_AC2DM))
-			       .setCancelable(false)
-			       .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			       		SharedPreferences.Editor edit = prefs.edit();
-			       		edit.putBoolean("useac2dm", true);
+		if(!prefs.getString("username", "").equals("")) {
+			if(!prefs.getBoolean("disableAC2DM", false) && !prefs.getBoolean("ac2dm_chosen", false)) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(lsgapp.this);
+				builder.setMessage(getString(R.string.enable_AC2DM))
+				.setCancelable(false)
+				.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						edit.putBoolean("useac2dm", true);
 			       		edit.putBoolean("ac2dm_chosen", true);
 			       		edit.commit();
 			       		Functions.registerAC2DM(lsgapp.this);
-			           }
-			       })
+			       		dialog.cancel();
+			       		}
+					})
 			       .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {
-				       		SharedPreferences.Editor edit = prefs.edit();
 				       		edit.putBoolean("useac2dm", false);
 				       		edit.putBoolean("ac2dm_chosen", true);
 				       		edit.commit();
 			                dialog.cancel();
 			           }
 			       });
-			AlertDialog alert = builder.create();
-			alert.show();
-    	}
-    	
-    	super.onCreate(savedInstanceState);
-        Functions.setTheme(false, false, this);
-        Functions.testDB(this);
-		getWindow().setBackgroundDrawableResource(R.layout.background);
-        super.onCreate(savedInstanceState);
-        getWindow().setBackgroundDrawableResource(R.layout.background);
-        
-		/*if(Functions.getSDK() >= 11) {
-			try {
-				AdvancedWrapper actHelper = new AdvancedWrapper();
-				actHelper.dropDownNav(this);
-				} catch (Exception e) {
-					Log.d("error", e.getMessage());
+				AlertDialog alert = builder.create();
+				builder.setCancelable(false);
+				alert.show();
+				}
+			if(prefs.getString(Functions.RELIGION, "-1").equals("-1")) {
+				final CharSequence[] items = getResources().getStringArray(R.array.religion);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.choose_religion);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						switch(item) {
+						case 0:
+							edit.putString(Functions.RELIGION, Functions.KATHOLISCH);
+							break;
+						case 1:
+							edit.putString(Functions.RELIGION, Functions.EVANGELISCH);
+							break;
+							default:
+								edit.putString(Functions.RELIGION, Functions.ETHIK);
+								break;
+								}
+						edit.commit();
+						dialog.cancel();
+						}
+					});
+				AlertDialog alert = builder.create();
+				builder.setCancelable(false);
+				alert.show();
+				}
+			if(prefs.getString(Functions.GENDER, "-1").equals("-1")) {
+				final CharSequence[] items = getResources().getStringArray(R.array.gender);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.your_gender);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						switch(item) {
+						case 0:
+							edit.putString(Functions.GENDER, "m");
+							break;
+						case 1:
+							edit.putString(Functions.GENDER, "w");
+							break;
+							default:
+								edit.putString(Functions.GENDER, "-1");
+								break;
+								}
+						edit.commit();
+						dialog.cancel();
+						}
+					});
+				builder.setCancelable(false);
+				AlertDialog alert = builder.create();
+				builder.setCancelable(false);
+				alert.show();
+				}
+			if(prefs.getString(Functions.FULL_CLASS, "-1").equals("-1")) {
+				SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
+				Cursor cur = myDB.query(Functions.DB_CLASS_TABLE, new String[] {Functions.DB_CLASS}, Functions.DB_CLASS + " LIKE ?", new String[] {"%"
+				+ prefs.getString("class", "").toLowerCase() + "%"},
+				null, null, null);
+				cur.moveToFirst();
+				final CharSequence[] items = new CharSequence[cur.getCount()];
+				int i = 0;
+				while(i < cur.getCount()) {
+					items[i] = cur.getString(cur.getColumnIndex(Functions.DB_CLASS));
+					i++;
+					cur.moveToNext();
 					}
-		}*/
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.your_class);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						edit.putString(Functions.FULL_CLASS, (String) items[item]);
+						edit.commit();
+						}
+					});
+				AlertDialog alert = builder.create();
+				alert.show();
+				myDB.close();
+				cur.close();
+				}
+			}
 	    setContentView(R.layout.viewpager);
 	    adapter = new ViewPagerAdapter(this);
 	    pager = (ViewPager)findViewById( R.id.viewpager );
@@ -176,132 +244,8 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
         
         UpdateCheck uCheck = new UpdateCheck(handler);
         uCheck.start();
-        
-        if(prefs.getString(Functions.RELIGION, "-1").equals("-1")) {
-        	final CharSequence[] items = getResources().getStringArray(R.array.religion);
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	builder.setTitle(R.string.choose_religion);
-        	builder.setItems(items, new DialogInterface.OnClickListener() {
-        	    public void onClick(DialogInterface dialog, int item) {
-        	    	SharedPreferences.Editor edit = prefs.edit();
-        	        switch(item) {
-        	        case 0:
-        	        	edit.putString(Functions.RELIGION, Functions.KATHOLISCH);
-        	        	break;
-        	        case 1:
-        	        	edit.putString(Functions.RELIGION, Functions.EVANGELISCH);
-        	        	default:
-        	        	edit.putString(Functions.RELIGION, Functions.ETHIK);
-        	        }
-        	        edit.commit();
-        	    }
-        	});
-        	AlertDialog alert = builder.create();
-        	alert.show();
-        }
-        if(prefs.getString(Functions.GENDER, "-1").equals("-1")) {
-        	final CharSequence[] items = getResources().getStringArray(R.array.gender);
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	builder.setTitle(R.string.your_gender);
-        	builder.setItems(items, new DialogInterface.OnClickListener() {
-        	    public void onClick(DialogInterface dialog, int item) {
-        	    	SharedPreferences.Editor edit = prefs.edit();
-        	        switch(item) {
-        	        case 0:
-        	        	edit.putString(Functions.GENDER, "m");
-        	        	break;
-        	        case 1:
-        	        	edit.putString(Functions.GENDER, "w");
-        	        	default:
-        	        	edit.putString(Functions.GENDER, "-1");
-        	        }
-        	        edit.commit();
-        	    }
-        	});
-        	AlertDialog alert = builder.create();
-        	alert.show();
-        }
-        if(prefs.getString(Functions.FULL_CLASS, "-1").equals("-1")) {
-        	SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
-        	Cursor cur = myDB.query(Functions.DB_CLASS_TABLE, new String[] {Functions.DB_CLASS}, Functions.DB_CLASS + " LIKE ?", new String[] {"%"
-        	+ prefs.getString("class", "").toLowerCase() + "%"},
-        			null, null, null);
-        	cur.moveToFirst();
-        	final CharSequence[] items = new CharSequence[cur.getCount()];
-        	int i = 0;
-        	while(i < cur.getCount()) {
-        		items[i] = cur.getString(cur.getColumnIndex(Functions.DB_CLASS));
-        		i++;
-        		cur.moveToNext();
-        	}
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	builder.setTitle(R.string.your_class);
-        	builder.setItems(items, new DialogInterface.OnClickListener() {
-        	    public void onClick(DialogInterface dialog, int item) {
-        	    	SharedPreferences.Editor edit = prefs.edit();
-        	        edit.putString(Functions.FULL_CLASS, (String) items[item]);
-        	        edit.commit();
-        	    }
-        	});
-        	AlertDialog alert = builder.create();
-        	alert.show();
-        	myDB.close();
-        	cur.close();
-        }
     }
-	/*protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		String listtext = (String) ((TextView) v).getText();
-		if(listtext.equals(getString(R.string.vplan))) {
-			Intent intent = new Intent(this, VPlan.class);
-			startActivity(intent);
-		}
-		if(listtext.equals(getString(R.string.events))) {
-			Intent intent = new Intent(this, Events.class);
-			startActivity(intent);
-		}
-		if(listtext.equals(getString(R.string.smvblog))) {
-			Intent intent = new Intent(this, SMVBlog.class);
-			startActivity(intent);
-		}
-		if(listtext.equals(getString(R.string.updatecheck))) {
-			Intent intent = new Intent(this, UpdateCheck.class);
-			startActivity(intent);
-		}
-	}
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.lsgapp, menu);
-	    return true;
-	}
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	    case R.id.help:
-	    	Intent help = new Intent(this, HelpAbout.class);
-	    	help.putExtra(Functions.helpabout, Functions.help);
-	    	startActivity(help);
-	        return true;
-	    case R.id.about:
-	    	Intent about = new Intent(this, HelpAbout.class);
-	    	about.putExtra(Functions.helpabout, Functions.about);
-	    	startActivity(about);
-	    	return true;
-	    case R.id.settings:
-	    	Intent settings;
-	    	if(Functions.getSDK() < 11)
-	    		settings = new Intent(this, Settings.class);
-	    	else
-	    		settings = new Intent(this, SettingsAdvanced.class);
-	    	startActivity(settings);
-	    	return true;
-	    default:
-	        return super.onOptionsItemSelected(item);
-	    }
-	}*/
     public void updateVP() {
-//		loading = ProgressDialog.show(lsgapp.this, "", getString(R.string.loading_vertretungen), true);
 		UpdateBroadcastReceiver.ProgressThread progress = new UpdateBroadcastReceiver.ProgressThread(handler, this);
 		progress.start();
 		}
@@ -357,8 +301,11 @@ public class lsgapp extends Activity  implements ViewPager.OnPageChangeListener 
             Intent subjects = new Intent(this, SubjectList.class);
             startActivity(subjects);
 	    	return true;
+	    case R.id.timetable:
+	    	Intent timetable = new Intent(this, TimeTable.class);
+	    	startActivity(timetable);
+	    	return true;
 	    case R.id.info:
-	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 	    	builder.setMessage(getString(R.string.number_all) + " " + Integer.valueOf(adapter.second_c.getCount()).toString() + "\n"
 	    			+ getString(R.string.number_mine) + " " + Integer.valueOf(adapter.c.getCount()).toString() + "\n"

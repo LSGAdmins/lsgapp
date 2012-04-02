@@ -15,7 +15,7 @@ import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
 //code for old devices -> deprecated
-@SuppressLint("deprecated")
+@SuppressLint("all")
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

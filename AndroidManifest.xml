@@ -35,8 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:label="@string/vplan" android:name="VPlan"></activity>
-        <activity android:label="@string/events" android:name="Events"></activity>
         <activity android:name="Settings" android:label="@string/settings"></activity>
         <activity android:name="HelpAbout"></activity>
         <activity android:label="@string/smvblog" android:name="SMVBlog"></activity>
@@ -59,6 +57,7 @@
               <category android:name="com.lsg.app" />
           </intent-filter>
     </receiver>
+        <activity android:label="@string/timetable" android:name="TimeTable"></activity>
     </application>
 
 </manifest>

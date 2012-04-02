@@ -17,6 +17,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher {
 	private String[] where_conds = new String[4];
 	private String[] where_conds_events = new String[6];
+	private String[] exclude_subjects = new String[4];
 	private final SQLiteDatabase myDB;
 	public Cursor c;
 	public Cursor second_c;
@@ -45,6 +47,7 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 	private String include_cond;
 	private lsgapp act;
 	private final Context context;
+	private final SharedPreferences prefs;
 	
 	public ViewPagerAdapter(lsgapp act) {
 		where_conds[0] = "%";
@@ -57,6 +60,24 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		where_conds_events[3] = "%";
 		where_conds_events[4] = "%";
 		where_conds_events[5] = "%";
+		prefs = PreferenceManager.getDefaultSharedPreferences(act);
+		exclude_subjects[1] = (prefs.getString(Functions.GENDER, "").equals("m")) ? "Sw" : "Sm";
+		if(prefs.getString(Functions.RELIGION, "").equals(Functions.KATHOLISCH)) {
+			exclude_subjects[2] = Functions.EVANGELISCH;
+			exclude_subjects[3] = Functions.ETHIK;
+		} else if(prefs.getString(Functions.RELIGION, "").equals(Functions.EVANGELISCH)) {
+			exclude_subjects[2] = Functions.KATHOLISCH;
+			exclude_subjects[3] = Functions.ETHIK;
+		} else {
+			exclude_subjects[2] = Functions.KATHOLISCH;
+			exclude_subjects[3] = Functions.EVANGELISCH;
+		}
+		Log.d("gender", prefs.getString(Functions.GENDER, ""));
+		Log.d("religion", prefs.getString(Functions.RELIGION, ""));
+		Log.d("exclude_subjects[]", exclude_subjects[0] + " asdf");
+		Log.d("exclude_subjects[]", exclude_subjects[1] + " asdf");
+		Log.d("exclude_subjects[]", exclude_subjects[2] + " asdf");
+		Log.d("exclude_subjects[]", exclude_subjects[3] + " asdf");
 		context = (Context) act;
 		this.act = act;
 		
@@ -247,10 +268,31 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		
 		
 		Calendar cal = Calendar.getInstance();
-		String dayofweek = (cal.get(Calendar.DAY_OF_WEEK) < 6) ? Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)).toString() : "0";
-		dayofweek = "0";
+		int day;
+		switch(cal.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.MONDAY:
+			day = 0;
+			break;
+		case Calendar.TUESDAY:
+			day = 1;
+			break;
+		case Calendar.WEDNESDAY:
+			day = 2;
+			break;
+		case Calendar.THURSDAY:
+			day = 3;
+			break;
+		case Calendar.FRIDAY:
+			day = 4;
+			break;
+			default:
+				day = 0;
+				break;
+		}
+		exclude_subjects[0] = Integer.valueOf(day).toString();
 		timetable_c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_ROWID, Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_RAUM, Functions.DB_LENGTH,
-				Functions.DB_HOUR, Functions.DB_DAY, Functions.DB_RAW_FACH}, Functions.DB_DAY + "=?", new String[] { dayofweek }, null, null, null);
+				Functions.DB_HOUR, Functions.DB_DAY, Functions.DB_RAW_FACH}, Functions.DB_DAY + "=? AND  " + Functions.DB_RAW_FACH + " != ? AND " + Functions.DB_RAW_FACH
+				+ " != ? AND " +  Functions.DB_RAW_FACH + " != ?", exclude_subjects, null, null, null);
 		timetableadap.changeCursor(timetable_c);
 	}
 	public void updateWhereCond(String searchText) {
@@ -281,6 +323,7 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		second_c.close();
 		events.close();
 		myDB.close();
+		timetableadap.close();
 	}
 	@Override
 	public void destroyItem( View pager, int position, Object view ) {

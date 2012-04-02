@@ -46,17 +46,17 @@ public final class R {
     }
     public static final class id {
         public static final int about=0x7f090020;
-        public static final int all=0x7f090024;
+        public static final int all=0x7f090026;
         public static final int event_date=0x7f090002;
         public static final int event_month=0x7f090000;
         public static final int event_place=0x7f090003;
         public static final int event_title=0x7f090001;
         public static final int first=0x7f090006;
         public static final int help=0x7f090021;
-        public static final int info=0x7f090026;
+        public static final int info=0x7f090023;
         public static final int list_view_empty=0x7f090004;
         public static final int main_textview=0x7f09000a;
-        public static final int mine=0x7f090023;
+        public static final int mine=0x7f090025;
         public static final int refresh=0x7f09001f;
         public static final int search=0x7f09001e;
         public static final int search_edit=0x7f09000b;
@@ -65,8 +65,9 @@ public final class R {
         public static final int settings=0x7f090022;
         public static final int standard_rellayout=0x7f09000c;
         public static final int standard_webview=0x7f090014;
-        public static final int subjects=0x7f090025;
+        public static final int subjects=0x7f090027;
         public static final int third=0x7f090009;
+        public static final int timetable=0x7f090024;
         public static final int timetable_day=0x7f090016;
         public static final int timetable_hour=0x7f090017;
         public static final int timetable_lay=0x7f090015;
