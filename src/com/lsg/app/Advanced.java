@@ -31,7 +31,7 @@ public class Advanced implements SearchView.OnQueryTextListener {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
 		int spinner = (!prefs.getBoolean("dark_actionbar", false)) ? android.R.layout.simple_spinner_dropdown_item : R.layout.spinner_dropdown_black_actionbar;
 		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(act, R.array.action_vertretungen, spinner);
-		ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
+		/*ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 				switch(itemPosition) {
@@ -52,7 +52,7 @@ public class Advanced implements SearchView.OnQueryTextListener {
 		ActionBar actionBar = act.getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		
-		actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);
+		actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);*/
 	}
 	public void searchBarInit(Menu menu, final SQLlist list) {
 		this.list = list;
@@ -61,6 +61,7 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	}
 	public boolean onQueryTextChange(String text) {
 		list.updateWhereCond(text);
+		list.updateList();
 		return true;
 	}
 	public boolean onQueryTextSubmit(String text) {

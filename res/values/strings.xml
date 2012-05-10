@@ -21,6 +21,7 @@
     <string name="number_mine">Vertretungen, die mich betreffen:</string>
     <string name="actdate">Aktualisierungsdatum:</string>
     <string name="vplan">Vertretungsplan</string>
+    <string name="vplan_short">Vertretungen</string>
     <string name="autopullvplan">Vertretungsplan im Hintergrund aktualisieren</string>
     <string name="autopull_intervall">Zeitintervall für die Aktualisierung (min)</string>
     <string name="updatevplanonstart">Vertretungsplan beim Appstart aktualisieren</string>
@@ -52,12 +53,14 @@
     <string name="room">Raum</string>
     <string name="networkerror">Netzwerkfehler beim Abruf</string>
     <string name="jsonerror">Fehler beim Parsen der Daten</string>
-    <string name="loginerror">Login-Fehler \n Bitte korrigieren Sie Benutzernamen und Passwort</string>
-    <string name="loading_vertretungen">Lade Vertretungen&#8230;</string>
+    <string name="unknownerror">Unbekannter Fehler</string>
+    <string name="loginerror">Login-Fehler\nBitte korrigieren Sie Benutzernamen und Passwort</string>
+    <string name="loading_vplan">Lade Vertretungen&#8230;</string>
     <string name="loading_events">Lade Termine&#8230;</string>
     <string name="loading_class">Lade Klasse&#8230;</string>
     <string name="loading_subjects">Lade Fächerliste&#8230;</string>
     <string name="loading_timetable">Lade Stundenplan&#8230;</string>
+    <string name="loading_common_data">Lade Daten&#8230;</string>
     <string name="downloading">Lade Update herunter</string>
     <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
     <string name="no_class"></string>
@@ -111,4 +114,7 @@
     <string name="help_bottom">
 	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden
 	</string>
+    <string name="vplan_mine_empty">Keine Vertretungen für mich!</string>
+    <string name="events_empty">Keine Termine!</string>
+    <string name="subjectlist_info">Lange drücken und halten, um Vertretungen bestimmter Fächer immer anzuzeigen / immer zu verbergen.</string>
 </resources>

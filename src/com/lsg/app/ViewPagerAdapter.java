@@ -39,10 +39,10 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 	public Cursor second_c;
 	public Cursor events;
 	public Cursor timetable_c;
-	private VertretungAdapter vadapter_second;
-	private VertretungAdapter vadapter;
-	private TimetableAdapter timetableadap;
-	private EventAdapter evadapter;
+	private VPlan.VertretungAdapter vadapter_second;
+	private VPlan.VertretungAdapter vadapter;
+	private TimeTable.TimetableAdapter timetableadap;
+	private Events.EventAdapter evadapter;
 	private String exclude_cond;
 	private String include_cond;
 	private lsgapp act;
@@ -86,12 +86,12 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		
 		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TABLE);
 		long count = num_rows.simpleQueryForLong();
-		if(count == 0)
-			act.updateVP();
-		vadapter = new VertretungAdapter(context, c);
-		vadapter_second = new VertretungAdapter(context, second_c);
-		evadapter = new EventAdapter(context, events);
-		timetableadap = new TimetableAdapter(context, timetable_c);
+		/*if(count == 0)
+			act.updateVP();*/
+		vadapter = new VPlan.VertretungAdapter(context, c);
+		vadapter_second = new VPlan.VertretungAdapter(context, second_c);
+		evadapter = new Events.EventAdapter(context, events);
+		timetableadap = new TimeTable.TimetableAdapter(context, timetable_c);
 		updateCursor();
 		}
 	

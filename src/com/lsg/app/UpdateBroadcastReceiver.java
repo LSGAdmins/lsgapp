@@ -3,13 +3,10 @@ package com.lsg.app;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
 public class UpdateBroadcastReceiver extends BroadcastReceiver {
-	public static class ProgressThread extends Thread {
+	/*public static class ProgressThread extends Thread {
 		Handler handler;
 		Context context;
 		boolean notify;
@@ -25,7 +22,7 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			}
 		public void run() {
 			Looper.prepare();
-			boolean update = Functions.refreshVPlan(context, handler, notify);
+			//boolean update = Functions.refreshVPlan(context, handler, notify);
 			
 			Message msg = handler.obtainMessage();
 			msg.arg1 = 3;
@@ -56,11 +53,22 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			
 			msg = handler.obtainMessage();
 			msg.arg1 = 1;
-			if(!update)
+			/*if(!update)
 				msg.arg1 = 2;
 			handler.sendMessage(msg);
 			}
+		}*/
+	public static class VPupdate extends Thread {
+		Context context;
+		VPupdate(Context c) {
+			context = c;
 		}
+		public void run() {
+			VPlan.VPlanUpdater vpup = new VPlan.VPlanUpdater(context);
+			String res[] = vpup.update();
+			Log.d(res[0], res[1]);
+		}
+	}
 	private static class IDSender extends Thread {
 		Context context;
 		String registration_id;
@@ -92,9 +100,8 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 		}
 	private void updateVP(Context context) {
 		Log.d("UpdateBroadcastReceiver", "update VPlan");
-		Handler h = new Handler();
-		ProgressThread progress = new ProgressThread(h, context, false);
-		progress.start();
+		VPupdate vp = new VPupdate(context);
+		vp.start();
 	}
 	private void handleRegistration(Context context, Intent intent) {
 		    String registration = intent.getStringExtra("registration_id"); 

@@ -50,13 +50,13 @@ public class Functions {
 	
 	public static final String   UPDATE_URL       = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
 	public static final String   UPDATE_CHECK_URL = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
-	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_raw.php";
+	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_app.php";
 	public static final String   EVENT_URL        = "http://linux.lsg.musin.de/cp/termine_app.php";
 	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php?all=true";
 	public static final String   SUBJECT_URL      = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
 	public static final String   REGISTRATION_URL = "http://linux.lsg.musin.de/cp/register_client.php";
 	public static final String   TIMETABLE_URL    = "http://linux.lsg.musin.de/cp/timetable.php";
-	public static final String   API_VERSION      = "2";
+	public static final String   API_VERSION      = "3";
 	
 	public static final String   class_key  = "class";
 	public static final String[] exclude    = {"Q11", "Q12"};
@@ -81,6 +81,14 @@ public class Functions {
 	public static final String DB_RAW_FACH        = "rawfach";
 	public static final String DB_DATE            = "date";
 	public static final String DB_LENGTH          = "length";
+	//Termine
+	public static final String DB_EVENTS_TABLE    = "events";
+	public static final String DB_DATES    		  = "dates";
+	public static final String DB_ENDDATES        = "enddates";
+	public static final String DB_TIMES           = "times";
+	public static final String DB_ENDTIMES        = "endtimes";
+	public static final String DB_TITLE           = "title";
+	public static final String DB_VENUE           = "venue";
 	//exclude & include
 	public static final String EXCLUDE_TABLE      = "exclude";
 	public static final String INCLUDE_TABLE      = "include";
@@ -197,7 +205,6 @@ public class Functions {
         	while ((line = reader.readLine()) != null) {
         		get += line;
         		}
-        	Log.d("get", get);
         	return get;
 		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage() + " "); e.printStackTrace(); return "networkerror";}
 	}
@@ -235,216 +242,6 @@ public class Functions {
 					};
 					return r;
 					}
-	}
-	
-	public static synchronized boolean refreshVPlan(final Context context, Handler h, boolean notify) {
-		Functions.testDB(context);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String add = "";
-		try {
-			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_date", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_time", ""), "UTF-8");
-		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
-		String get = Functions.getData(Functions.VP_URL, context, true, add);
-		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
-			try {
-        		JSONArray jArray = new JSONArray(get);
-        		int i = 0;
-    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-    			myDB.delete(Functions.DB_VPLAN_TABLE, null, null); //clear vertretungen
-        		while(i < jArray.length() - 1) {
-        			JSONObject jObject = jArray.getJSONObject(i);
-        			ContentValues values = new ContentValues();
-        			values.put(Functions.DB_KLASSENSTUFE, jObject.getString("klassenstufe"));
-        			values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
-        			values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
-        			values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
-        			values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
-        			values.put(Functions.DB_RAUM, jObject.getString("raum"));
-        			values.put(Functions.DB_ART, jObject.getString("art"));
-        			values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
-        			values.put(Functions.DB_FACH, jObject.getString("fach")); 
-        			values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
-        			values.put(Functions.DB_DATE, jObject.getString("date"));
-        			values.put(Functions.DB_LENGTH, jObject.getInt("length"));
-            		myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
-        			i++;
-        			}
-        		myDB.close();
-        		JSONObject jObject            = jArray.getJSONObject(i);
-        		String date                   = jObject.getString("date");
-        		String time                   = jObject.getString("time");
-        		SharedPreferences.Editor edit = prefs.edit();
-        		edit.putString("vplan_date", date);
-        		edit.putString("vplan_time", time);
-        		edit.commit();
-        		} catch(JSONException e) {
-        			Log.d("json", e.getMessage());
-        			if(notify)
-        				h.post(getErrorRunnable("jsonerror", context));
-        			return false;
-        		}
-			}
-		else if(get.equals("noact")) {
-			Runnable r = new Runnable() {
-				public void run() {
-					Toast.makeText(context, context.getString(R.string.noact), Toast.LENGTH_SHORT).show();
-				}
-			};
-			if(notify)
-				h.post(r);
-			return true;
-		}
-		else {
-			if(notify)
-				h.post(getErrorRunnable(get, context));
-			return false;
-		}
-		return true;
-		}
-	public static synchronized boolean updateTimetable(final Context context, Handler h, boolean notify) {
-
-		Functions.testDB(context);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String add = "";
-		try {
-			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_date", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("timetable_time", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("class", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.FULL_CLASS, ""), "UTF-8");
-		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
-		String get = Functions.getData(Functions.TIMETABLE_URL, context, true, add);
-		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
-			try {
-        		JSONArray jArray = new JSONArray(get);
-        		JSONObject jObject_           = jArray.getJSONObject(0);
-        		String date                   = jObject_.getString("date");
-        		String time                   = jObject_.getString("time");
-        		String one                    = jObject_.getString("one");
-        		String two                    = jObject_.getString("two");
-        		String klasse                 = jObject_.getString("klasse");
-        		SharedPreferences.Editor edit = prefs.edit();
-        		edit.putString("timetable_date", date);
-        		edit.putString("timetable_time", time);
-        		edit.putString("timetable_one", one);
-        		edit.putString("timetable_two", two);
-        		edit.putString("timetable_klasse", klasse);
-        		edit.commit();
-        		int i = 1;
-    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-    			myDB.delete(Functions.DB_TIME_TABLE, null, null); //clear vertretungen
-        		while(i < jArray.length()) {
-        			JSONObject jObject = jArray.getJSONObject(i);
-        			ContentValues values = new ContentValues();
-        			values.put(Functions.DB_LEHRER,   jObject.getString("teacher"));
-        			values.put(Functions.DB_FACH,     jObject.getString("subject"));
-        			values.put(Functions.DB_RAW_FACH, jObject.getString("rawsubject"));
-        			values.put(Functions.DB_RAUM,     jObject.getString("room"));
-        			values.put(Functions.DB_LENGTH,   jObject.getInt   ("length"));
-        			values.put(Functions.DB_DAY,      jObject.getInt   ("day"));
-        			values.put(Functions.DB_HOUR,     jObject.getInt   ("hour"));
-            		myDB.insert(Functions.DB_TIME_TABLE, null, values);
-        			i++;
-        			}
-        		myDB.close();
-        		} catch(JSONException e) {
-        			Log.d("json", e.getMessage());
-        			if(notify)
-        				h.post(getErrorRunnable("jsonerror", context));
-        			return false;
-        		}
-			}
-		else if(get.equals("noact")) {
-			Runnable r = new Runnable() {
-				public void run() {
-					Toast.makeText(context, context.getString(R.string.noact), Toast.LENGTH_SHORT).show();
-				}
-			};
-			if(notify)
-				h.post(r);
-			return true;
-		}
-		else {
-			if(notify)
-				h.post(getErrorRunnable(get, context));
-			return false;
-		}
-		return true;
-	}
-	public static synchronized boolean updateSubjectList(final Context context, Handler h, boolean notify) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String add = "";
-		try {
-			add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("subject_update_time", ""), "UTF-8");
-		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
-		String get = Functions.getData(Functions.SUBJECT_URL, context, true, add);
-		if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noupdate")) {
-			try {
-        		JSONArray jArray = new JSONArray(get);
-        		int i = 0;
-    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-    			myDB.delete(Functions.DB_SUBJECT_TABLE, null, null); //clear subjectlist
-        		while(i < jArray.length() - 1) {
-        			JSONObject jObject = jArray.getJSONObject(i);
-        			ContentValues values = new ContentValues();
-        			values.put(Functions.DB_RAW_FACH, jObject.getString("kuerzel"));
-        			values.put(Functions.DB_FACH, jObject.getString("name"));
-            		myDB.insert(Functions.DB_SUBJECT_TABLE, null, values);
-        			i++;
-        			}
-        		JSONObject jObject            = jArray.getJSONObject(i);
-        		String update_time            = jObject.getString("update_time");
-        		SharedPreferences.Editor edit = prefs.edit();
-        		edit.putString("subject_update_time", update_time);
-        		edit.commit();
-        		myDB.close();
-        		} catch(JSONException e) {
-        			Log.d("json", e.getMessage());
-        			if(notify)
-        				h.post(getErrorRunnable("jsonerror", context));
-        			return false;
-        		}
-			}
-		else if(get.equals("noupdate")) {
-			Runnable r = new Runnable() {
-				public void run() {
-					Toast.makeText(context, context.getString(R.string.noact_subjects), Toast.LENGTH_SHORT).show();
-				}
-			};
-			if(notify)
-				h.post(r);
-			return true;
-		}
-		else {
-			if(notify)
-				h.post(getErrorRunnable(get, context));
-			return false;
-		}
-		return true;
-	}
-	public static synchronized void getClass(Context context) {
-		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		try {
-			String get = Functions.getData(Functions.CLASS_URL, context, true, "");
-			JSONArray jArray = new JSONArray(get);
-			int i = 0;
-			myDB.delete(Functions.DB_CLASS_TABLE, null, null);
-			while(i < jArray.length()-1) {
-				ContentValues vals = new ContentValues();
-				vals.put(Functions.DB_CLASS, jArray.getString(i));
-				myDB.insert(Functions.DB_CLASS_TABLE, null, vals);
-				i++;
-			}
-        	SharedPreferences.Editor editor = prefs.edit();
-        	editor.putString("class", jArray.getString(i));
-        	editor.commit();
-        	myDB.close();
-        	Log.d("class", jArray.getString(i));
-        }
-        catch(Exception e) {
-        	myDB.close();
-	    	Log.d("except", e.getMessage());
-        }
 	}
 	public static void cleanDB(Context context) {
 		Calendar now  = Calendar.getInstance();
@@ -575,48 +372,6 @@ public class Functions {
     	Functions.cleanDB(context);
 	}
 	
-	//Termine
-	public static final String DB_EVENTS_TABLE    = "events";
-	public static final String DB_DATES    		  = "dates";
-	public static final String DB_ENDDATES        = "enddates";
-	public static final String DB_TIMES           = "times";
-	public static final String DB_ENDTIMES        = "endtimes";
-	public static final String DB_TITLE           = "title";
-	public static final String DB_VENUE           = "venue";
-	public static boolean refreshEvents(Context context, Handler h) {
-		Functions.testDB(context);
-		String get = Functions.getData(Functions.EVENT_URL, context, false, "");
-		if(!get.equals("networkerror")) {
-			try {
-        		JSONArray jArray = new JSONArray(get);
-        		int i = 0;
-    			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-    			myDB.delete(Functions.DB_EVENTS_TABLE, null, null); //clear termine
-        		while(i < jArray.length()) {
-        			JSONObject jObject = jArray.getJSONObject(i);
-        			ContentValues values = new ContentValues();
-        			values.put(Functions.DB_DATES, jObject.getString("dates"));
-        			values.put(Functions.DB_ENDDATES, jObject.getString("enddates"));
-        			values.put(Functions.DB_TIMES, jObject.getString("times"));
-        			values.put(Functions.DB_ENDTIMES, jObject.getString("endtimes"));
-        			values.put(Functions.DB_TITLE, jObject.getString("title"));
-        			values.put(Functions.DB_VENUE, jObject.getString("venue"));
-            		myDB.insert(Functions.DB_EVENTS_TABLE, null, values);
-        			i++;
-        			}
-        		myDB.close();
-        		} catch(JSONException e) {
-        			Log.d("json", e.getMessage());
-        			h.post(getErrorRunnable("jsonerror", context));
-        			return false;
-        		}	
-        }
-		else {
-			h.post(getErrorRunnable(get, context));
-			return false;
-		}
-		return true;
-	}
 	//handlers for adding / removing items to / from blacklist
 	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, Context context, String table) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
