@@ -35,12 +35,12 @@ public class SettingsAdvanced extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        Functions.setTheme(false, true, this);
+        //Functions.setTheme(false, true, this);
     }
 
     @Override
     public void onBuildHeaders(List<Header> target) {
-        Functions.setTheme(false, true, this);
+        //Functions.setTheme(false, true, this);
         loadHeadersFromResource(R.xml.setting_headers, target);
     }
 
@@ -129,7 +129,7 @@ public class SettingsAdvanced extends PreferenceActivity {
     		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
     				null, null, null, null, null);
     		
-    		adap = new SimpleCursorAdapter(getActivity(), R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
+    		adap = new SimpleCursorAdapter(getActivity(), R.layout.main_listitem_black, c, new String[] {Functions.DB_FACH},
     				new int[] {R.id.main_textview}, 0);
     		setListAdapter(adap);
     	}

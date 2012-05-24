@@ -104,14 +104,15 @@ public final class R {
         public static final int list=0x7f030006;
         public static final int list_viewflipper=0x7f030007;
         public static final int main_listitem=0x7f030008;
-        public static final int main_nav=0x7f030009;
-        public static final int search=0x7f03000a;
-        public static final int spinner_dropdown_black_actionbar=0x7f03000b;
-        public static final int standard=0x7f03000c;
-        public static final int timetable_item=0x7f03000d;
-        public static final int updatecheck=0x7f03000e;
-        public static final int vertretung_item=0x7f03000f;
-        public static final int viewpager=0x7f030010;
+        public static final int main_listitem_black=0x7f030009;
+        public static final int main_nav=0x7f03000a;
+        public static final int search=0x7f03000b;
+        public static final int spinner_dropdown_black_actionbar=0x7f03000c;
+        public static final int standard=0x7f03000d;
+        public static final int timetable_item=0x7f03000e;
+        public static final int updatecheck=0x7f03000f;
+        public static final int vertretung_item=0x7f030010;
+        public static final int viewpager=0x7f030011;
     }
     public static final class menu {
         public static final int events=0x7f080000;

@@ -5,15 +5,16 @@
             android:title="@string/search"
             android:showAsAction="ifRoom|withText"
             android:actionViewClass="android.widget.SearchView" />
+        <!-- refresh -->
+        <item android:id="@+id/refresh"
+            android:icon="@android:drawable/ic_menu_rotate"
+            android:title="@string/refresh"
+            android:showAsAction="ifRoom|withText" />
         <!-- info -->
         <item android:id="@+id/info"
             android:icon="@android:drawable/ic_menu_info_details"
             android:title="@string/vplan_info"
             android:showAsAction="ifRoom|withText" />
-        <!-- refresh -->
-        <item android:id="@+id/refresh"
-            android:icon="@android:drawable/ic_menu_rotate"
-            android:title="@string/refresh" />
         <!-- subjectlist -->
         <item android:id="@+id/subjects"
             android:title="@string/subjectlist" />
