@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -29,11 +30,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.CursorAdapter;
@@ -51,8 +54,10 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 		private final SQLiteDatabase myDB;
 		public Cursor cursor_all;
 		public Cursor cursor_mine;
+		public Cursor cursor_teachers;
 		private VPlan.VertretungAdapter vadapter_all;
 		private VPlan.VertretungAdapter vadapter_mine;
+		private VPlan.VertretungAdapter vadapter_teachers;
 		private String exclude_cond;
 		private String include_cond;
 		private VPlan act;
@@ -90,24 +95,20 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 			
 			SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TABLE);
 			long count = num_rows.simpleQueryForLong();
-			if(count == 0)
+			SQLiteStatement num_rows_2 = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TEACHER);
+			long count2 = num_rows_2.simpleQueryForLong();
+			if(count == 0 || count2 == 0)
 				act.updateVP();
 			num_rows.close();
-			vadapter_all = new VPlan.VertretungAdapter(context, cursor_all);
-			vadapter_mine = new VPlan.VertretungAdapter(context, cursor_mine);
+			vadapter_all = new VPlan.VertretungAdapter(context, cursor_all, false);
+			vadapter_mine = new VPlan.VertretungAdapter(context, cursor_mine, false);
+			vadapter_teachers = new VPlan.VertretungAdapter(context, cursor_teachers, true);
 			updateCursor();
 			}
 		
-	/*	@Override
-		public String getTitle( int position )
-		{
-			super.get
-			return titles[ position ];
-			}*/
-		
 		@Override
 		public int getCount() {
-			return 2;
+			return 3;
 			}
 		
 		@Override
@@ -126,12 +127,16 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 					lv.setAdapter(vadapter_mine);
 				if(position == 1)
 					lv.setAdapter(vadapter_all);
+				if(position == 2)
+					lv.setAdapter(vadapter_teachers);
 				Functions.styleListView(lv, context);
 				act.registerForContextMenu(lv);
 				lv.setEmptyView(lay.findViewById(R.id.list_view_empty));
 				if(position == 0)
 					((TextView) lay.findViewById(R.id.list_view_empty)).setText(R.string.vplan_mine_empty);
 				if(position == 1)
+					((TextView) lay.findViewById(R.id.list_view_empty)).setText(R.string.vplan_empty);
+				if(position == 2)
 					((TextView) lay.findViewById(R.id.list_view_empty)).setText(R.string.vplan_empty);
 				((ViewPager)pager).addView(lay, 0);
 				return lay;
@@ -192,8 +197,12 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
 					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
 					Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);
+			cursor_teachers = myDB.query(Functions.DB_VPLAN_TEACHER, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
+					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
+					Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);;
 			vadapter_mine.changeCursor(cursor_mine);
 			vadapter_all.changeCursor(cursor_all);
+			vadapter_teachers.changeCursor(cursor_teachers);
 		}
 		public void updateWhereCond(String searchText) {
 			where_conds[1] = "%" + searchText + "%";
@@ -246,7 +255,8 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 		@Override
 		public void startUpdate( View view ) {}
 	}
-	public static class VertretungAdapter extends CursorAdapter {
+	public class VertretungAdapter extends CursorAdapter {
+		private boolean teacher;
 		class Standard {
 			public LinearLayout standard;
 			public TextView date;
@@ -258,13 +268,18 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 			public TextView bottom;
 			public WebView webv;
 			}
-		public VertretungAdapter(Context context, Cursor c) {
+		public VertretungAdapter(Context context, Cursor c, boolean teacher) {
 			super(context, c, false);
+			this.teacher = teacher;
 			}
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			LayoutInflater inflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View rowView = inflater.inflate(R.layout.standard, null, true);
+			View rowView;
+			if(teacher)
+				rowView = inflater.inflate(R.layout.standard, null, true);
+			else
+				rowView = inflater.inflate(R.layout.standard, null, true);
 			Standard holder = new Standard();
 			holder.standard = (LinearLayout) rowView.findViewById(R.id.standard_rellayout);
 			holder.date = (TextView) rowView.findViewById(R.id.vertretung_date);
@@ -331,8 +346,14 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 				holder.title.setText(klasse + " (" + fach + ")");
 				String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
 				holder.type.setText(type);
-				
-				Integer lesson = Integer.valueOf(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));
+				Integer lesson;
+				try {
+				lesson = Integer.valueOf(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));
+				} catch(Exception e) {
+					//old db style, do act!!!
+					lesson = 0;
+					VPlan.this.updateVP();
+				}
 				String when = lesson.toString();
 				int i = 0;
 				int length = cursor.getInt(cursor.getColumnIndex(Functions.DB_LENGTH));
@@ -405,7 +426,9 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 						values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
 						values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
 						values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
+						values.put(Functions.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
 						values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
+						values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
 						values.put(Functions.DB_RAUM, jObject.getString("raum"));
 						values.put(Functions.DB_ART, jObject.getString("art"));
 						values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
@@ -439,6 +462,65 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 				return new String[] {"unknownerror", context.getString(R.string.unknownerror)};
 			return new String[] {"success", " "};
 			}
+		public String[] updateTeachers() {
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				String add = "";
+				try {
+					add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_teacher_date", ""), "UTF-8")
+							+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_teacher_time", ""), "UTF-8")
+							+ "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode("teachers", "UTF-8");
+					} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+				String get = Functions.getData(Functions.VP_URL, context, true, add);
+				Log.d("get", get);
+				if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact") && !get.equals("rights")) {
+					try {
+						JSONArray jArray = new JSONArray(get);
+						int i = 0;
+						SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+						myDB.delete(Functions.DB_VPLAN_TEACHER, null, null); //clear vertretungen
+						while(i < jArray.length() - 1) {
+							JSONObject jObject = jArray.getJSONObject(i);
+							ContentValues values = new ContentValues();
+							values.put(Functions.DB_KLASSENSTUFE, jObject.getString("klassenstufe"));
+							values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
+							values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
+							values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
+							values.put(Functions.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
+							values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
+							values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
+							values.put(Functions.DB_RAUM, jObject.getString("raum"));
+							values.put(Functions.DB_ART, jObject.getString("art"));
+							values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
+							values.put(Functions.DB_FACH, jObject.getString("fach"));
+							values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
+							values.put(Functions.DB_DATE, jObject.getString("date"));
+							values.put(Functions.DB_LENGTH, jObject.getInt("length"));
+							myDB.insert(Functions.DB_VPLAN_TEACHER, null, values);
+							i++;
+							}
+						myDB.close();
+						JSONObject jObject            = jArray.getJSONObject(i);
+						String date                   = jObject.getString("date");
+						String time                   = jObject.getString("time");
+						SharedPreferences.Editor edit = prefs.edit();
+						edit.putString("vplan_teacher_date", date);
+						edit.putString("vplan_teacher_time", time);
+						edit.commit();
+						} catch(JSONException e) {
+							Log.d("jsonerror", e.getMessage());
+							return new String[] {"json", context.getString(R.string.jsonerror)};
+						}
+					}
+				else if(get.equals("noact"))
+					return new String[] {"noact", context.getString(R.string.noact)};
+				else if(get.equals("loginerror"))
+					return new String[] {"loginerror", context.getString(R.string.loginerror)};
+				else if(get.equals("networkerror"))
+					return new String[] {"networkerror", context.getString(R.string.networkerror)};
+				else
+					return new String[] {"unknownerror", context.getString(R.string.unknownerror)};
+				return new String[] {"success", " "};
+				}
 		}
 	public class VPlanUpdateTask extends AsyncTask<Void, Void, String[]> {
 		protected void onPreExecute() {
@@ -448,6 +530,7 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 		@Override
 		protected String[] doInBackground(Void... params) {
 			VPlanUpdater vpup = new VPlanUpdater(VPlan.this);
+			vpup.updateTeachers();
 			return vpup.update();
 		}
 		protected void onPostExecute(String[] res) {
@@ -472,17 +555,49 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	private ViewPager pager;
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
+	private LinearLayout[] lins = new LinearLayout[3];
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
-        getWindow().setBackgroundDrawableResource(R.layout.background);
+        //getWindow().setBackgroundDrawableResource(R.layout.background);
 		setContentView(R.layout.viewpager);
 	    adapter = new VPlanPagerAdapter(this);
-	    pager = (ViewPager)findViewById( R.id.viewpager );
+	    pager = (ViewPager)findViewById(R.id.viewpager);
 	    pager.setOnPageChangeListener(this);
 	    pager.setAdapter(adapter);
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	}
+	    lins[0] = (LinearLayout) findViewById(R.id.first);
+	    lins[1] = (LinearLayout) findViewById(R.id.second);
+	    lins[2] = (LinearLayout) findViewById(R.id.third);
+	    lins[0].setVisibility(View.VISIBLE);
+	    lins[1].setVisibility(View.VISIBLE);
+	    lins[2].setVisibility(View.VISIBLE);
+	    ((TextView) findViewById(R.id.first_textv)).setText(getString(R.string.mine_short));
+	    ((TextView) findViewById(R.id.second_textv)).setText(getString(R.string.all_short));
+	    ((TextView) findViewById(R.id.third_textv)).setText(getString(R.string.teachers_short));
+	    ((TextView) findViewById(R.id.first_textv)).setOnClickListener(new OnClickListener() {
+	    	public void onClick(View v) {
+	    		pager.setCurrentItem(0);
+	    	}
+	    });
+	    ((TextView) findViewById(R.id.second_textv)).setOnClickListener(new OnClickListener() {
+	    	public void onClick(View v) {
+	    		pager.setCurrentItem(1);
+	    	}
+	    });
+	    ((TextView) findViewById(R.id.third_textv)).setOnClickListener(new OnClickListener() {
+	    	public void onClick(View v) {
+	    		pager.setCurrentItem(2);
+	    	}
+	    });
+	    //pager.setCurrentItem(1, true);
+	    //pager.setCurrentItem(0, true);
+	    Display display = getWindowManager().getDefaultDisplay();
+	    Point size = new Point();
+	    display.getSize(size);
+	    //int flipper_width = (findViewById(R.id.viewflipper)).getWidth();
+		//Functions.moveViewPagerTitles(lins, 320, 0, 0);
+	    }
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.vplan, menu);
@@ -552,19 +667,20 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	    vpup.execute();
 	}
 	@Override
-	public void onPageScrollStateChanged(int arg0) {
+	public void onPageScrollStateChanged(int state) {
 		//not interesting
 	}
 	@Override
-	public void onPageScrolled(int arg0, float arg1, int arg2) {
-		//not interesting
+	public void onPageScrolled(int position, float offset, int offsetPixels) {
+	    lins[0].setVisibility(View.VISIBLE);
+	    lins[1].setVisibility(View.VISIBLE);
+	    lins[2].setVisibility(View.VISIBLE);
+		int flipper_width = (findViewById(R.id.viewflipper)).getWidth();
+		Functions.moveViewPagerTitles(lins, flipper_width, position, offsetPixels, this);
 	}
 	@Override
 	public void onPageSelected(int position) {
-		if(position == 0)
-			setTitle(R.string.mine);
-		if(position == 1)
-			setTitle(R.string.all);
+		//not interesting
 	}
 	@Override
 	public void onDestroy() {

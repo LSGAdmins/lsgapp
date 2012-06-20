@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,8 +34,6 @@ import android.widget.Toast;
 
 public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListener*/ {
 	Download down;
-	private ViewPagerAdapter adapter;
-	private ViewPager pager;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor edit;
 
@@ -239,7 +236,6 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
         Functions.testDB(this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
         super.onCreate(savedInstanceState);
-        getWindow().setBackgroundDrawableResource(R.layout.background);
         setContentView(R.layout.main_nav);
 
 	    UpdateCheckTask upcheck = new UpdateCheckTask();
@@ -263,149 +259,6 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
         if(Functions.getSDK() >= 9)
  		   down = new Download(lsgapp.this);
 		}
-    /*
-	    setContentView(R.layout.viewpager);
-	    adapter = new ViewPagerAdapter(this);
-	    pager = (ViewPager)findViewById( R.id.viewpager );
-	    pager.setOnPageChangeListener(this);
-	    /*TitlePageIndicator indicator =
-	        (TitlePageIndicator)findViewById( R.id.indicator );*//*
-	    pager.setAdapter(adapter);
-	    //indicator.setViewPager( pager );
-        
-        
-        UpdateCheck uCheck = new UpdateCheck(handler);
-        uCheck.start();
-    }
-    public void updateVP() {
-		UpdateBroadcastReceiver.ProgressThread progress = new UpdateBroadcastReceiver.ProgressThread(handler, this);
-		progress.start();
-		}
-	public void setPage(int page) {
-		pager.setCurrentItem(page);
-	}
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main, menu);
-	    if(Functions.getSDK() >= 11) {
-	    	AdvancedWrapper ahelp = new AdvancedWrapper();
-	    	ahelp.searchBar(menu, adapter);
-	    }
-	    else
-	    	menu.removeItem(R.id.search);
-	    return true;
-	}
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.removeItem(R.id.all);
-		menu.removeItem(R.id.mine);
-	    if(Functions.getSDK() < 11) {
-	    	if(pager.getCurrentItem() == 0)
-	    		menu.add(0, R.id.all, Menu.NONE, R.string.all);
-	    	else
-	    		menu.add(0, R.id.mine, Menu.NONE, R.string.mine);
-	    }
-		return true;
-	}
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	    case R.id.settings:
-	    	Intent settings;
-	    	if(Functions.getSDK() >= 11)
-	    		settings = new Intent(this, SettingsAdvanced.class);
-	    	else
-	    		settings = new Intent(this, Settings.class);
-	    	startActivity(settings);
-	        return true;
-	    case R.id.refresh:
-	    	updateVP();
-	    	return true;
-	    case R.id.mine:
-	    	setPage(0);
-	    	return true;
-	    case R.id.all:
-	    	setPage(1);
-	    	return true;
-	    case R.id.subjects:
-            Intent subjects = new Intent(this, SubjectList.class);
-            startActivity(subjects);
-	    	return true;
-	    case R.id.timetable:
-	    	Intent timetable = new Intent(this, TimeTable.class);
-	    	startActivity(timetable);
-	    	return true;
-	    case R.id.info:
-	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    	builder.setMessage(getString(R.string.number_all) + " " + Integer.valueOf(adapter.second_c.getCount()).toString() + "\n"
-	    			+ getString(R.string.number_mine) + " " + Integer.valueOf(adapter.c.getCount()).toString() + "\n"
-	    			+ getString(R.string.actdate) + prefs.getString("vplan_date", "") + " / " + prefs.getString("vplan_time", ""))
-	    	       .setCancelable(true)
-	    	       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-	    	           public void onClick(DialogInterface dialog, int id) {
-	    	                dialog.cancel();
-	    	           }
-	    	       });
-	    	AlertDialog alert = builder.create();
-	    	alert.show();
-	    	return true;
-        case android.R.id.home:
-            // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, lsgapp.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            return true;
-        case R.id.vplan_item:
-            Intent vplan_int = new Intent(this, VPlan.class);
-            startActivity(vplan_int);
-        	return true;
-        case R.id.event_item:
-            Intent event_int = new Intent(this, Events.class);
-            startActivity(event_int);
-        	return true;
-        case R.id.smv_item:
-            Intent smv_int = new Intent(this, SMVBlog.class);
-            startActivity(smv_int);
-        	return true;
-	    default:
-	        return super.onOptionsItemSelected(item);
-	    }
-	}
-	public void onPageScrollStateChanged (int state) {}
-	public void onPageScrolled (int position, float positionOffset, int positionOffsetPixels) {}
-	public void onPageSelected (int position) {
-		if(Functions.getSDK() >= 11) {
-			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.selectedItem(position, this);
-			}
-		if(position == 0)
-			setTitle(R.string.timetable);
-		else if(position == 1)
-			setTitle(R.string.mine);
-		else if(position == 2)
-			setTitle(R.string.all);
-			else if(position == 3)
-				setTitle(R.string.events);
-			else if(position == 4)
-				setTitle(R.string.smvblog);
-	}
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_VPLAN_TABLE);
-	}
-	@Override
-	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, this, adapter, Functions.DB_VPLAN_TABLE);
-	}
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		adapter.closeCursorsDB();
-	}*/
-
     public void button_press(View v) {
     	Log.d("text", (String) ((Button) v).getText());
     	if(((String) ((Button) v).getText()).equals(getString(R.string.timetable))) {
@@ -563,4 +416,4 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 		myDB.close();
 		num_rows.close();
 		}
-}
+	}

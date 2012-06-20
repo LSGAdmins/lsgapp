@@ -9,9 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -25,7 +23,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -33,9 +30,13 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class Functions {
@@ -69,11 +70,14 @@ public class Functions {
 	public static final String DB_NAME            = "lsgapp";
 	//VPlan
 	public static final String DB_VPLAN_TABLE     = "vertretungen";
+	public static final String DB_VPLAN_TEACHER   = "lehrervertretungen";
 	public static final String DB_KLASSENSTUFE    = "klassenstufe";
 	public static final String DB_KLASSE          = "klasse";
 	public static final String DB_STUNDE          = "stunde";
 	public static final String DB_VERTRETER       = "vertreter";
+	public static final String DB_RAW_VERTRETER   = "rawvertreter";
 	public static final String DB_LEHRER          = "lehrer";
+	public static final String DB_RAW_LEHRER      = "rawlehrer";
 	public static final String DB_RAUM            = "raum";
 	public static final String DB_ART             = "art";
 	public static final String DB_VERTRETUNGSTEXT = "vertretungstext";
@@ -130,11 +134,14 @@ public class Functions {
 		act.setTheme(theme);
 		
 		if(homeasup && Functions.getSDK() >= 11) {
-			try {
-				AdvancedWrapper advWrapper = new AdvancedWrapper();
-				advWrapper.homeasup(act);
-			} catch (Exception e) {
-			}
+			homeUp(act);
+		}
+	}
+	public static void homeUp(Activity act) {
+		try {
+			AdvancedWrapper advWrapper = new AdvancedWrapper();
+			advWrapper.homeasup(act);
+		} catch (Exception e) {
 		}
 	}
 	public static void setAlarm(Context context) {
@@ -300,6 +307,21 @@ public class Functions {
     	    	    + Functions.DB_FACH               + " TEXT,"
     	    	    + Functions.DB_DATE               + " TEXT"
     				+");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TEACHER
+    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
+    	    		+ Functions.DB_KLASSENSTUFE       + " INTEGER,"
+    	    	    + Functions.DB_KLASSE	          + " TEXT,"
+    	    	    + Functions.DB_STUNDE             + " INTEGER,"
+    	    	    + Functions.DB_VERTRETER          + " TEXT,"
+    	     	    + Functions.DB_LEHRER             + " TEXT,"
+    	    	    + Functions.DB_RAUM               + " TEXT,"
+    	    	    + Functions.DB_ART                + " TEXT,"
+    	    	    + Functions.DB_VERTRETUNGSTEXT    + " TEXT,"
+    	    	    + Functions.DB_FACH               + " TEXT,"
+    	    	    + Functions.DB_DATE               + " TEXT,"
+    	    	    + Functions.DB_RAW_FACH           + " TEXT,"
+    	    	    + Functions.DB_LENGTH             + " INTEGER"
+    				+");");
     		//blacklist
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.EXCLUDE_TABLE + " ("
     				+ Functions.DB_ROWID + " INTEGER primary key autoincrement,"
@@ -363,6 +385,20 @@ public class Functions {
     			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_RAW_FACH);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
     			myDB.setVersion(4);
+    		}
+    		if(myDB.getVersion() == 4) {
+    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_LEHRER);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_VERTRETER + " TEXT");
+    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_LEHRER);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
+    			myDB.setVersion(5);
+    		}
+    		if(myDB.getVersion() == 5) {
+    			Log.d(Functions.DB_VPLAN_TEACHER, "adding column " + Functions.DB_RAW_LEHRER);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TEACHER + " ADD COLUMN " + Functions.DB_RAW_VERTRETER + " TEXT");
+    			Log.d(Functions.DB_VPLAN_TEACHER, "adding column " + Functions.DB_RAW_LEHRER);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TEACHER + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
+    			myDB.setVersion(6);
     		}
     		myDB.close();
         } catch (Exception e) {
@@ -523,5 +559,32 @@ public class Functions {
 		Intent unregIntent = new Intent("com.google.android.c2dm.intent.UNREGISTER");
 		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
 		context.startService(unregIntent);
+	}
+	public static void moveViewPagerTitles(LinearLayout[] lins, int flipper_width, int position, int offsetPixels, Context context) {
+		FrameLayout.LayoutParams[] lp = new FrameLayout.LayoutParams[lins.length];
+		int[][] offsets = new int[lins.length][2];
+		int i = 0;
+		while(i < lins.length) {
+			//lins[i].setVisibility(View.VISIBLE);
+			lp[i] = new FrameLayout.LayoutParams(lins[i].getLayoutParams());
+			offsets[i][0] = flipper_width * position + offsetPixels + -i * flipper_width;
+			offsets[i][1] = (flipper_width - lins[i].getWidth()) / 2;
+
+			TextView v = (TextView) ((ViewGroup) lins[i]).getChildAt(0);
+			v.setTextColor(context.getResources().getColor(R.color.inactivegrey));
+			if(offsets[i][0] > offsets[i][1] && offsets[i][0] < 3 * offsets[i][1]) {
+				offsets[i][0] = offsets[i][1];
+			} else if(offsets[i][0] > 3* offsets[i][1]) {
+				offsets[i][0] = offsets[i][1] + (offsets[i][0] - 3 * offsets[i][1]);
+			} else if(offsets[i][0] < - offsets[i][1] && offsets[i][0] > - 3 * offsets[i][1] + 3) {
+				offsets[i][0] = - offsets[i][1];
+			} else if(offsets[i][0] <= -3 * offsets[i][1] + 3) {
+				offsets[i][0] = - offsets[i][1] + (offsets[i][0] + 3 * offsets[i][1] - 3);
+			} else
+				v.setTextColor(context.getResources().getColor(R.color.darkblue));
+			lp[i].setMargins(offsets[i][1] - offsets[i][0], 0, offsets[i][1] + offsets[i][0], 0);
+			lins[i].setLayoutParams(lp[i]);
+			i++;
+		}
 	}
 }

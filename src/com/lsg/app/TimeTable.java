@@ -96,7 +96,7 @@ public class TimeTable extends Activity {
 			}
 			String rawfach = cursor.getString(cursor.getColumnIndex(Functions.DB_RAW_FACH));
 			String lehrer = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
-			Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {}, Functions.DB_STUNDE + "=? AND " + Functions.DB_RAW_FACH + "=? AND " + Functions.DB_LEHRER + "=?",
+			Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {}, Functions.DB_STUNDE + "=? AND " + Functions.DB_RAW_FACH + "=? AND " + Functions.DB_RAW_LEHRER + "=?",
 					new String[] {Integer.valueOf(hour).toString(), rawfach, lehrer}, null, null, null);
 			if(c.getCount() > 0)
 				holder.lay.setBackgroundResource(R.layout.background_info);
@@ -196,7 +196,7 @@ public class TimeTable extends Activity {
 					String hour = Integer.valueOf(c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1).toString();
 					Cursor d = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_STUNDE, Functions.DB_VERTRETUNGSTEXT, 
 							Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_ART}, Functions.DB_RAW_FACH + "=? AND " + Functions.DB_STUNDE + "=? AND "
-					+ Functions.DB_LEHRER + "=?",
+					+ Functions.DB_RAW_LEHRER + "=?",
 					new String[] {c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)), hour, c.getString(c.getColumnIndex(Functions.DB_LEHRER))}, null, null, null);
 					d.moveToFirst();
 					if(d.getCount() > 0) {

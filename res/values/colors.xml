@@ -23,6 +23,7 @@
 <color name="mintcream">#f5fffa</color>
 <color name="seperatorgrey">#DDD</color>
 <color name="backgroundgrey">#EEE</color>
+<color name="inactivegrey">#AAA</color>
 <color name="fontgrey">#666</color>
 <color name="fontblack">#222</color>
 </resources>

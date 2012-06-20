@@ -88,8 +88,8 @@ public class ViewPagerAdapter extends PagerAdapter implements SQLlist, TextWatch
 		long count = num_rows.simpleQueryForLong();
 		/*if(count == 0)
 			act.updateVP();*/
-		vadapter = new VPlan.VertretungAdapter(context, c);
-		vadapter_second = new VPlan.VertretungAdapter(context, second_c);
+		vadapter = new VPlan.VertretungAdapter(context, c, false);
+		vadapter_second = new VPlan.VertretungAdapter(context, second_c, false);
 		evadapter = new Events.EventAdapter(context, events);
 		timetableadap = new TimeTable.TimetableAdapter(context, timetable_c);
 		updateCursor();

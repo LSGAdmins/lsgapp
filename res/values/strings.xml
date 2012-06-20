@@ -80,6 +80,10 @@
     <string name="no_classes">Ohne Klassenbezeichnung</string>
     <string name="all">Alle Vertretungen</string>
     <string name="mine">Meine Vertretungen</string>
+    <string name="teachers">Lehrervertretungen</string>
+    <string name="all_short">Alle</string>
+    <string name="mine_short">Meine</string>
+    <string name="teachers_short">Lehrer</string>
     <string name="smvblog">SMVBlog</string>
     <string name="oops">Oops!</string>
     <string name="update_available"><b>Update verfügbar!</b></string>

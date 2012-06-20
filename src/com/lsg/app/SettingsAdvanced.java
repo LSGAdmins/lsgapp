@@ -34,8 +34,7 @@ public class SettingsAdvanced extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        //Functions.setTheme(false, true, this);
+        Functions.homeUp(this);
     }
 
     @Override
