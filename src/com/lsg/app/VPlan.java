@@ -18,7 +18,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -30,27 +29,27 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
-	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher {
+	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
 		private String[] where_conds = new String[4];
 		private String[] where_conds_events = new String[6];
 		private String[] exclude_subjects = new String[4];
+		private String[] titles = new String[3];
 		private final SQLiteDatabase myDB;
 		public Cursor cursor_all;
 		public Cursor cursor_mine;
@@ -75,6 +74,9 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 			where_conds_events[3] = "%";
 			where_conds_events[4] = "%";
 			where_conds_events[5] = "%";
+			titles[0] = "Meine Vertretungen";
+			titles[1] = "Schülervertretungen";
+			titles[2] = "Lehrervertretungen";
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
 			exclude_subjects[1] = (prefs.getString(Functions.GENDER, "").equals("m")) ? "Sw" : "Sm";
 			if(prefs.getString(Functions.RELIGION, "").equals(Functions.KATHOLISCH)) {
@@ -110,6 +112,14 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 		public int getCount() {
 			return 3;
 			}
+		
+		public String getTitle(int pos) {
+			return titles[pos];
+			}
+		 @Override
+	        public CharSequence getPageTitle (int position) {
+	            return titles[position];
+	        }
 		
 		@Override
 		public Object instantiateItem(View pager, int position) {
@@ -556,6 +566,7 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
 	private LinearLayout[] lins = new LinearLayout[3];
+	private TitlePager titlePager;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
@@ -565,38 +576,8 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	    pager = (ViewPager)findViewById(R.id.viewpager);
 	    pager.setOnPageChangeListener(this);
 	    pager.setAdapter(adapter);
-	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    lins[0] = (LinearLayout) findViewById(R.id.first);
-	    lins[1] = (LinearLayout) findViewById(R.id.second);
-	    lins[2] = (LinearLayout) findViewById(R.id.third);
-	    lins[0].setVisibility(View.VISIBLE);
-	    lins[1].setVisibility(View.VISIBLE);
-	    lins[2].setVisibility(View.VISIBLE);
-	    ((TextView) findViewById(R.id.first_textv)).setText(getString(R.string.mine_short));
-	    ((TextView) findViewById(R.id.second_textv)).setText(getString(R.string.all_short));
-	    ((TextView) findViewById(R.id.third_textv)).setText(getString(R.string.teachers_short));
-	    ((TextView) findViewById(R.id.first_textv)).setOnClickListener(new OnClickListener() {
-	    	public void onClick(View v) {
-	    		pager.setCurrentItem(0);
-	    	}
-	    });
-	    ((TextView) findViewById(R.id.second_textv)).setOnClickListener(new OnClickListener() {
-	    	public void onClick(View v) {
-	    		pager.setCurrentItem(1);
-	    	}
-	    });
-	    ((TextView) findViewById(R.id.third_textv)).setOnClickListener(new OnClickListener() {
-	    	public void onClick(View v) {
-	    		pager.setCurrentItem(2);
-	    	}
-	    });
-	    //pager.setCurrentItem(1, true);
-	    //pager.setCurrentItem(0, true);
-	    Display display = getWindowManager().getDefaultDisplay();
-	    Point size = new Point();
-	    display.getSize(size);
-	    //int flipper_width = (findViewById(R.id.viewflipper)).getWidth();
-		//Functions.moveViewPagerTitles(lins, 320, 0, 0);
+	    prefs = PreferenceManager.getDefaultSharedPreferences(this);		
+	    titlePager = new TitlePager(adapter, ((FrameLayout) findViewById(R.id.title_container)), this, pager);
 	    }
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -672,11 +653,7 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	}
 	@Override
 	public void onPageScrolled(int position, float offset, int offsetPixels) {
-	    lins[0].setVisibility(View.VISIBLE);
-	    lins[1].setVisibility(View.VISIBLE);
-	    lins[2].setVisibility(View.VISIBLE);
-		int flipper_width = (findViewById(R.id.viewflipper)).getWidth();
-		Functions.moveViewPagerTitles(lins, flipper_width, position, offsetPixels, this);
+		titlePager.moveViewPagerTitles(position, offsetPixels);
 	}
 	@Override
 	public void onPageSelected(int position) {

@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:shape="rectangle" >
-
-<solid
-        android:color="@color/mintcream" />
+    <solid
+        android:color="@color/white" />
 </shape>

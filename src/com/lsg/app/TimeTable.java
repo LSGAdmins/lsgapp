@@ -8,9 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.lsg.app.Events.EventUpdateTask;
-import com.lsg.app.VPlan.VPlanUpdater;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -19,17 +16,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,12 +37,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TimeTable extends Activity {
+public class TimeTable extends Activity implements ViewPager.OnPageChangeListener {
 	public static class TimetableAdapter extends CursorAdapter {
 		private SQLiteDatabase myDB;
 		class TimetableItem {
@@ -113,7 +112,7 @@ public class TimeTable extends Activity {
 		}
 	}
 
-	public class TimeTableViewPagerAdapter extends PagerAdapter {
+	public class TimeTableViewPagerAdapter extends PagerAdapter implements PagerTitles {
 		private String[] exclude_subjects = new String[4];
 		private final SQLiteDatabase myDB;
 		public Cursor timetable_monday;
@@ -128,6 +127,7 @@ public class TimeTable extends Activity {
 		private TimetableAdapter timetableadap_friday;
 		private final Context context;
 		private final SharedPreferences prefs;
+		private String[] titles = new String[5];
 		
 		public TimeTableViewPagerAdapter(TimeTable act) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
@@ -143,6 +143,11 @@ public class TimeTable extends Activity {
 				exclude_subjects[3] = Functions.EVANGELISCH;
 			}
 			context = (Context) act;
+			titles[0] = "montag";
+			titles[1] = "dienstag";
+			titles[2] = "mittwoch";
+			titles[3] = "donnerstag";
+			titles[4] = "freitag";
 			
 			myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 			timetableadap_monday    = new TimetableAdapter(context, timetable_monday);
@@ -162,6 +167,10 @@ public class TimeTable extends Activity {
 		public int getCount() {
 			return 5;
 			}
+		@Override
+		public String getTitle(int pos) {
+			return titles[pos];
+		}
 		@Override
 		public Object instantiateItem(View pager, int position) {
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -375,14 +384,19 @@ public class TimeTable extends Activity {
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
+	private TitlePager titlePager;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
+		getWindow().setBackgroundDrawableResource(R.layout.background);
 		setContentView(R.layout.viewpager);
 		viewpageradap = new TimeTableViewPagerAdapter(this);
 	    pager = (ViewPager)findViewById(R.id.viewpager);
 	    pager.setAdapter(viewpageradap);
+	    pager.setOnPageChangeListener(this);
+	    pager.setPageMargin(Functions.dpToPx(40, this));
+	    pager.setPageMarginDrawable(R.layout.viewpager_margin);
 	    
 	    //get current day
 	    Calendar cal = Calendar.getInstance();
@@ -407,8 +421,8 @@ public class TimeTable extends Activity {
 				day = 0;
 				break;
 		}
-		
 	    pager.setCurrentItem(day, true);
+	    titlePager = new TitlePager(viewpageradap, ((FrameLayout) findViewById(R.id.title_container)), (Context )this, pager);
 	}
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -441,5 +455,19 @@ public class TimeTable extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		viewpageradap.closeCursorsDB();
+	}
+	@Override
+	public void onPageScrolled(int position, float offset, int offsetPixels) {
+		titlePager.moveViewPagerTitles(position, offsetPixels);
+	}
+	@Override
+	public void onPageScrollStateChanged(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onPageSelected(int arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

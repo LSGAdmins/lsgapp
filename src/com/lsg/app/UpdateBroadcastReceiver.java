@@ -67,6 +67,8 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			VPlan.VPlanUpdater vpup = new VPlan.VPlanUpdater(context);
 			String res[] = vpup.update();
 			Log.d(res[0], res[1]);
+			res = vpup.updateTeachers();
+			Log.d(res[0], res[1]);
 		}
 	}
 	private static class IDSender extends Thread {
@@ -84,7 +86,6 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	public void onReceive(final Context context, Intent intent) {
 		try {
 			String action = intent.getAction();
-			Log.d("action", action);
 			if (action.equals("com.google.android.c2dm.intent.REGISTRATION")) {
 				handleRegistration(context, intent);
 				} else if (action.equals("com.google.android.c2dm.intent.RECEIVE")) {
@@ -99,7 +100,6 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 				}
 		}
 	private void updateVP(Context context) {
-		Log.d("UpdateBroadcastReceiver", "update VPlan");
 		VPupdate vp = new VPupdate(context);
 		vp.start();
 	}
@@ -120,5 +120,5 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 		Log.d("c2dm message", action);
 		if(action.equals("update_vplan"))
 			updateVP(context);
-	}
+		}
 	}

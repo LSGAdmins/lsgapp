@@ -19,12 +19,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -560,31 +562,8 @@ public class Functions {
 		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
 		context.startService(unregIntent);
 	}
-	public static void moveViewPagerTitles(LinearLayout[] lins, int flipper_width, int position, int offsetPixels, Context context) {
-		FrameLayout.LayoutParams[] lp = new FrameLayout.LayoutParams[lins.length];
-		int[][] offsets = new int[lins.length][2];
-		int i = 0;
-		while(i < lins.length) {
-			//lins[i].setVisibility(View.VISIBLE);
-			lp[i] = new FrameLayout.LayoutParams(lins[i].getLayoutParams());
-			offsets[i][0] = flipper_width * position + offsetPixels + -i * flipper_width;
-			offsets[i][1] = (flipper_width - lins[i].getWidth()) / 2;
-
-			TextView v = (TextView) ((ViewGroup) lins[i]).getChildAt(0);
-			v.setTextColor(context.getResources().getColor(R.color.inactivegrey));
-			if(offsets[i][0] > offsets[i][1] && offsets[i][0] < 3 * offsets[i][1]) {
-				offsets[i][0] = offsets[i][1];
-			} else if(offsets[i][0] > 3* offsets[i][1]) {
-				offsets[i][0] = offsets[i][1] + (offsets[i][0] - 3 * offsets[i][1]);
-			} else if(offsets[i][0] < - offsets[i][1] && offsets[i][0] > - 3 * offsets[i][1] + 3) {
-				offsets[i][0] = - offsets[i][1];
-			} else if(offsets[i][0] <= -3 * offsets[i][1] + 3) {
-				offsets[i][0] = - offsets[i][1] + (offsets[i][0] + 3 * offsets[i][1] - 3);
-			} else
-				v.setTextColor(context.getResources().getColor(R.color.darkblue));
-			lp[i].setMargins(offsets[i][1] - offsets[i][0], 0, offsets[i][1] + offsets[i][0], 0);
-			lins[i].setLayoutParams(lp[i]);
-			i++;
-		}
+	public static int dpToPx(int dp, Context ctx) {
+	    Resources r = ctx.getResources();
+	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, r.getDisplayMetrics());
 	}
 }
