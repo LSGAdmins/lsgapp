@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -34,7 +35,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.webkit.WebView;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
@@ -44,7 +47,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
+public class VPlan extends Activity {
 	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
 		private String[] where_conds = new String[4];
 		private String[] where_conds_events = new String[6];
@@ -562,22 +565,22 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 		}
 	}
 	private VPlanPagerAdapter adapter;
-	private ViewPager pager;
+	private ExtendedViewPager pager;
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
-	private LinearLayout[] lins = new LinearLayout[3];
-	private TitlePager titlePager;
+	private SlideMenu menu;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
         //getWindow().setBackgroundDrawableResource(R.layout.background);
 		setContentView(R.layout.viewpager);
 	    adapter = new VPlanPagerAdapter(this);
-	    pager = (ViewPager)findViewById(R.id.viewpager);
-	    pager.setOnPageChangeListener(this);
+	    pager = (ExtendedViewPager)findViewById(R.id.viewpager);
+	    //pager.setOnPageChangeListener(this);
 	    pager.setAdapter(adapter);
-	    prefs = PreferenceManager.getDefaultSharedPreferences(this);		
-	    titlePager = new TitlePager(adapter, ((FrameLayout) findViewById(R.id.title_container)), this, pager);
+	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    menu = new SlideMenu(this);
+	    menu.checkEnabled();
 	    }
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -625,10 +628,7 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	    	alert.show();
 	    	return true;
         case android.R.id.home:
-            // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, lsgapp.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            menu.show();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -646,18 +646,6 @@ public class VPlan extends Activity implements ViewPager.OnPageChangeListener {
 	public void updateVP() {
 	    VPlanUpdateTask vpup = new VPlanUpdateTask();
 	    vpup.execute();
-	}
-	@Override
-	public void onPageScrollStateChanged(int state) {
-		//not interesting
-	}
-	@Override
-	public void onPageScrolled(int position, float offset, int offsetPixels) {
-		titlePager.moveViewPagerTitles(position, offsetPixels);
-	}
-	@Override
-	public void onPageSelected(int position) {
-		//not interesting
 	}
 	@Override
 	public void onDestroy() {

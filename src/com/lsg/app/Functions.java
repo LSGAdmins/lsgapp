@@ -564,6 +564,24 @@ public class Functions {
 	}
 	public static int dpToPx(int dp, Context ctx) {
 	    Resources r = ctx.getResources();
-	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, r.getDisplayMetrics());
+	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
 	}
-}
+	//source: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
+	public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
+		int childCount = viewGroup.getChildCount();
+		for (int i = 0; i < childCount; i++) {
+			View view = viewGroup.getChildAt(i);
+			view.setEnabled(enabled);
+			if (view instanceof ViewGroup) {
+				enableDisableViewGroup((ViewGroup) view, enabled);
+				} else if (view instanceof ListView) {
+					view.setEnabled(enabled);
+					ListView listView = (ListView) view;
+					int listChildCount = listView.getChildCount();
+					for (int j = 0; j < listChildCount; j++) {
+						listView.getChildAt(j).setEnabled(false);
+						}
+					}
+			}
+		}
+	}

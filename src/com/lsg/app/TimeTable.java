@@ -43,7 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TimeTable extends Activity implements ViewPager.OnPageChangeListener {
+public class TimeTable extends Activity {
 	public static class TimetableAdapter extends CursorAdapter {
 		private SQLiteDatabase myDB;
 		class TimetableItem {
@@ -78,12 +78,12 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			TimetableItem holder = (TimetableItem) view.getTag();
-			int position = cursor.getPosition();
+			/*int position = cursor.getPosition();
 			if(position == 0) {
 				holder.timetable_day.setVisibility(View.VISIBLE);
 				holder.timetable_day.setText(context.getResources().getStringArray(R.array.days)[cursor.getInt(cursor.getColumnIndex(Functions.DB_DAY))]);
 			}
-			else
+			else*/
 				holder.timetable_day.setVisibility(View.GONE);
 			int hour = cursor.getInt(cursor.getColumnIndex(Functions.DB_HOUR)) + 1;
 			String when = Integer.valueOf(hour).toString();
@@ -143,11 +143,11 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 				exclude_subjects[3] = Functions.EVANGELISCH;
 			}
 			context = (Context) act;
-			titles[0] = "montag";
-			titles[1] = "dienstag";
-			titles[2] = "mittwoch";
-			titles[3] = "donnerstag";
-			titles[4] = "freitag";
+			titles[0] = "Montag";
+			titles[1] = "Dienstag";
+			titles[2] = "Mittwoch";
+			titles[3] = "Donnerstag";
+			titles[4] = "Freitag";
 			
 			myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 			timetableadap_monday    = new TimetableAdapter(context, timetable_monday);
@@ -171,6 +171,10 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 		public String getTitle(int pos) {
 			return titles[pos];
 		}
+		 @Override
+	        public CharSequence getPageTitle (int position) {
+	            return titles[position];
+	        }
 		@Override
 		public Object instantiateItem(View pager, int position) {
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -384,7 +388,6 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
-	private TitlePager titlePager;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -394,7 +397,7 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 		viewpageradap = new TimeTableViewPagerAdapter(this);
 	    pager = (ViewPager)findViewById(R.id.viewpager);
 	    pager.setAdapter(viewpageradap);
-	    pager.setOnPageChangeListener(this);
+	    //pager.setOnPageChangeListener(this);
 	    pager.setPageMargin(Functions.dpToPx(40, this));
 	    pager.setPageMarginDrawable(R.layout.viewpager_margin);
 	    
@@ -422,7 +425,6 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 				break;
 		}
 	    pager.setCurrentItem(day, true);
-	    titlePager = new TitlePager(viewpageradap, ((FrameLayout) findViewById(R.id.title_container)), (Context )this, pager);
 	}
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -455,19 +457,5 @@ public class TimeTable extends Activity implements ViewPager.OnPageChangeListene
 	public void onDestroy() {
 		super.onDestroy();
 		viewpageradap.closeCursorsDB();
-	}
-	@Override
-	public void onPageScrolled(int position, float offset, int offsetPixels) {
-		titlePager.moveViewPagerTitles(position, offsetPixels);
-	}
-	@Override
-	public void onPageScrollStateChanged(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onPageSelected(int arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }
