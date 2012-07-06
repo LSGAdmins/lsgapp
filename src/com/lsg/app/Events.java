@@ -144,6 +144,7 @@ public class Events extends ListActivity implements SQLlist {
 	public class EventUpdateTask extends AsyncTask<Void, Void, String[]> {
 		protected void onPreExecute() {
 			super.onPreExecute();
+			Functions.lockRotation(Events.this);
 			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events));
 		}
 		@Override
@@ -166,6 +167,7 @@ public class Events extends ListActivity implements SQLlist {
 			}
 			else
 				updateList();
+			Functions.unlockRotation(Events.this);
 		}
 	}
 	private ProgressDialog loading;

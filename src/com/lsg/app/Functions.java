@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -29,10 +30,13 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.FrameLayout;
@@ -587,4 +591,25 @@ public class Functions {
 					}
 			}
 		}
+	public static void lockRotation(Activity ctx) {
+		WindowManager wm =  (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
+	    Display dp = wm.getDefaultDisplay();
+		switch(dp.getOrientation()) {
+		case Surface.ROTATION_0:
+			ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			break;
+		case Surface.ROTATION_90:
+			ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			break;
+		case Surface.ROTATION_180:
+			ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+			break;
+		case Surface.ROTATION_270:
+			ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+			break;
+		}
+	}
+	public static void unlockRotation(Activity ctx) {
+		ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+	}
 	}

@@ -362,6 +362,7 @@ public class TimeTable extends Activity {
 	public class TimeTableUpdateTask extends AsyncTask<Void, Void, String[]> {
 		protected void onPreExecute() {
 			super.onPreExecute();
+			Functions.lockRotation(TimeTable.this);
 			loading = ProgressDialog.show(TimeTable.this, "", getString(R.string.loading_timetable));
 		}
 		@Override
@@ -383,6 +384,7 @@ public class TimeTable extends Activity {
 				TimeTable.this.startActivity(intent);
 			}
 			viewpageradap.updateCursor();
+			Functions.unlockRotation(TimeTable.this);
 		}
 	}
 	private ProgressDialog loading;

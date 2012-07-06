@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -30,12 +31,15 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
@@ -536,10 +540,9 @@ public class VPlan extends Activity {
 	public class VPlanUpdateTask extends AsyncTask<Void, Void, String[]> {
 		@TargetApi(11)
 		protected void onPreExecute() {
-			showLoading(menu.findItem(R.id.refresh), VPlan.this);
 			super.onPreExecute();
 			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vplan));
-			showLoading = true;
+			Functions.lockRotation(VPlan.this);
 		}
 		@Override
 		protected String[] doInBackground(Void... params) {
@@ -548,10 +551,7 @@ public class VPlan extends Activity {
 			return vpup.update();
 		}
 		protected void onPostExecute(String[] res) {
-			hideLoading(menu.findItem(R.id.refresh));
-			showLoading = false;
 			loading.cancel();
-			VPlan.this.cancelLoading();
 			Log.d("ready", "finished");
 			if(!res[0].equals("success"))
 				Toast.makeText(VPlan.this, res[1], Toast.LENGTH_LONG).show();
@@ -569,22 +569,13 @@ public class VPlan extends Activity {
 					adapter.updateCursor();
 				} catch(Exception e) {}
 			}
+			Functions.unlockRotation(VPlan.this);
 		}
-	}
-	@TargetApi(14)
-	public static void showLoading(MenuItem load, Context ctx) {
-		ProgressBar prog = new ProgressBar(ctx);
-		load.setActionView(prog);
-	}
-	@TargetApi(14)
-	public static void hideLoading(MenuItem load) {
-		load.setActionView(null);
 	}
 	private VPlanPagerAdapter adapter;
 	private ExtendedViewPager pager;
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
-	private static boolean showLoading = false;
 	private SlideMenu slidemenu;
 	private Menu menu;
 	public void onCreate(Bundle savedInstanceState) {
@@ -599,12 +590,7 @@ public class VPlan extends Activity {
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    slidemenu = new SlideMenu(this);
 	    slidemenu.checkEnabled();
-	    if(showLoading && false)
-	    	loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vplan));
 	    }
-	public void cancelLoading() {
-		loading.cancel();
-	}
 	public boolean onCreateOptionsMenu(Menu menu) {
 		this.menu = menu;
 		MenuInflater inflater = getMenuInflater();
@@ -615,7 +601,6 @@ public class VPlan extends Activity {
 	    }
 	    else
 	    	menu.removeItem(R.id.search);
-	    hideLoading(menu.findItem(R.id.refresh));
 	    return true;
 	}
 	@Override
@@ -676,8 +661,5 @@ public class VPlan extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		adapter.closeCursorsDB();
-		if(showLoading)
-			loading.cancel();
-		cancelLoading();
 	}
 }

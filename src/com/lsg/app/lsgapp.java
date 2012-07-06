@@ -116,6 +116,7 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 	class CommonDataTask extends AsyncTask<Void, Void, String[]> {
 		protected void onPreExecute() {
 			super.onPreExecute();
+			Functions.lockRotation(lsgapp.this);
 			loading = ProgressDialog.show(lsgapp.this, "", lsgapp.this.getString(R.string.loading_common_data));
 		}
 		@Override
@@ -181,6 +182,7 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 					}
 				}
 				}
+			Functions.unlockRotation(lsgapp.this);
 			}
 			}
 	class UpdateCheckTask extends AsyncTask<Void, Void, String[]> {
