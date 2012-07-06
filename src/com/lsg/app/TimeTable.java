@@ -390,6 +390,7 @@ public class TimeTable extends Activity {
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
+	private SlideMenu slidemenu;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -427,6 +428,8 @@ public class TimeTable extends Activity {
 				break;
 		}
 	    pager.setCurrentItem(day, true);
+	    slidemenu = new SlideMenu(this);
+	    slidemenu.checkEnabled();
 	}
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -441,11 +444,7 @@ public class TimeTable extends Activity {
 	    	updateTimeTable();
 	    	return true;
         case android.R.id.home:
-            // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, lsgapp.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        	slidemenu.show();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);

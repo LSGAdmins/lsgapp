@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -94,11 +97,38 @@ public class SlideMenu {
     	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	menu = inflater.inflate(R.layout.menu, null);
     	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
-    	lays.setMargins(0,
-    			statusHeight, 0, 0);
+    	lays.setMargins(0,statusHeight, 0, 0);
     	menu.setLayoutParams(lays);
-    	Log.d("height", "status"+new Integer(statusHeight).toString());
     	parent.addView(menu);
+    	ListView list = (ListView) act.findViewById(R.id.menu_listview);
+    	list.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent intent;
+				switch(position) {
+				case 0:
+					intent = new Intent(act, TimeTable.class);
+					break;
+				case 1:
+					intent = new Intent(act, VPlan.class);
+					break;
+				case 2:
+					intent = new Intent(act, Events.class);
+					break;
+				case 3:
+					intent = new Intent(act, SMVBlog.class);
+					break;
+				case 4:
+					intent = new Intent(act, Settings.class);
+					break;
+					default:
+						intent = new Intent(act, TimeTable.class);
+						break;
+				}
+				menuShown = false;
+				act.startActivity(intent);
+			}
+    	});
     	if(animate)
     		menu.startAnimation(ta);
     	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
