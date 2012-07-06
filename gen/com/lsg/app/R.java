@@ -18,7 +18,7 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
-        public static final int backgroundgrey=0x7f060014;
+        public static final int backgroundgrey=0x7f060015;
         public static final int darkblack=0x7f06000e;
         public static final int darkblue=0x7f060001;
         public static final int darkgreen=0x7f060005;
@@ -26,11 +26,12 @@ public final class R {
         public static final int darkorange=0x7f060007;
         public static final int darkpurple=0x7f060003;
         public static final int darkred=0x7f060009;
-        public static final int floralwhite=0x7f060010;
-        public static final int fontblack=0x7f060017;
-        public static final int fontgrey=0x7f060016;
-        public static final int ghostwhite=0x7f060011;
-        public static final int inactivegrey=0x7f060015;
+        public static final int dividerblack=0x7f06000f;
+        public static final int floralwhite=0x7f060011;
+        public static final int fontblack=0x7f060018;
+        public static final int fontgrey=0x7f060017;
+        public static final int ghostwhite=0x7f060012;
+        public static final int inactivegrey=0x7f060016;
         public static final int lightblue=0x7f060000;
         public static final int lightgreen=0x7f060004;
         public static final int lightgrey=0x7f06000a;
@@ -38,9 +39,9 @@ public final class R {
         public static final int lightpurple=0x7f060002;
         public static final int lightred=0x7f060008;
         public static final int margingrey=0x7f06000d;
-        public static final int mintcream=0x7f060012;
-        public static final int oldblue=0x7f06000f;
-        public static final int seperatorgrey=0x7f060013;
+        public static final int mintcream=0x7f060013;
+        public static final int oldblue=0x7f060010;
+        public static final int seperatorgrey=0x7f060014;
         public static final int white=0x7f06000c;
     }
     public static final class drawable {

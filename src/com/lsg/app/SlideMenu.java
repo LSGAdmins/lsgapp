@@ -61,6 +61,7 @@ public class SlideMenu {
 	private static LinearLayout content;
 	private static FrameLayout parent;
 	private static int menuSize;
+	private static int statusHeight = 0;
 	private Activity act;
 	SlideMenu(Activity act) {
 		this.act = act;
@@ -70,6 +71,12 @@ public class SlideMenu {
 			this.show(false);
 	}
 	public void show() {
+		if(statusHeight == 0) {
+			Rect rectgle = new Rect();
+			Window window = act.getWindow();
+			window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
+			statusHeight = rectgle.top;
+			}
 		this.show(true);
 	}
 	public void show(boolean animate) {
@@ -86,15 +93,11 @@ public class SlideMenu {
     	parent = (FrameLayout) content.getParent();
     	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	menu = inflater.inflate(R.layout.menu, null);
-    	Rect rectgle = new Rect();
-    	Window window = act.getWindow();
-    	window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
     	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
     	lays.setMargins(0,
-    			rectgle.top, 0, 0);
+    			statusHeight, 0, 0);
     	menu.setLayoutParams(lays);
-    	int statusBarHeight = rectgle.top;
-    	Log.d("height", "status"+new Integer(statusBarHeight).toString());
+    	Log.d("height", "status"+new Integer(statusHeight).toString());
     	parent.addView(menu);
     	if(animate)
     		menu.startAnimation(ta);

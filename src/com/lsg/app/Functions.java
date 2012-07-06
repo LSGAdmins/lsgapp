@@ -571,15 +571,18 @@ public class Functions {
 		int childCount = viewGroup.getChildCount();
 		for (int i = 0; i < childCount; i++) {
 			View view = viewGroup.getChildAt(i);
-			view.setEnabled(enabled);
+			if(view.isFocusable())
+				view.setEnabled(enabled);
 			if (view instanceof ViewGroup) {
 				enableDisableViewGroup((ViewGroup) view, enabled);
 				} else if (view instanceof ListView) {
-					view.setEnabled(enabled);
+					if(view.isFocusable())
+						view.setEnabled(enabled);
 					ListView listView = (ListView) view;
 					int listChildCount = listView.getChildCount();
 					for (int j = 0; j < listChildCount; j++) {
-						listView.getChildAt(j).setEnabled(false);
+						if(view.isFocusable())
+							listView.getChildAt(j).setEnabled(false);
 						}
 					}
 			}

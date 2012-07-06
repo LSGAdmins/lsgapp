@@ -58,7 +58,7 @@
           </intent-filter>
     </receiver>
         <activity android:label="@string/timetable" android:name="TimeTable"></activity>
-        <activity android:label="@string/mine" android:name="VPlan"></activity>
+        <activity android:label="@string/vplan" android:name="VPlan"></activity>
         <activity android:label="@string/events" android:name="Events"></activity>
         <activity android:name="MenuActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
     </application>
