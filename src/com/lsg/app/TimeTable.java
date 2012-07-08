@@ -428,7 +428,7 @@ public class TimeTable extends Activity {
 				break;
 		}
 	    pager.setCurrentItem(day, true);
-	    slidemenu = new SlideMenu(this);
+	    slidemenu = new SlideMenu(this, 0);
 	    slidemenu.checkEnabled();
 	}
 	public boolean onCreateOptionsMenu(Menu menu) {

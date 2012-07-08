@@ -17,6 +17,8 @@ import android.view.KeyEvent;
 //code for old devices -> deprecated
 @SuppressLint("all")
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+	private SlideMenu slidemenu;
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,6 +70,8 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	Preference ac2dm = (Preference) findPreference("useac2dm");
         	prefCat.removePreference(ac2dm);
         }
+        slidemenu = new SlideMenu(this, 4);
+        slidemenu.checkEnabled();
 	}
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {

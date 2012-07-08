@@ -31,10 +31,12 @@ import android.widget.TextView;
 
 @TargetApi(11)
 public class SettingsAdvanced extends PreferenceActivity {
+	private SlideMenu slidemenu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Functions.homeUp(this);
+        slidemenu = new SlideMenu(this, 4);
     }
 
     @Override
@@ -198,10 +200,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 	    // Handle item selection
 	    switch (item.getItemId()) {
         case android.R.id.home:
-            // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, lsgapp.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            slidemenu.show();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);

@@ -588,7 +588,7 @@ public class VPlan extends Activity {
 	    //pager.setOnPageChangeListener(this);
 	    pager.setAdapter(adapter);
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    slidemenu = new SlideMenu(this);
+	    slidemenu = new SlideMenu(this, 1);
 	    slidemenu.checkEnabled();
 	    }
 	public boolean onCreateOptionsMenu(Menu menu) {

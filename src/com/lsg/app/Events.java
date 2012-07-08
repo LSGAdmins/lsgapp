@@ -178,6 +178,7 @@ public class Events extends ListActivity implements SQLlist {
 	private String[] where_conds_events = new String[6];
 	private Cursor events;
 	private SQLiteDatabase myDB;
+	private SlideMenu slidemenu;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -199,6 +200,8 @@ public class Events extends ListActivity implements SQLlist {
 		if(count == 0)
 			updateEvents();
 		num_rows.close();
+		slidemenu = new SlideMenu(this, 2);
+		slidemenu.checkEnabled();
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -220,10 +223,7 @@ public class Events extends ListActivity implements SQLlist {
 	    	updateEvents();
 	    	return true;
         case android.R.id.home:
-            // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, lsgapp.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+        	slidemenu.show();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);

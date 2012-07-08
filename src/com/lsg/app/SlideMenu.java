@@ -52,7 +52,6 @@ public class SlideMenu {
 			MenuItem holder = (MenuItem) rowView.getTag();
 			String s = items[position].label;
 			holder.label.setText(s);
-			//holder.label.setCompoundDrawables(act.getResources().getDrawable(items[position].icon), null, null, null);
 			holder.icon.setImageResource(items[position].icon);
 
 			return rowView;
@@ -66,8 +65,10 @@ public class SlideMenu {
 	private static int menuSize;
 	private static int statusHeight = 0;
 	private Activity act;
-	SlideMenu(Activity act) {
+	private static int curAct;
+	SlideMenu(Activity act, int curAct) {
 		this.act = act;
+		this.curAct = curAct;
 	}
 	public void checkEnabled() {
 		if(menuShown)
@@ -84,7 +85,6 @@ public class SlideMenu {
 	}
 	public void show(boolean animate) {
     	menuSize = Functions.dpToPx(250, act);
-    	Log.d("menu", "menuSize" + new Integer(menuSize).toString());
     	content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
     	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
     	parm.setMargins(menuSize, 0, -menuSize, 0);
@@ -104,31 +104,40 @@ public class SlideMenu {
     	list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Intent intent;
-				switch(position) {
-				case 0:
-					intent = new Intent(act, TimeTable.class);
-					break;
-				case 1:
-					intent = new Intent(act, VPlan.class);
-					break;
-				case 2:
-					intent = new Intent(act, Events.class);
-					break;
-				case 3:
-					intent = new Intent(act, SMVBlog.class);
-					break;
-				case 4:
-					intent = new Intent(act, Settings.class);
-					break;
+				if(position != curAct) {
+					hide();
+					Intent intent;
+					switch(position) {
+					case 0:
+						intent = new Intent(act, TimeTable.class);
+						break;
+					case 1:
+						intent = new Intent(act, VPlan.class);
+						break;
+					case 2:
+						intent = new Intent(act, Events.class);
+						break;
+					case 3:
+						intent = new Intent(act, SMVBlog.class);
+						break;
+					case 4:
+						if(Functions.getSDK() >= 11)
+							intent = new Intent(act, SettingsAdvanced.class);
+						else
+							intent = new Intent(act, Settings.class);
+						break;
 					default:
 						intent = new Intent(act, TimeTable.class);
 						break;
+						}
+					menuShown = false;
+					intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+					act.startActivity(intent);
+					} else {
+						hide();
+					}
 				}
-				menuShown = false;
-				act.startActivity(intent);
-			}
-    	});
+			});
     	if(animate)
     		menu.startAnimation(ta);
     	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
@@ -137,9 +146,14 @@ public class SlideMenu {
     			SlideMenu.this.hide();
     		}
     	});
+    	
     	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
-    	((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(false);
-    	((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(false);
+    	try {    		
+    		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(false);
+    		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(false);
+    	} catch(Exception e) {
+    		//no viewpager :)
+    	}
     	menuShown = true;
     	this.fill();
 	}
@@ -175,8 +189,12 @@ public class SlideMenu {
     	parm.setMargins(0, 0, 0, 0);
     	content.setLayoutParams(parm);
     	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
-    	((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
-    	((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(true);
+    	try {
+    		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
+    		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(true);
+    	} catch(Exception e) {
+    		//no viewpager :)
+    	}
     	menuShown = false;
 	}
 }

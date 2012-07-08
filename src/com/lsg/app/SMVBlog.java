@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 public class SMVBlog extends Activity {
+	private SlideMenu slidemenu;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,16 +49,15 @@ public class SMVBlog extends Activity {
 		else
 			webview.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
 		Log.d("SMVBlog", "load");
+		slidemenu = new SlideMenu(this, 3);
+		slidemenu.checkEnabled();
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
 	    switch (item.getItemId()) {
         case android.R.id.home:
-            // app icon in action bar clicked; change mode
-            Intent intent = new Intent(this, lsgapp.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            slidemenu.show();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
