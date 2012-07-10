@@ -76,6 +76,9 @@
     <string name="include_empty">Keine Fächer in der Whitelist</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="next">Weiter</string>
+    <string name ="previous">Zurück</string>
+    <string name ="enter_logindetails">Bitte gib deine Login-Daten an:</string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
     <string name="all">Alle Vertretungen</string>

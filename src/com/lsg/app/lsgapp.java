@@ -7,15 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,9 +29,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
-public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListener*/ {
+public class lsgapp extends Activity {
 	Download down;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor edit;
@@ -230,14 +231,79 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 				}
 			}
 		}
+	
+	class LoginTest extends AsyncTask<Void, Void, Boolean> {
+		Context context;
+		LoginTest(Context c) {
+			context = c;
+		}
+		protected void onPreExecute() {
+			super.onPreExecute();
+			loading = ProgressDialog.show(context, null, "Teste Login-Daten...");
+		}
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			return Functions.testLogin(context);
+		}
+		@Override
+		protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+			loading.cancel();
+			if(success) {
+				loginsuccess = true;
+				step = 1;
+				setup(step, false);
+			}
+			else
+	    		setupUser();
+		}
+	}
+	class PersonData extends AsyncTask<Void, Void, String> {
+		Context context;
+		PersonData(Context c) {
+			context = c;
+		}
+		protected void onPreExecute() {
+			super.onPreExecute();
+			loading = ProgressDialog.show(context, null, "Lade Daten...");
+		}
+		@Override
+		protected String doInBackground(Void... params) {
+			return Functions.getData(Functions.PERSON_DATA_URL, context, true, "");
+		}
+		@Override
+		protected void onPostExecute(String data) {
+			super.onPostExecute(data);
+			loading.cancel();
+			try {
+				JSONObject jarr = new JSONObject(data);
+				gender = jarr.getString("gender").charAt(0);
+				religion = jarr.getString("religion");
+			} catch (Exception e) {}
+			dataUser = prefs.getString("username", "");
+			setVPlanData();
+		}
+	}
 	private ProgressDialog loading;
+	private static int step = 0;
+	private static boolean loginsuccess = false;
+	private static char gender = '0';
+	private static String religion = null;
+	private static String dataUser = null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	
     	super.onCreate(savedInstanceState);
         Functions.setTheme(false, false, this);
         Functions.testDB(this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
-        super.onCreate(savedInstanceState);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		edit = prefs.edit();
+		if(prefs.getBoolean("firstrun", true)) {
+			setup(step, false);
+		} else
+			startActivity(new Intent(this, TimeTable.class));
+		/*
         setContentView(R.layout.main_nav);
 
 	    UpdateCheckTask upcheck = new UpdateCheckTask();
@@ -259,8 +325,79 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 		}
 
         if(Functions.getSDK() >= 9)
- 		   down = new Download(lsgapp.this);
+ 		   down = new Download(lsgapp.this);*/
 		}
+    public void setup(int step, boolean force) {
+    	if(!loginsuccess)
+    		step = 0;
+    	switch(step) {
+    	case 0:
+    		if(!force)
+    			testUser();
+    		else
+    			setupUser();
+    		break;
+    	case 1:
+    		setupVPlan();
+    		break;
+    	}
+    }
+    public void testUser() {
+    	setTitle("LSGäpp Setup");
+    	if(!prefs.getString("username", "").equals("")) {
+    		LoginTest test = new LoginTest(this);
+    		test.execute();
+    	} else
+    		setupUser();
+    }
+    public void setupUser() {
+    	setContentView(R.layout.setup_user);
+    	((EditText) findViewById(R.id.username)).setText(prefs.getString("username", ""));
+    	((EditText) findViewById(R.id.password)).setText(prefs.getString("password", ""));
+    }
+    public void setupVPlan() {
+    	setContentView(R.layout.setup_vplan);
+    	if(dataUser == null || !dataUser.equals(prefs.getString("username", ""))) {
+    		PersonData pd = new PersonData(this);
+    		pd.execute();
+    		} else
+    			setVPlanData();
+    }
+    public void setVPlanData() {
+		RadioGroup genderrg = (RadioGroup) findViewById(R.id.gendergroup);
+		if(gender == 'm')
+			genderrg.check(R.id.male);
+		else
+			genderrg.check(R.id.female);
+		RadioGroup religionrg = (RadioGroup) findViewById(R.id.religiongroup);
+		if(religion.equals("K"))
+			religionrg.check(R.id.catholic);
+		else if(religion.equals("Ev"))
+				religionrg.check(R.id.protestant);
+		else if(religion.equals("Eth"))
+			religionrg.check(R.id.ethnic);
+    }
+    public void next(View v) {
+    	switch(step) {
+    	case 0:
+    		edit.putString("username", (((EditText) findViewById(R.id.username))).getText().toString());
+    		edit.putString("password", (((EditText) findViewById(R.id.password))).getText().toString());
+    		testUser();
+    		break;
+    	case 1:
+    		startActivity(new Intent(this, TimeTable.class));
+    		break;
+    	}
+    	//step += 1;
+    	//setup(step);
+    	//startActivity(new Intent(this, TimeTable.class));
+    }
+    public void previous(View v) {
+    	step -= 1;
+    	setup(step, true);
+    }
+    
+    
     public void button_press(View v) {
     	Log.d("text", (String) ((Button) v).getText());
     	if(((String) ((Button) v).getText()).equals(getString(R.string.timetable))) {
@@ -292,7 +429,7 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.lsgapp, menu);
+	    //inflater.inflate(R.menu.lsgapp, menu);
 	    return true;
 	}
 	@Override
@@ -319,12 +456,12 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 	@Override
 	public void onPause() {
 		super.onPause();
-		if(Functions.getSDK() >= 9)
-			unregisterReceiver(down.downloadReceiver);
+		/*if(Functions.getSDK() >= 9)
+			unregisterReceiver(down.downloadReceiver);*/
 	}
 	@Override
 	public void onResume() {
-		super.onResume();
+		super.onResume();/*
 		if(Functions.getSDK() >= 9) {
 			IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
 			registerReceiver(down.downloadReceiver, intentFilter);
@@ -416,6 +553,6 @@ public class lsgapp extends Activity /* implements ViewPager.OnPageChangeListene
 			cdt.execute();
 		}
 		myDB.close();
-		num_rows.close();
+		num_rows.close();*/
 		}
 	}

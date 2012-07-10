@@ -1,0 +1,110 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:layout_marginLeft="10dp"
+    	android:layout_marginRight="10dp"
+    	android:orientation="vertical" >
+    	<TextView
+	        android:id="@+id/textView1"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Einstellungen für den Vertretungsplan:"
+        	android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    	<CheckBox
+	        android:id="@+id/checkBox1"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Vertretungsplan pushen?"
+        	android:checked="true" />
+
+    	<TextView
+	        android:id="@+id/textView2"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Religionsunterricht:"
+        	android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    	<RadioGroup
+	        android:id="@+id/religiongroup"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginLeft="10dp" >
+
+        	<RadioButton
+	            android:id="@+id/catholic"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:checked="true"
+            	android:text="Katholisch" />
+	
+    	    <RadioButton
+            	android:id="@+id/protestant"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:text="Evangelisch" />
+
+        	<RadioButton
+	            android:id="@+id/ethnic"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:checked="true"
+            	android:text="Ethik" />
+    	</RadioGroup>
+
+    	<TextView
+	        android:id="@+id/textView3"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Geschlecht?"
+        	android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <RadioGroup
+        	android:id="@+id/gendergroup"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginLeft="10dp" >
+
+        	<RadioButton
+	            android:id="@+id/female"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:checked="true"
+            	android:text="Weiblich" />
+
+        	<RadioButton
+	            android:id="@+id/male"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:text="Männlich" />
+
+    	</RadioGroup>
+
+    	<LinearLayout
+	        android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:orientation="horizontal"
+        	android:layout_gravity="bottom" >
+
+        	<Button
+	            android:id="@+id/button2"
+            	android:layout_width="fill_parent"
+            	android:layout_height="wrap_content"
+            	android:layout_weight="1"
+            	android:text="Zurück"
+            	android:onClick="previous" />
+
+        	<Button
+	            android:id="@+id/button1"
+            	android:layout_width="fill_parent"
+            	android:layout_height="wrap_content"
+            	android:layout_weight="1"
+            	android:text="Weiter"
+            	android:onClick="next" />
+
+    	</LinearLayout>
+	</LinearLayout>
+</ScrollView>

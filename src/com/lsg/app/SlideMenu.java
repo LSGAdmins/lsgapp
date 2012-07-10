@@ -26,11 +26,14 @@ public class SlideMenu {
 		SlideMenu.SlideMenuAdapter.MenuDesc[] items;
 		class MenuItem {
 			public TextView label;
+			public TextView title;
 			public ImageView icon;
 		}
 		static class MenuDesc {
+			public int type = Functions.TYPE_PAGE;
 			public int icon;
 			public String label;
+			public String title;
 		}
 		public SlideMenuAdapter(Activity act, SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
 			super(act, R.id.menu_label, items);
@@ -38,14 +41,27 @@ public class SlideMenu {
 			this.items = items;
 			}
 		@Override
+        public int getItemViewType(int position) {
+            return items[position].type;
+        }
+		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View rowView = convertView;
 			if (rowView == null) {
 				LayoutInflater inflater = act.getLayoutInflater();
-				rowView = inflater.inflate(R.layout.menu_listitem, null);
 				MenuItem viewHolder = new MenuItem();
-				viewHolder.label = (TextView) rowView.findViewById(R.id.menu_label);
+				switch(getItemViewType(position)) {
+				case Functions.TYPE_PAGE:
+					rowView = inflater.inflate(R.layout.menu_listitem, null);
+					viewHolder.title = null;
+					break;
+				case Functions.TYPE_INFO:
+					rowView = inflater.inflate(R.layout.menu_info, null);
+					viewHolder.title = (TextView) rowView.findViewById(R.id.title);
+					break;
+				}
 				viewHolder.icon = (ImageView) rowView.findViewById(R.id.menu_icon);
+				viewHolder.label = (TextView) rowView.findViewById(R.id.menu_label);
 				rowView.setTag(viewHolder);
 			}
 
@@ -53,6 +69,15 @@ public class SlideMenu {
 			String s = items[position].label;
 			holder.label.setText(s);
 			holder.icon.setImageResource(items[position].icon);
+			
+			if(holder.title != null) {
+				if(items[position].title != null) {
+					holder.title.setText(items[position].title);
+					holder.title.setVisibility(View.VISIBLE);
+				}
+				else
+					holder.title.setVisibility(View.GONE);
+			}
 
 			return rowView;
 		}
@@ -159,8 +184,8 @@ public class SlideMenu {
 	}
 	public void fill() {
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
-		SlideMenuAdapter.MenuDesc[] items = new SlideMenuAdapter.MenuDesc[5];
-		for(int i = 0; i < 5; i++) {
+		SlideMenuAdapter.MenuDesc[] items = new SlideMenuAdapter.MenuDesc[6];
+		for(int i = 0; i < 6; i++) {
 			items[i] = new SlideMenuAdapter.MenuDesc();
 		}
 		items[0].icon = R.drawable.ic_launcher;
@@ -173,6 +198,10 @@ public class SlideMenu {
 		items[3].label = "SMVBlog";
 		items[4].icon = R.drawable.ic_launcher;
 		items[4].label = "Einstellungen";
+		items[5].type = Functions.TYPE_INFO;
+		items[5].title = "Aktuell";
+		items[5].icon = R.drawable.ic_launcher;
+		items[5].label = "test";
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
 	}

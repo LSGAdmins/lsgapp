@@ -63,6 +63,8 @@ public class Functions {
 	public static final String   SUBJECT_URL      = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
 	public static final String   REGISTRATION_URL = "http://linux.lsg.musin.de/cp/register_client.php";
 	public static final String   TIMETABLE_URL    = "http://linux.lsg.musin.de/cp/timetable.php";
+	public static final String   LOGIN_TEST_URL   = "http://linux.lsg.musin.de/cp/setup.php?act=checklogin";
+	public static final String   PERSON_DATA_URL  = "http://linux.lsg.musin.de/cp/setup.php?act=getdata";
 	public static final String   API_VERSION      = "3";
 	
 	public static final String   class_key  = "class";
@@ -121,6 +123,9 @@ public class Functions {
 	public static final String GENDER             = "gender";
 	
 	public static final String FULL_CLASS         = "full_class";
+	//slidemenu
+	public static final int TYPE_PAGE             = 0;
+	public static final int TYPE_INFO             = 1;
 	
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
@@ -221,7 +226,9 @@ public class Functions {
         	return get;
 		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage() + " "); e.printStackTrace(); return "networkerror";}
 	}
-	
+	public static boolean testLogin(Context context) {
+		return (getData(Functions.LOGIN_TEST_URL, context, true, "").equals("true"));
+	}
 	public static Runnable getErrorRunnable(String error, final Context context) {
 		Log.d("asdf", "errorrunnable");
 		if(error.equals("jsonerror")) {
