@@ -3,8 +3,8 @@ package com.lsg.app;
 import org.apache.http.util.EncodingUtils;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -19,6 +19,7 @@ public class SMVBlog extends Activity {
 	private SlideMenu slidemenu;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.d("smv", "oncreate");
 		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 		Functions.setTheme(false, true, this);
@@ -44,13 +45,17 @@ public class SMVBlog extends Activity {
 			AdvancedWrapper advWrapper = new AdvancedWrapper();
 			advWrapper.postUrl(webview, "http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
 			advWrapper = null;
-			//webview.postUrl("http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
 		}
 		else
 			webview.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
 		Log.d("SMVBlog", "load");
 		slidemenu = new SlideMenu(this, 3);
 		slidemenu.checkEnabled();
+	}
+	@Override
+	public void onConfigurationChanged(Configuration newConfig){        
+	    super.onConfigurationChanged(newConfig);
+	    Log.d("config", "change: " + newConfig.toString());
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

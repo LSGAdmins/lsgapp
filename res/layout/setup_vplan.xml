@@ -15,7 +15,7 @@
         	android:textAppearance="?android:attr/textAppearanceLarge" />
 
     	<CheckBox
-	        android:id="@+id/checkBox1"
+	        android:id="@+id/push_check"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:text="Vertretungsplan pushen?"
@@ -48,7 +48,7 @@
             	android:text="Evangelisch" />
 
         	<RadioButton
-	            android:id="@+id/ethnic"
+	            android:id="@+id/ethics"
             	android:layout_width="wrap_content"
             	android:layout_height="wrap_content"
             	android:checked="true"
@@ -59,7 +59,7 @@
 	        android:id="@+id/textView3"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
-        	android:text="Geschlecht?"
+        	android:text="Geschlecht:"
         	android:textAppearance="?android:attr/textAppearanceMedium" />
 	
 	    <RadioGroup
@@ -83,6 +83,19 @@
 
     	</RadioGroup>
 
+	    <TextView
+	        android:id="@+id/textView3"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Klasse:"
+        	android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <RadioGroup
+        	android:id="@+id/classgroup"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginLeft="10dp" >
+    	</RadioGroup>
     	<LinearLayout
 	        android:layout_width="match_parent"
         	android:layout_height="wrap_content"

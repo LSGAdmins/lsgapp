@@ -223,6 +223,7 @@ public class Functions {
         	while ((line = reader.readLine()) != null) {
         		get += line;
         		}
+        	Log.d("get", get);
         	return get;
 		} catch(Exception e) {
 			Log.d("except in fetching data: ", e.getMessage() + " ");
@@ -564,6 +565,7 @@ public class Functions {
 		}
 	}
 	public static void registerAC2DM(Context context) {
+		Log.d("ac2dm", "registration for ac2dm");
 		Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
 		registrationIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
 		registrationIntent.putExtra("sender", Functions.EMAIL);

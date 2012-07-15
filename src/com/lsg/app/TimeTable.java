@@ -341,6 +341,11 @@ public class TimeTable extends Activity {
 						values.put(Functions.DB_LENGTH,   jObject.getInt   ("length"));
 						values.put(Functions.DB_DAY,      jObject.getInt   ("day"));
 						values.put(Functions.DB_HOUR,     jObject.getInt   ("hour"));
+						Log.d("lehrer", values.getAsString(Functions.DB_LEHRER));
+						Log.d("fach", values.getAsString(Functions.DB_FACH));
+						Log.d("fachjson", jObject.getString("subject"));
+						Log.d("null", new Boolean(jObject.isNull("subject")).toString());
+						//Log.d("get", get);
 						myDB.insert(Functions.DB_TIME_TABLE, null, values);
 						i++;
 						}

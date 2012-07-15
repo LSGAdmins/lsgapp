@@ -28,7 +28,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -288,8 +290,13 @@ public class lsgapp extends Activity {
 			loading.cancel();
 			try {
 				JSONObject jarr = new JSONObject(data);
-				gender = jarr.getString("gender").charAt(0);
-				religion = jarr.getString("religion");
+				gender    = jarr.getString("gender").charAt(0);
+				religion  = jarr.getString("religion");
+				usr_class = jarr.getString("class");
+				JSONArray json_cls = jarr.getJSONArray("classes");
+				classes   = new String[json_cls.length()];
+				for(int i = 0; i < json_cls.length(); i++)
+					classes[i] = json_cls.getString(i);
 			} catch (Exception e) {}
 			dataUser = prefs.getString("username", "");
 			setVPlanData();
@@ -301,6 +308,8 @@ public class lsgapp extends Activity {
 	private static char gender = '0';
 	private static String religion = null;
 	private static String dataUser = null;
+	private static String[] classes;
+	private static String usr_class;
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	
@@ -325,7 +334,7 @@ public class lsgapp extends Activity {
     	if(prefs.getBoolean("updatevplanonstart", false)) {
     		UpdateBroadcastReceiver.VPupdate upd = new UpdateBroadcastReceiver.VPupdate(this);
     		upd.start();
-    	}
+    	}*/
     	Functions.setAlarm(this);
 		Intent testAC2DM = new Intent("com.google.android.c2dm.intent.REGISTER");
 		if(startService(testAC2DM) == null) {
@@ -333,7 +342,7 @@ public class lsgapp extends Activity {
 			edit.putBoolean("disableAC2DM", true);
 			edit.putBoolean("useac2dm", false);
 			edit.commit();
-		}
+		}/*
 
         if(Functions.getSDK() >= 9)
  		   down = new Download(lsgapp.this);*/
@@ -375,6 +384,11 @@ public class lsgapp extends Activity {
     			setVPlanData();
     }
     public void setVPlanData() {
+    	if(prefs.getBoolean("disableAC2DM", false)) {
+    		CheckBox chk = (CheckBox) findViewById(R.id.push_check);
+    		chk.setChecked(false);
+    		chk.setVisibility(View.GONE);
+    		}
 		RadioGroup genderrg = (RadioGroup) findViewById(R.id.gendergroup);
 		if(gender == 'm')
 			genderrg.check(R.id.male);
@@ -386,7 +400,18 @@ public class lsgapp extends Activity {
 		else if(religion.equals("Ev"))
 				religionrg.check(R.id.protestant);
 		else if(religion.equals("Eth"))
-			religionrg.check(R.id.ethnic);
+			religionrg.check(R.id.ethics);
+		RadioButton[] rb = new RadioButton[classes.length];
+		for(int i = 0; i < classes.length; i++) {
+			rb[i] = new RadioButton(this);
+			rb[i].setText(classes[i]);
+			rb[i].setId(i);
+			if(classes[i].equals(usr_class))
+				rb[i].toggle();
+		}
+		RadioGroup classrg = (RadioGroup) findViewById(R.id.classgroup);
+		for(int i = 0; i < classes.length; i++)
+			classrg.addView(rb[i], i);
     }
     public void next(View v) {
     	switch(step) {
@@ -397,6 +422,29 @@ public class lsgapp extends Activity {
     		testUser();
     		break;
     	case 1:
+    		RadioGroup religionrg = (RadioGroup) findViewById(R.id.religiongroup);
+    		String religion;
+    		switch(religionrg.getCheckedRadioButtonId()) {
+    		case R.id.catholic:
+    			religion = Functions.KATHOLISCH;
+    			break;
+    		case R.id.protestant:
+    			religion = Functions.EVANGELISCH;
+    			break;
+    		case R.id.ethics:
+    		default:
+    			religion = Functions.ETHIK;
+    			break;
+    		}
+    		edit.putString(Functions.RELIGION, religion);
+    		RadioGroup genderrg = (RadioGroup) findViewById(R.id.gendergroup);
+    		edit.putString(Functions.GENDER, (genderrg.getCheckedRadioButtonId() == R.id.female) ? "w" : "m");
+    		RadioGroup classrg = (RadioGroup) findViewById(R.id.classgroup);
+    		edit.putString(Functions.FULL_CLASS, classes[classrg.getCheckedRadioButtonId()]);
+    		CheckBox chk = (CheckBox) findViewById(R.id.push_check);
+    		edit.putBoolean("useac2dm", chk.isChecked());
+    		if(chk.isChecked())
+    			Functions.registerAC2DM(this);
     		startActivity(new Intent(this, TimeTable.class));
     		break;
     	}
