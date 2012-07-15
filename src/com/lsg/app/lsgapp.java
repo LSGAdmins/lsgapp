@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -232,7 +231,7 @@ public class lsgapp extends Activity {
 			}
 		}
 	
-	class LoginTest extends AsyncTask<Void, Void, Boolean> {
+	class LoginTest extends AsyncTask<Void, Void, String> {
 		Context context;
 		LoginTest(Context c) {
 			context = c;
@@ -242,20 +241,32 @@ public class lsgapp extends Activity {
 			loading = ProgressDialog.show(context, null, "Teste Login-Daten...");
 		}
 		@Override
-		protected Boolean doInBackground(Void... params) {
-			return Functions.testLogin(context);
+		protected String doInBackground(Void... params) {
+			return Functions.getData(Functions.LOGIN_TEST_URL, context, true, "");
 		}
 		@Override
-		protected void onPostExecute(Boolean success) {
+		protected void onPostExecute(String success) {
 			super.onPostExecute(success);
 			loading.cancel();
-			if(success) {
+			if(success.equals("true")) {
 				loginsuccess = true;
 				step = 1;
 				setup(step, false);
 			}
-			else
+			else if(success.equals("false"))
 	    		setupUser();
+			else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(lsgapp.this);
+				builder.setMessage("Internet-Verbindung ist zum Setup erforderlich.")
+				       .setCancelable(true)
+				       .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+				                lsgapp.this.finish();
+				           }
+				       });
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
 		}
 	}
 	class PersonData extends AsyncTask<Void, Void, String> {
@@ -382,6 +393,7 @@ public class lsgapp extends Activity {
     	case 0:
     		edit.putString("username", (((EditText) findViewById(R.id.username))).getText().toString());
     		edit.putString("password", (((EditText) findViewById(R.id.password))).getText().toString());
+    		edit.commit();
     		testUser();
     		break;
     	case 1:

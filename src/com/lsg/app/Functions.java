@@ -224,10 +224,11 @@ public class Functions {
         		get += line;
         		}
         	return get;
-		} catch(Exception e) { Log.d("except in fetching data: ", e.getMessage() + " "); e.printStackTrace(); return "networkerror";}
-	}
-	public static boolean testLogin(Context context) {
-		return (getData(Functions.LOGIN_TEST_URL, context, true, "").equals("true"));
+		} catch(Exception e) {
+			Log.d("except in fetching data: ", e.getMessage() + " ");
+			e.printStackTrace();
+			return "networkerror";
+			}
 	}
 	public static Runnable getErrorRunnable(String error, final Context context) {
 		Log.d("asdf", "errorrunnable");
