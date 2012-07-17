@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.lsg.app.TimeTable.TimeTableUpdater;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -302,6 +304,70 @@ public class lsgapp extends Activity {
 			setVPlanData();
 		}
 	}
+	class SendData extends AsyncTask<Void, Void, Boolean> {
+		Context context;
+		SharedPreferences prefs;
+		SendData(Context c, SharedPreferences p) {
+			context = c;
+			prefs = p;
+		}
+		protected void onPreExecute() {
+			super.onPreExecute();
+			loading = ProgressDialog.show(context, null, "Lade Daten...");
+		}
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			String res = "";
+			try {
+				res = Functions.getData(Functions.PERSON_DATA_SEND_URL, context, true,
+						"&" + URLEncoder.encode("full_class", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.FULL_CLASS, ""), "UTF-8")
+						+ "&" + URLEncoder.encode("gender", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.GENDER, ""), "UTF-8")
+						+ "&" + URLEncoder.encode("religion", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.RELIGION, ""), "UTF-8"));
+			} catch (Exception e) {}
+			Log.d("res", res);
+			return res.equals("success");
+		}
+		@Override
+		protected void onPostExecute(Boolean parm) {
+			super.onPostExecute(parm);
+			loading.cancel();
+			step += 1;
+			setup(step, false);
+		}
+	}
+	class TimeTableData extends AsyncTask<Void, Void, Integer[]> {
+		Context context;
+		TimeTableData(Context c) {
+			context = c;
+		}
+		protected void onPreExecute() {
+			super.onPreExecute();
+			loading = ProgressDialog.show(context, null, "Lade Daten...");
+		}
+		@Override
+		protected Integer[] doInBackground(Void... params) {
+			TimeTableUpdater upd = new TimeTableUpdater(lsgapp.this);
+			upd.update();
+			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+			for(int day = 0; day < 7; day++) {
+				for(int hour = 0; hour < 12; hour++) {
+					SQLiteStatement stmt = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_TIME_TABLE + " WHERE day=? AND hour=?");
+					
+					stmt.bindString(1, Integer.valueOf(day).toString());
+					stmt.bindString(2, Integer.valueOf(hour).toString());
+					long count = stmt.simpleQueryForLong();
+					Log.d("count", Long.valueOf(count).toString());
+				}
+			}
+			return new Integer[] {1};
+		}
+		@Override
+		protected void onPostExecute(Integer[] parm) {
+			loading.cancel();
+			super.onPostExecute(parm);
+    		startActivity(new Intent(lsgapp.this, TimeTable.class));
+		}
+	}
 	private ProgressDialog loading;
 	private static int step = 0;
 	private static boolean loginsuccess = false;
@@ -360,6 +426,9 @@ public class lsgapp extends Activity {
     	case 1:
     		setupVPlan();
     		break;
+    	case 2:
+    		setupTimeTable();
+    		break;
     	}
     }
     public void testUser() {
@@ -413,6 +482,11 @@ public class lsgapp extends Activity {
 		for(int i = 0; i < classes.length; i++)
 			classrg.addView(rb[i], i);
     }
+    public void setupTimeTable() {
+    	setContentView(R.layout.setup_timetable);
+		TimeTableData ttd = new TimeTableData(this);
+		ttd.execute();
+    }
     public void next(View v) {
     	switch(step) {
     	case 0:
@@ -445,7 +519,9 @@ public class lsgapp extends Activity {
     		edit.putBoolean("useac2dm", chk.isChecked());
     		if(chk.isChecked())
     			Functions.registerAC2DM(this);
-    		startActivity(new Intent(this, TimeTable.class));
+    		edit.commit();
+    		SendData sd = new SendData(this, prefs);
+    		sd.execute();
     		break;
     	}
     	//step += 1;

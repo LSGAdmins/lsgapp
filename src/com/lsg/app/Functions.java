@@ -55,17 +55,18 @@ public class Functions {
 	//c2dm
 	public static final String   EMAIL       = "noreply.lsg@googlemail.com";
 	
-	public static final String   UPDATE_URL       = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
-	public static final String   UPDATE_CHECK_URL = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
-	public static final String   VP_URL           = "http://linux.lsg.musin.de/cp/vp_app.php";
-	public static final String   EVENT_URL        = "http://linux.lsg.musin.de/cp/termine_app.php";
-	public static final String   CLASS_URL        = "http://linux.lsg.musin.de/cp/getClass.php?all=true";
-	public static final String   SUBJECT_URL      = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
-	public static final String   REGISTRATION_URL = "http://linux.lsg.musin.de/cp/register_client.php";
-	public static final String   TIMETABLE_URL    = "http://linux.lsg.musin.de/cp/timetable.php";
-	public static final String   LOGIN_TEST_URL   = "http://linux.lsg.musin.de/cp/setup.php?act=checklogin";
-	public static final String   PERSON_DATA_URL  = "http://linux.lsg.musin.de/cp/setup.php?act=getdata";
-	public static final String   API_VERSION      = "3";
+	public static final String   UPDATE_URL           = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
+	public static final String   UPDATE_CHECK_URL     = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
+	public static final String   VP_URL               = "http://linux.lsg.musin.de/cp/vp_app.php";
+	public static final String   EVENT_URL            = "http://linux.lsg.musin.de/cp/termine_app.php";
+	public static final String   CLASS_URL            = "http://linux.lsg.musin.de/cp/getClass.php?all=true";
+	public static final String   SUBJECT_URL          = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
+	public static final String   REGISTRATION_URL     = "http://linux.lsg.musin.de/cp/register_client.php";
+	public static final String   TIMETABLE_URL        = "http://linux.lsg.musin.de/cp/timetable.php";
+	public static final String   LOGIN_TEST_URL       = "http://linux.lsg.musin.de/cp/setup.php?act=checklogin";
+	public static final String   PERSON_DATA_URL      = "http://linux.lsg.musin.de/cp/setup.php?act=getdata";
+	public static final String   PERSON_DATA_SEND_URL = "http://linux.lsg.musin.de/cp/setup.php?act=setdata";
+	public static final String   API_VERSION          = "3";
 	
 	public static final String   class_key  = "class";
 	public static final String[] exclude    = {"Q11", "Q12"};
@@ -223,7 +224,6 @@ public class Functions {
         	while ((line = reader.readLine()) != null) {
         		get += line;
         		}
-        	Log.d("get", get);
         	return get;
 		} catch(Exception e) {
 			Log.d("except in fetching data: ", e.getMessage() + " ");
