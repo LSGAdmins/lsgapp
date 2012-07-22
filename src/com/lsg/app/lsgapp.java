@@ -2,12 +2,11 @@ package com.lsg.app;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.lsg.app.TimeTable.TimeTableUpdater;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,9 +31,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.lsg.app.TimeTable.TimeTableUpdater;
 
 public class lsgapp extends Activity {
 	Download down;
@@ -335,7 +338,7 @@ public class lsgapp extends Activity {
 			setup(step, false);
 		}
 	}
-	class TimeTableData extends AsyncTask<Void, Void, Integer[]> {
+	class TimeTableData extends AsyncTask<Void, Void, ArrayList<Integer[]>> {
 		Context context;
 		TimeTableData(Context c) {
 			context = c;
@@ -345,27 +348,42 @@ public class lsgapp extends Activity {
 			loading = ProgressDialog.show(context, null, "Lade Daten...");
 		}
 		@Override
-		protected Integer[] doInBackground(Void... params) {
+		protected ArrayList<Integer[]> doInBackground(Void... params) {
+			ArrayList<Integer[]> conflicts = new ArrayList<Integer[]>();
 			TimeTableUpdater upd = new TimeTableUpdater(lsgapp.this);
 			upd.update();
 			SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 			for(int day = 0; day < 7; day++) {
 				for(int hour = 0; hour < 12; hour++) {
-					SQLiteStatement stmt = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_TIME_TABLE + " WHERE day=? AND hour=?");
-					
+					SQLiteStatement stmt = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_TIME_TABLE + " WHERE " + Functions.DB_DAY + "=? AND " + Functions.DB_HOUR
+							+ "=? AND " + Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_RAW_FACH + "!=?");
 					stmt.bindString(1, Integer.valueOf(day).toString());
 					stmt.bindString(2, Integer.valueOf(hour).toString());
+					stmt.bindString(3, prefs.getString(Functions.GENDER, "m").equals("m") ? "Sw" : "Sm");
+					if(prefs.getString(Functions.RELIGION, "").equals(Functions.KATHOLISCH)) {
+						stmt.bindString(4, Functions.EVANGELISCH);
+						stmt.bindString(5, Functions.ETHIK);
+					} else if(prefs.getString(Functions.RELIGION, "").equals(Functions.EVANGELISCH)) {
+						stmt.bindString(4, Functions.KATHOLISCH);
+						stmt.bindString(5, Functions.ETHIK);
+					} else {
+						stmt.bindString(4, Functions.EVANGELISCH);
+						stmt.bindString(5, Functions.KATHOLISCH);
+					}
 					long count = stmt.simpleQueryForLong();
-					Log.d("count", Long.valueOf(count).toString());
+					if(count > 1) {
+						conflicts.add(new Integer[]{day, hour});
+					}
 				}
 			}
-			return new Integer[] {1};
+			myDB.close();
+			return conflicts;
 		}
 		@Override
-		protected void onPostExecute(Integer[] parm) {
+		protected void onPostExecute(ArrayList<Integer[]> conflicts) {
 			loading.cancel();
-			super.onPostExecute(parm);
-    		startActivity(new Intent(lsgapp.this, TimeTable.class));
+			super.onPostExecute(conflicts);
+    		setupTimeTableConflicts(conflicts);
 		}
 	}
 	private ProgressDialog loading;
@@ -376,6 +394,8 @@ public class lsgapp extends Activity {
 	private static String dataUser = null;
 	private static String[] classes;
 	private static String usr_class;
+	private static ArrayList<Integer[]> timetable_conflicts;
+	private static ArrayList<RadioGroup> timetable_conflicts_rg;
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	
@@ -429,6 +449,7 @@ public class lsgapp extends Activity {
     	case 2:
     		setupTimeTable();
     		break;
+    	case 3:
     	}
     }
     public void testUser() {
@@ -487,6 +508,70 @@ public class lsgapp extends Activity {
 		TimeTableData ttd = new TimeTableData(this);
 		ttd.execute();
     }
+    public void setupTimeTableConflicts(ArrayList<Integer[]> conflicts) {
+    	Integer[] conflict = new Integer[2];
+    	timetable_conflicts = conflicts;
+    	timetable_conflicts_rg = new ArrayList<RadioGroup>();
+		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+    	for(int i = 0; i < conflicts.size(); i++) {
+    		conflict = conflicts.get(i);
+    		
+    		String[] selectionArgs = new String[5];
+    		selectionArgs[0] = Integer.valueOf(conflict[0]).toString();
+    		selectionArgs[1] = Integer.valueOf(conflict[1]).toString();
+    		selectionArgs[2] = prefs.getString(Functions.GENDER, "m").equals("m") ? "Sw" : "Sm";
+    		if(prefs.getString(Functions.RELIGION, "").equals(Functions.KATHOLISCH)) {
+				selectionArgs[3] = Functions.EVANGELISCH;
+				selectionArgs[4] = Functions.ETHIK;
+			} else if(prefs.getString(Functions.RELIGION, "").equals(Functions.EVANGELISCH)) {
+				selectionArgs[3] = Functions.KATHOLISCH;
+				selectionArgs[4] = Functions.ETHIK;
+			} else {
+				selectionArgs[3] = Functions.EVANGELISCH;
+				selectionArgs[4] = Functions.KATHOLISCH;
+			}
+    		Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_ROWID, Functions.DB_FACH, Functions.DB_LEHRER},
+    				Functions.DB_DAY + "=? AND " + Functions.DB_HOUR + "=? AND " + Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_RAW_FACH
+    				+ "!=?", selectionArgs, null, null, null);
+    		c.moveToFirst();
+    		RadioGroup rg = new RadioGroup(this);
+    		TextView tv = new TextView(this);
+    		tv.setText(getResources().getStringArray(R.array.days)[conflict[0]] + ", " + Integer.valueOf(conflict[1]+1).toString() + ". Stunde");
+    		tv.setTextAppearance(this, android.R.attr.textAppearanceMedium);
+    		((LinearLayout) findViewById(R.id.timetable_conflicts_placeholder)).addView(tv);
+    		boolean showNone;
+    		if(conflict[1] + 1 < 7)
+    			showNone = false;
+    		else
+    			showNone = true;
+    		for(int ii = 0; ii < c.getCount(); ii++) {
+    			if(showNone) {
+    				try {
+    					if(!c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)).substring(0, 3).equals("INT"))
+    						showNone = false;
+    					} catch(IndexOutOfBoundsException e) {
+    						showNone = false;
+    						}
+    				}
+        		RadioButton option = new RadioButton(this);
+        		option.setText(c.getString(c.getColumnIndex(Functions.DB_FACH)) + " bei " +
+        		c.getString(c.getColumnIndex(Functions.DB_LEHRER)));
+        		option.setId(c.getInt(c.getColumnIndex(Functions.DB_ROWID)));
+        		if(ii == 0)
+        			option.setChecked(true);
+        		rg.addView(option);
+        		c.moveToNext();
+        		if(ii + 1 == c.getCount() && showNone) {
+        			option = new RadioButton(this);
+            		option.setText("Kein Unterricht für mich!");
+            		option.setId(0);
+            		rg.addView(option);
+        		}
+    		}
+    		((LinearLayout) findViewById(R.id.timetable_conflicts_placeholder)).addView(rg);
+    		timetable_conflicts_rg.add(rg);
+    	}
+    }
     public void next(View v) {
     	switch(step) {
     	case 0:
@@ -522,6 +607,13 @@ public class lsgapp extends Activity {
     		edit.commit();
     		SendData sd = new SendData(this, prefs);
     		sd.execute();
+    		break;
+    	case 2:
+    		for(int i = 0; i < timetable_conflicts_rg.size(); i++) {
+    			RadioGroup rg = timetable_conflicts_rg.get(i);
+    			Log.d("id", Integer.valueOf(rg.getCheckedRadioButtonId()).toString());
+    			startActivity(new Intent(this, TimeTable.class));
+    		}
     		break;
     	}
     	//step += 1;

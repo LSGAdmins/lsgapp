@@ -112,6 +112,7 @@ public class Functions {
 	public static final String DB_TIME_TABLE      = "timetable";
 	public static final String DB_DAY             = "day";
 	public static final String DB_HOUR            = "hour";
+	public static final String DB_DISABLED        = "disabled";
 	//classes
 	public static final String DB_CLASS_TABLE     = "classes";
 	public static final String DB_CLASS           = "class";
@@ -414,6 +415,10 @@ public class Functions {
     			Log.d(Functions.DB_VPLAN_TEACHER, "adding column " + Functions.DB_RAW_LEHRER);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TEACHER + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
     			myDB.setVersion(6);
+    		}
+    		if(myDB.getVersion() == 6) {
+    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_DISABLED);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_DISABLED + " INT");
     		}
     		myDB.close();
         } catch (Exception e) {

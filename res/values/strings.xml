@@ -30,9 +30,9 @@
     <string name="vplan_empty">Keine Vertretungen!</string>
     <string name="events">Termine</string>
     <string name="settings">Einstellungen</string>
-    <string name="timetablesettings">Einstellungen für den Vertretungsplan:</string>
+    <string name="vplansettings">Vertretungsplan</string>
     <string name="push_vplan">Vertretungsplan pushen?</string>
-    <string name="religion">Religionsunterricht:</string>
+    <string name="religion">Religionsunterricht</string>
     <string name="catholic">Katholisch</string>
     <string name="protestant">Evangelisch</string>
     <string name="ethics">Ethik</string>
@@ -40,6 +40,11 @@
     <string name="choose_religion">Wähle deinen Religionsunterricht</string>
     <string name="your_gender">Dein Geschlecht</string>
     <string name="your_class">Deine Klasse</string>
+    <string name="gender">Geschlecht</string>
+    <string name="male">Männlich</string>
+    <string name="female">Weiblich</string>
+    <string name="class_">Klasse</string>
+    <string name="choose_lessons">Bitte die jeweils besuchte Stunde wählen:</string>
     <string name="subjectlist">Fächerübersicht</string>
     <string name="subjectlist_empty">Fächerübersicht leer</string>
     <string name="blacklist">Blacklist</string>
@@ -84,7 +89,7 @@
     <string name="no">Nein</string>
     <string name="next">Weiter</string>
     <string name ="previous">Zurück</string>
-    <string name ="enter_logindetails">Bitte gib deine Login-Daten an:</string>
+    <string name ="login_setup">Login</string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
     <string name="all">Alle Vertretungen</string>

@@ -204,7 +204,7 @@ public class TimeTable extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_HOUR, Functions.DB_LEHRER},
-							Functions.DB_ROWID + "=?", new String[] {new Long(id).toString()}, null, null, null);
+							Functions.DB_ROWID + "=?", new String[] {Long.valueOf(id).toString()}, null, null, null);
 					c.moveToFirst();
 					String hour = Integer.valueOf(c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1).toString();
 					Cursor d = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_STUNDE, Functions.DB_VERTRETUNGSTEXT, 
@@ -341,11 +341,6 @@ public class TimeTable extends Activity {
 						values.put(Functions.DB_LENGTH,   jObject.getInt   ("length"));
 						values.put(Functions.DB_DAY,      jObject.getInt   ("day"));
 						values.put(Functions.DB_HOUR,     jObject.getInt   ("hour"));
-						Log.d("lehrer", values.getAsString(Functions.DB_LEHRER));
-						Log.d("fach", values.getAsString(Functions.DB_FACH));
-						Log.d("fachjson", jObject.getString("subject"));
-						Log.d("null", new Boolean(jObject.isNull("subject")).toString());
-						//Log.d("get", get);
 						myDB.insert(Functions.DB_TIME_TABLE, null, values);
 						i++;
 						}
