@@ -27,21 +27,14 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:hardwareAccelerated="true"
-        android:allowBackup="true">
+        android:allowBackup="true" android:theme="@style/AppTheme">
         <activity
-            android:name=".lsgapp"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:name=".SetupAssistant"
+            android:label="@string/app_name" />
         <activity android:name="Settings" android:label="@string/settings"></activity>
         <activity android:name="HelpAbout"></activity>
         <activity android:label="@string/smvblog"
             android:name="SMVBlog"
-            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
             android:hardwareAccelerated="false"></activity>
         <activity android:label="@string/subjectlist" android:name="SubjectList"></activity>
         <activity android:name="BlackWhiteList"></activity>
@@ -62,7 +55,11 @@
               <category android:name="com.lsg.app" />
           </intent-filter>
     </receiver>
-        <activity android:label="@string/timetable" android:name="TimeTable"></activity>
+        <activity android:label="@string/app_name" android:name="TimeTable" android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter></activity>
         <activity android:label="@string/vplan" android:name="VPlan"></activity>
         <activity android:label="@string/events" android:name="Events"></activity>
     </application>

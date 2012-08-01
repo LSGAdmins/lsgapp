@@ -3,6 +3,7 @@ package com.lsg.app;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -17,20 +18,20 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	    ActionBar actionBar = act.getActionBar();
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	}
-	public static void selectedItem(int position, lsgapp act) {
+	public static void selectedItem(int position, SetupAssistant act) {
 		ActionBar bar = act.getActionBar();
 		if(position < 3 && position > 0) {
-			Advanced.dropDownNav(act);
+			//Advanced.dropDownNav(act);
 			bar.setSelectedNavigationItem(position - 1);
 		}
 		else if(position >= 3 || position == 0) {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		}
 	}
-	public static void dropDownNav(final lsgapp act) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
+	public static void dropDownNav(Activity context, int actionArrayRes) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		int spinner = (!prefs.getBoolean("dark_actionbar", false)) ? android.R.layout.simple_spinner_dropdown_item : R.layout.spinner_dropdown_black_actionbar;
-		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(act, R.array.action_vertretungen, spinner);
+		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(context, actionArrayRes, spinner);
 		/*ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -48,11 +49,11 @@ public class Advanced implements SearchView.OnQueryTextListener {
 			return false;
 			}
 		};
-		
-		ActionBar actionBar = act.getActionBar();
+		*/
+		ActionBar actionBar = context.getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		
-		actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);*/
+		actionBar.setListNavigationCallbacks(mSpinnerAdapter, null);
 	}
 	public void searchBarInit(Menu menu, final SQLlist list) {
 		this.list = list;

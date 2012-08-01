@@ -1,19 +1,13 @@
 package com.lsg.app;
 
-import org.apache.http.util.EncodingUtils;
-
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Toast;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 public class SMVBlog extends Activity {
 	private SlideMenu slidemenu;
@@ -24,7 +18,7 @@ public class SMVBlog extends Activity {
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 		Functions.setTheme(false, true, this);
 		
-		WebView webview = new WebView(this);
+		/*WebView webview = new WebView(this);
 		setContentView(webview);
 		webview.getSettings().setJavaScriptEnabled(true);
 		final Activity activity = this;
@@ -47,9 +41,19 @@ public class SMVBlog extends Activity {
 			advWrapper = null;
 		}
 		else
-			webview.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
+			webview.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");*/
+		try {
+			setContentView(Functions.webv);
+		} catch(RuntimeException e) {
+			FrameLayout parent = (FrameLayout) Functions.webv.getParent();
+			parent.removeAllViews();
+			setContentView(Functions.webv);
+		}
+		/*WebView webv = new WebView(this);
+		webv.restoreState(Functions.webvSave);
+		setContentView(webv);*/
 		Log.d("SMVBlog", "load");
-		slidemenu = new SlideMenu(this, 3);
+		slidemenu = new SlideMenu(this, SMVBlog.class);
 		slidemenu.checkEnabled();
 	}
 	@Override
@@ -67,5 +71,15 @@ public class SMVBlog extends Activity {
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
+	}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.d("dest", "ondestroy");
+		//Functions.webv.saveState(Functions.webvSave);
+		FrameLayout par = (FrameLayout) Functions.webv.getParent();
+		par.removeAllViewsInLayout();
+		LinearLayout parpar = (LinearLayout) par.getParent();
+		parpar.removeAllViews();
 	}
 }

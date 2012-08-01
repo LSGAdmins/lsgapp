@@ -10,6 +10,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
 
+import org.apache.http.util.EncodingUtils;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -25,6 +28,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -37,10 +41,12 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class Functions {
 	public static final String   TAG            = "LSGäpp";
@@ -110,6 +116,10 @@ public class Functions {
 	public static final String DB_DAY             = "day";
 	public static final String DB_HOUR            = "hour";
 	public static final String DB_DISABLED        = "disabled";
+	//timetable headers
+	public static final String DB_TIME_TABLE_HEADERS = "tt_headers";
+	public static final String DB_TEACHER         = "teacher";
+	public static final String DB_SECOND_TEACHER  = "secteacher";
 	//classes
 	public static final String DB_CLASS_TABLE     = "classes";
 	public static final String DB_CLASS           = "class";
@@ -125,7 +135,14 @@ public class Functions {
 	//slidemenu
 	public static final int TYPE_PAGE             = 0;
 	public static final int TYPE_INFO             = 1;
+	public static final String IS_LOGGED_IN       = "isloggedin";
 	
+	/**
+	 * set holo theme in android 4
+	 * @param dialog if it should be a dialog
+	 * @param homeasup if there should be a "homeasup" navigation
+	 * @param act the calling activity
+	 */
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
 		int theme = android.R.style.Theme_Light;
 		if(Functions.getSDK() >= 11) {
@@ -147,6 +164,10 @@ public class Functions {
 			homeUp(act);
 		}
 	}
+	/**
+	 * method to set home as up
+	 * @param act the calling activity
+	 */
 	public static void homeUp(Activity act) {
 		try {
 			AdvancedWrapper advWrapper = new AdvancedWrapper();
@@ -154,6 +175,10 @@ public class Functions {
 		} catch (Exception e) {
 		}
 	}
+	/**
+	 * initialize the vplan-pull
+	 * @param context the app context
+	 */
 	public static void setAlarm(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		if(!prefs.getBoolean("autopullvplan", false)) {
@@ -172,6 +197,11 @@ public class Functions {
 			time_add = 1;
 		Functions.setAlarm(context, time_add);
 	}
+	/**
+	 * set an alarm to pull the vplan
+	 * @param context the app context
+	 * @param time_add the time to wait
+	 */
 	public static void setAlarm(Context context, int time_add) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		if(!prefs.getBoolean("autopullvplan", false)) {
@@ -187,6 +217,11 @@ public class Functions {
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (time_add*1000*60), sender);
 		}
+	/**
+	 * style a listview, to get more beautiful dividers
+	 * @param lv the listview
+	 * @param context the context
+	 */
 	public static void styleListView(ListView lv, Context context) {
 		if(Functions.getSDK() >= 11) {
 			ColorDrawable sage = new ColorDrawable(context.getResources().getColor(R.color.seperatorgrey));
@@ -198,7 +233,14 @@ public class Functions {
 	public static int getSDK() { //needed for compat with 1.5, no longer supported
 		return Build.VERSION.SDK_INT;
 	}
-	
+	/**
+	 * a helper method to connect to the api
+	 * @param urlString the url to open
+	 * @param context the app context
+	 * @param login if the login params are needed
+	 * @param add add this to the query string in post
+	 * @return the fetched data
+	 */
 	public static String getData(String urlString, Context context, boolean login, String add) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
@@ -229,41 +271,11 @@ public class Functions {
 			return "networkerror";
 			}
 	}
-	public static Runnable getErrorRunnable(String error, final Context context) {
-		Log.d("asdf", "errorrunnable");
-		if(error.equals("jsonerror")) {
-			Runnable r = new Runnable (){
-				public void run() {
-					Toast.makeText(context, context.getString(R.string.jsonerror), Toast.LENGTH_LONG).show();
-					}
-				};
-				return r;
-				}
-		else if(error.equals("loginerror")) {
-			Runnable r = new Runnable (){
-					public void run() {
-						Toast.makeText(context, context.getString(R.string.loginerror), Toast.LENGTH_LONG).show();
-						Intent intent;
-						if(Functions.getSDK() >= 11)
-							intent = new Intent(context, SettingsAdvanced.class);
-						else
-							intent = new Intent(context, Settings.class);
-						intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-						context.startActivity(intent);
-					}
-					};
-					return r;
-		}
-		else {
-			Runnable r = new Runnable (){
-					public void run() {
-						Toast.makeText(context, context.getString(R.string.networkerror), Toast.LENGTH_LONG).show();
-					}
-					};
-					return r;
-					}
-	}
-	public static void cleanDB(Context context) {
+	/**
+	 * Clean database of vplan - used when the vplan is one day old, but there's no new version
+	 * @param context the app context to access the database
+	 */
+	public static void cleanVPlanTable(Context context) {
 		Calendar now  = Calendar.getInstance();
 		int year_now  = now.get(Calendar.YEAR);
 		int month_now = now.get(Calendar.MONTH)+1;
@@ -302,7 +314,11 @@ public class Functions {
 		result.close();
 		myDB.close();
 	}
-	public static void testDB(Context context) {
+	/**
+	 * Set up database
+	 * @param context the context of the app, to open the database
+	 */
+	public static void setupDB(Context context) {
 		SQLiteDatabase myDB;
 		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
     	try {
@@ -372,6 +388,12 @@ public class Functions {
     	    	    + Functions.DB_DAY                 + " INTEGER,"
     	    	    + Functions.DB_HOUR                + " INTEGER"
     				+");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_HEADERS
+    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
+    				+ Functions.DB_TEACHER + " TEXT,"
+    				+ Functions.DB_SECOND_TEACHER + " TEXT,"
+    				+ Functions.DB_KLASSE + " TEXT"
+    				+ ");");
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_CLASS_TABLE
     				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
     	    	    + Functions.DB_CLASS              + " TEXT"
@@ -416,16 +438,42 @@ public class Functions {
     		if(myDB.getVersion() == 6) {
     			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_DISABLED);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_DISABLED + " INT");
+    			myDB.setVersion(7);
+    		}
+    		if(myDB.getVersion() == 7) {
+    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_CLASS);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_CLASS + " TEXT");
+    			myDB.setVersion(8);
+    		}
+    		if(myDB.getVersion() == 8) {
+    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_TEACHER);
+    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_TEACHER + " TEXT");
+    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_HOUR);
+    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_HOUR + " TEXT");
+    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_DAY);
+    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_DAY + " TEXT");
+    			myDB.setVersion(9);
+    		}
+    		if(myDB.getVersion() == 9) {
+    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_RAW_LEHRER);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
+    			myDB.setVersion(10);
     		}
     		myDB.close();
         } catch (Exception e) {
         	myDB.close();
         	Log.d("db", e.getMessage());
         	}
-    	Functions.cleanDB(context);
+    	Functions.cleanVPlanTable(context);
 	}
-	
-	//handlers for adding / removing items to / from blacklist
+	/**
+	 * add items to blacklist / remove items from blacklist
+	 * @param menu the menu to show
+	 * @param v the calling view
+	 * @param menuInfo information about the calling view, eg. id
+	 * @param context the app context
+	 * @param table the table to use, either Functions.DB_VPLAN_TABLE or Functions.DB_SUBJECT_TABLE
+	 */
 	public static void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, Context context, String table) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		String klasse  = "";
@@ -435,7 +483,7 @@ public class Functions {
 		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		if(table.equals(Functions.DB_VPLAN_TABLE)) {
 			Cursor cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					new String[] {new Long(info.id).toString()}, null, null, null);
+					new String[] {Long.valueOf(info.id).toString()}, null, null, null);
 			cur.moveToFirst();
 			
 			klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
@@ -453,7 +501,7 @@ public class Functions {
 				conmenu = 1;
 			} else if(table.equals(Functions.DB_SUBJECT_TABLE)) {
 				Cursor cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-						new String[] {new Long(info.id).toString()}, null, null, null);
+						new String[] {Long.valueOf(info.id).toString()}, null, null, null);
 				cur.moveToFirst();
 				
 				rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
@@ -486,6 +534,14 @@ public class Functions {
 			menu.add(Menu.NONE, 3, 0, context.getString(R.string.no_includesubject));
 		}
 	}
+	/**
+	 * Callback for the above method
+	 * @param item the clicked MenuItem
+	 * @param context the app context
+	 * @param list the calling Activity, has to extend SQLlist
+	 * @param table the table
+	 * @return always true
+	 */
 	public static boolean contextMenuSelect(MenuItem item, Context context, final SQLlist list, String table) {
 		final SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
@@ -493,10 +549,10 @@ public class Functions {
 		  Cursor cur;
 		  if(table.equals(Functions.DB_VPLAN_TABLE)) {
 			  cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					  new String[] {new Long(info.id).toString()}, null, null, null);
+					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
 		  } else { //table.equals(Functions.DB_SUBJECT_TABLE)
 			  cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					  new String[] {new Long(info.id).toString()}, null, null, null);
+					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
 		  }
 		  cur.moveToFirst();
 		  
@@ -553,6 +609,11 @@ public class Functions {
 		  }
 		  return true;
 	}
+	/**
+	 * send the ac2dm id to the server, when it's demanded
+	 * @param id the ac2dm device id
+	 * @param context the app context
+	 */
 	public static void sendClientId(String id, Context context) {
 		String add = "";
 		try {
@@ -566,6 +627,10 @@ public class Functions {
 			Log.d("sendId", "networkerror");
 		}
 	}
+	/**
+	 * fire off an registration intent for ac2dm
+	 * @param context the app context
+	 */
 	public static void registerAC2DM(Context context) {
 		Log.d("ac2dm", "registration for ac2dm");
 		Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
@@ -573,15 +638,31 @@ public class Functions {
 		registrationIntent.putExtra("sender", Functions.EMAIL);
 		context.startService(registrationIntent);
 	}
+	/**
+	 * unregister from ac2dm, if setting is disabled
+	 * @param context the app context
+	 */
 	public static void unregisterAC2DM(Context context) {
 		Intent unregIntent = new Intent("com.google.android.c2dm.intent.UNREGISTER");
 		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
 		context.startService(unregIntent);
 	}
+	/**
+	 * a little helper function to convert dp units to pixel on the specific device
+	 * @param dp the value in dp
+	 * @param ctx the app context
+	 * @return an intent containing the size in pixels
+	 */
 	public static int dpToPx(int dp, Context ctx) {
 	    Resources r = ctx.getResources();
 	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-	}
+	}/*
+	public static int percentToPx(double percent, Activity context) {
+		Display display = context.getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		return (int) (size.x * percent);
+	}*/
 	//source: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
 	public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
 		int childCount = viewGroup.getChildCount();
@@ -603,6 +684,10 @@ public class Functions {
 					}
 			}
 		}
+	/**
+	 * lock the rotation for asynctask
+	 * @param ctx the app context
+	 */
 	public static void lockRotation(Activity ctx) {
 		WindowManager wm =  (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
 	    Display dp = wm.getDefaultDisplay();
@@ -621,7 +706,40 @@ public class Functions {
 			break;
 		}
 	}
+	/**
+	 * unlock the rotation change
+	 * @param ctx the app context
+	 */
 	public static void unlockRotation(Activity ctx) {
 		ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+	}
+	public static WebView webv;
+	public static Bundle webvSave;
+	@SuppressLint("SetJavaScriptEnabled")
+	public static void init(Activity act) {
+		webv = new WebView(act);
+		webv.getSettings().setJavaScriptEnabled(true);
+		webv.setWebChromeClient(new WebChromeClient() {
+			public void onProgressChanged(WebView view, int progress) {
+				//actactivity.setProgress(progress*1000);
+				if(progress == 100)
+					webv.saveState(Functions.webvSave);
+				}
+			});
+		webv.setWebViewClient(new WebViewClient() {
+			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+				//Toast.makeText(act, getString(R.string.oops) + " " + description, Toast.LENGTH_SHORT).show();
+				}
+			});
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
+		String postData = "log=" + prefs.getString("username", "")
+				+ "&pwd=" + prefs.getString("password", "") + "&redirect_to=http://www.lsg.musin.de/smv/aktuelles/";
+		if(Functions.getSDK() >= 5) {
+			AdvancedWrapper advWrapper = new AdvancedWrapper();
+			advWrapper.postUrl(webv, "http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
+			advWrapper = null;
+		}
+		else
+			webv.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
 	}
 	}

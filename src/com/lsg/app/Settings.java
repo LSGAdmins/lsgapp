@@ -15,7 +15,7 @@ import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
 //code for old devices -> deprecated
-@SuppressLint("all")
+@SuppressLint("deprecated")
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	private SlideMenu slidemenu;
 	@SuppressWarnings("deprecation")
@@ -70,7 +70,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	Preference ac2dm = (Preference) findPreference("useac2dm");
         	prefCat.removePreference(ac2dm);
         }
-        slidemenu = new SlideMenu(this, 4);
+        slidemenu = new SlideMenu(this, Settings.class);
         slidemenu.checkEnabled();
 	}
     @Override
@@ -98,7 +98,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-	    	Intent intent = new Intent(this, lsgapp.class);
+	    	Intent intent = new Intent(this, SetupAssistant.class);
 	    	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 	    	startActivity(intent);
 	        return false;

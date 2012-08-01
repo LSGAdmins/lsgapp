@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -27,7 +26,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,7 +35,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -143,7 +140,7 @@ public class TimeTable extends Activity {
 
 	public class TimeTableViewPagerAdapter extends PagerAdapter implements
 			PagerTitles {
-		private String[] exclude_subjects = new String[5];
+		private String[] exclude_subjects = new String[6];
 		private final SQLiteDatabase myDB;
 		public Cursor timetable_monday;
 		public Cursor timetable_tuesday;
@@ -327,11 +324,47 @@ public class TimeTable extends Activity {
 		public void updateCursor() {
 			exclude_subjects[0] = "0";
 			exclude_subjects[4] = "1";
+			exclude_subjects[5] = "%"
+					+ prefs.getString(Functions.FULL_CLASS, "null").substring(0, 2)
+					+ "%"
+					+ prefs.getString(Functions.FULL_CLASS, "null").substring(2, 3)
+					+ "%";
 			String wherecond = Functions.DB_DAY + "=? AND  "
 					+ Functions.DB_RAW_FACH + " != ? AND "
 					+ Functions.DB_RAW_FACH + " != ? AND "
 					+ Functions.DB_RAW_FACH + " != ? AND "
-					+ Functions.DB_DISABLED + " != ?";
+					+ Functions.DB_DISABLED + " != ? AND " + Functions.DB_CLASS
+					+ " LIKE ?";
+
+			String query = "SELECT  "
+					+ Functions.DB_TIME_TABLE + "." + Functions.DB_ROWID + " AS _id, "
+					+ Functions.DB_TIME_TABLE + "." + Functions.DB_LEHRER
+					+ ", " + Functions.DB_TIME_TABLE + "." + Functions.DB_FACH
+					+ ", " + Functions.DB_TIME_TABLE + "." + Functions.DB_RAUM
+					+ ", " + Functions.DB_TIME_TABLE + "."
+					+ Functions.DB_LENGTH + ", " + Functions.DB_TIME_TABLE
+					+ "." + Functions.DB_HOUR + ", " + Functions.DB_TIME_TABLE
+					+ "." + Functions.DB_DAY + ", " + Functions.DB_TIME_TABLE
+					+ "." + Functions.DB_RAW_FACH + " FROM "
+					+ Functions.DB_TIME_TABLE + " LEFT OUTER JOIN "
+					+ Functions.EXCLUDE_TABLE + " ON "
+					+ Functions.DB_TIME_TABLE + "." + Functions.DB_RAW_FACH
+					+ "=" + Functions.EXCLUDE_TABLE + "."
+					+ Functions.DB_RAW_FACH + " WHERE "
+					+ Functions.DB_TIME_TABLE + "." + Functions.DB_RAW_LEHRER
+					+ "=" + Functions.EXCLUDE_TABLE + "."
+					+ Functions.DB_TEACHER + " AND " + Functions.DB_TIME_TABLE
+					+ "." + Functions.DB_HOUR + "=" + Functions.EXCLUDE_TABLE
+					+ "." + Functions.DB_HOUR + " AND "
+					+ Functions.DB_TIME_TABLE + "." + Functions.DB_DAY + "="
+					+ Functions.EXCLUDE_TABLE + "." + Functions.DB_DAY
+					+ " /*AND " + Functions.EXCLUDE_TABLE + "."
+					+ Functions.DB_DAY + "=" + "null*/";
+			Log.d("lines", Integer.valueOf(query.length()).toString());
+			timetable_monday = myDB.rawQuery(query, new String[] {});
+			Log.d("query", query);
+			//timetable_monday.moveToFirst();
+			//Log.d("query", timetable_monday.getString(timetable_monday.getColumnIndex(Functions.DB_ROWID)));
 			timetable_monday = myDB.query(Functions.DB_TIME_TABLE,
 					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
 							Functions.DB_FACH, Functions.DB_RAUM,
@@ -339,7 +372,6 @@ public class TimeTable extends Activity {
 							Functions.DB_DAY, Functions.DB_RAW_FACH },
 					wherecond, exclude_subjects, null, null, null);
 			timetableadap_monday.changeCursor(timetable_monday);
-
 			exclude_subjects[0] = "1";
 			timetable_tuesday = myDB.query(Functions.DB_TIME_TABLE,
 					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
@@ -373,7 +405,7 @@ public class TimeTable extends Activity {
 							Functions.DB_FACH, Functions.DB_RAUM,
 							Functions.DB_LENGTH, Functions.DB_HOUR,
 							Functions.DB_DAY, Functions.DB_RAW_FACH },
-					wherecond, exclude_subjects, null, null, null);
+					wherecond, exclude_subjects, null, null, Functions.DB_HOUR);
 			timetableadap_friday.changeCursor(timetable_friday);
 		}
 
@@ -450,41 +482,71 @@ public class TimeTable extends Activity {
 			if (!get.equals("networkerror") && !get.equals("loginerror")
 					&& !get.equals("noact")) {
 				try {
-					JSONArray jArray = new JSONArray(get);
-					JSONObject jObject_ = jArray.getJSONObject(0);
-					String date = jObject_.getString("date");
-					String time = jObject_.getString("time");
-					String one = jObject_.getString("one");
-					String two = jObject_.getString("two");
-					String klasse = jObject_.getString("klasse");
-					SharedPreferences.Editor edit = prefs.edit();
-					edit.putString("timetable_date", date);
-					edit.putString("timetable_time", time);
-					edit.putString("timetable_one", one);
-					edit.putString("timetable_two", two);
-					edit.putString("timetable_klasse", klasse);
-					edit.commit();
-					int i = 1;
+					JSONArray classes = new JSONArray(get);
 					SQLiteDatabase myDB = context.openOrCreateDatabase(
 							Functions.DB_NAME, Context.MODE_PRIVATE, null);
 					myDB.delete(Functions.DB_TIME_TABLE, null, null); // clear
-																		// vertretungen
-					while (i < jArray.length()) {
-						JSONObject jObject = jArray.getJSONObject(i);
-						ContentValues values = new ContentValues();
-						values.put(Functions.DB_LEHRER,
-								jObject.getString("teacher"));
-						values.put(Functions.DB_FACH,
-								jObject.getString("subject"));
-						values.put(Functions.DB_RAW_FACH,
-								jObject.getString("rawsubject"));
-						values.put(Functions.DB_RAUM, jObject.getString("room"));
-						values.put(Functions.DB_LENGTH,
-								jObject.getInt("length"));
-						values.put(Functions.DB_DAY, jObject.getInt("day"));
-						values.put(Functions.DB_HOUR, jObject.getInt("hour"));
-						myDB.insert(Functions.DB_TIME_TABLE, null, values);
-						i++;
+																		// timetable
+					for (int i = 0; i < classes.length(); i++) {
+						JSONArray one_class = classes.getJSONArray(i);
+						JSONObject class_info = one_class.getJSONObject(0);
+						String date = class_info.getString("date");
+						String time = class_info.getString("time");
+						String one = class_info.getString("one");
+						String two = class_info.getString("two");
+						String klasse = class_info.getString("klasse");
+						SharedPreferences.Editor edit = prefs.edit();
+						edit.putString("timetable_date", date);
+						edit.putString("timetable_time", time);
+						ContentValues headerval = new ContentValues();
+						headerval.put(Functions.DB_TEACHER, one);
+						headerval.put(Functions.DB_SECOND_TEACHER, two);
+						headerval.put(Functions.DB_KLASSE, klasse);
+						myDB.insert(Functions.DB_TIME_TABLE_HEADERS, null, headerval);
+						edit.putString("timetable_one", one);
+						edit.putString("timetable_two", two);
+						edit.putString("timetable_klasse", klasse);
+						edit.commit();
+						for(int ii = 1; ii < one_class.length(); ii++) {
+							JSONObject jObject = one_class.getJSONObject(ii);
+							//Log.d("json", jObject.toString());
+							ContentValues values = new ContentValues();
+							values.put(Functions.DB_LEHRER,
+									jObject.getString("teacher"));
+							values.put(Functions.DB_FACH,
+									jObject.getString("subject"));
+							values.put(Functions.DB_RAW_FACH,
+									jObject.getString("rawsubject"));
+							values.put(Functions.DB_RAUM,
+									jObject.getString("room"));
+							values.put(Functions.DB_LENGTH,
+									jObject.getInt("length"));
+							values.put(Functions.DB_DAY, jObject.getInt("day"));
+							values.put(Functions.DB_HOUR,
+									jObject.getInt("hour"));
+							values.put(Functions.DB_CLASS, jObject.getString("class"));
+							values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawteacher"));
+							Cursor c = myDB.query(Functions.EXCLUDE_TABLE,
+									new String[] { Functions.DB_ROWID },
+									Functions.DB_TEACHER + "=? AND "
+											+ Functions.DB_RAW_FACH
+											+ "=? AND "
+											+ Functions.DB_HOUR
+											+ "=? AND "
+											+ Functions.DB_DAY + "=?",
+									new String[] {
+											values.getAsString(Functions.DB_RAW_LEHRER),
+											values.getAsString(Functions.DB_RAW_FACH),
+											values.getAsString(Functions.DB_HOUR),
+											values.getAsString(Functions.DB_DAY) },
+									null, null, null);
+					c.moveToFirst();
+					if(c.getCount() > 0) {
+						values.put(Functions.DB_DISABLED, 1);
+					} else
+						values.put(Functions.DB_DISABLED, 2);
+							myDB.insert(Functions.DB_TIME_TABLE, null, values);
+						}
 					}
 					myDB.close();
 				} catch (JSONException e) {
@@ -542,7 +604,16 @@ public class TimeTable extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);
+		if(!((SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this)).getBoolean(Functions.IS_LOGGED_IN, false)) {
+			Toast.makeText(this, getString(R.string.run_setup_assistant), Toast.LENGTH_LONG).show();
+			startActivity(new Intent(TimeTable.this, Events.class));
+			Functions.init(this);
+			this.finish();
+			return;
+		}
+		setTitle(R.string.timetable);
 		Functions.setTheme(false, true, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		setContentView(R.layout.viewpager);
@@ -577,8 +648,12 @@ public class TimeTable extends Activity {
 			break;
 		}
 		pager.setCurrentItem(day, true);
-		slidemenu = new SlideMenu(this, 0);
+		slidemenu = new SlideMenu(this, TimeTable.class);
 		slidemenu.checkEnabled();
+		if(Functions.getSDK() >= 11) {
+			AdvancedWrapper adv = new AdvancedWrapper();
+			adv.dropDownNav(this, R.array.timetable_actions);
+		}
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -606,10 +681,13 @@ public class TimeTable extends Activity {
 		TimeTableUpdateTask upd = new TimeTableUpdateTask();
 		upd.execute();
 	}
-
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		viewpageradap.closeCursorsDB();
+		try {
+			viewpageradap.closeCursorsDB();
+		} catch(NullPointerException e) {
+			//viewpager not yet initialized
+		}
 	}
 }

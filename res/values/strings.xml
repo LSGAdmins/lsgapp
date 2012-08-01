@@ -44,6 +44,7 @@
     <string name="male">Männlich</string>
     <string name="female">Weiblich</string>
     <string name="class_">Klasse</string>
+    <string name="run_setup_assistant">Bitte den Setup-Assistenten ausführen!\nAndernfalls können leider nur Termine und die Startseite des SMVBlogs eingesehen werden.</string>
     <string name="choose_lessons">Bitte die jeweils besuchte Stunde wählen:</string>
     <string name="subjectlist">Fächerübersicht</string>
     <string name="subjectlist_empty">Fächerübersicht leer</string>

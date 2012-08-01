@@ -30,7 +30,7 @@ public class HelpAbout extends Activity {
 	    switch (item.getItemId()) {
         case android.R.id.home:
             // app icon in action bar clicked; change mode
-            Intent intent = new Intent(this, lsgapp.class);
+            Intent intent = new Intent(this, SetupAssistant.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;

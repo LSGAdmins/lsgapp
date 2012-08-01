@@ -36,7 +36,8 @@ public class SettingsAdvanced extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Functions.homeUp(this);
-        slidemenu = new SlideMenu(this, 4);
+        slidemenu = new SlideMenu(this, SettingsAdvanced.class);
+        slidemenu.checkEnabled();
     }
 
     @Override

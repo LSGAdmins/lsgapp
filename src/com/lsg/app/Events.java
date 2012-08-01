@@ -200,7 +200,7 @@ public class Events extends ListActivity implements SQLlist {
 		if(count == 0)
 			updateEvents();
 		num_rows.close();
-		slidemenu = new SlideMenu(this, 2);
+		slidemenu = new SlideMenu(this, Events.class);
 		slidemenu.checkEnabled();
 	}
 

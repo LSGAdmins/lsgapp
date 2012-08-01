@@ -3,12 +3,15 @@ package com.lsg.app;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
@@ -34,6 +37,7 @@ public class SlideMenu {
 			public int icon;
 			public String label;
 			public String title;
+			public Class<?extends Activity> action;
 		}
 		public SlideMenuAdapter(Activity act, SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
 			super(act, R.id.menu_label, items);
@@ -84,21 +88,31 @@ public class SlideMenu {
 	}
 	
 	private static boolean menuShown = false;
+	private static boolean menuToHide = false;
 	private static View menu;
 	private static LinearLayout content;
 	private static FrameLayout parent;
 	private static int menuSize;
 	private static int statusHeight = 0;
 	private Activity act;
-	private static int curAct;
-	SlideMenu(Activity act, int curAct) {
+	private static Class<? extends Activity> curAct;
+	private SharedPreferences prefs;
+	SlideMenuAdapter.MenuDesc[] items;
+	SlideMenu(Activity act, Class<? extends Activity> curAct) {
 		this.act = act;
-		this.curAct = curAct;
+		SlideMenu.curAct = curAct;
+		prefs = PreferenceManager.getDefaultSharedPreferences(act);
 	}
 	public void checkEnabled() {
 		if(menuShown)
 			this.show(false);
-	}
+	}/*
+	public void checkHide() {
+		if(menuToHide) {
+			this.hide();
+			menuToHide = false;
+		}
+	}*/
 	public void show() {
 		if(statusHeight == 0) {
 			Rect rectgle = new Rect();
@@ -125,37 +139,25 @@ public class SlideMenu {
     	lays.setMargins(0,statusHeight, 0, 0);
     	menu.setLayoutParams(lays);
     	parent.addView(menu);
+    	menu.getViewTreeObserver().addOnGlobalLayoutListener(
+				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						menu.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+						if(menuToHide) {
+							hide();
+							menuToHide = false;
+						}
+						}
+					});
     	ListView list = (ListView) act.findViewById(R.id.menu_listview);
     	list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if(position != curAct) {
-					hide();
-					Intent intent;
-					switch(position) {
-					case 0:
-						intent = new Intent(act, TimeTable.class);
-						break;
-					case 1:
-						intent = new Intent(act, VPlan.class);
-						break;
-					case 2:
-						intent = new Intent(act, Events.class);
-						break;
-					case 3:
-						intent = new Intent(act, SMVBlog.class);
-						break;
-					case 4:
-						if(Functions.getSDK() >= 11)
-							intent = new Intent(act, SettingsAdvanced.class);
-						else
-							intent = new Intent(act, Settings.class);
-						break;
-					default:
-						intent = new Intent(act, TimeTable.class);
-						break;
-						}
-					menuShown = false;
+				if(!items[position].action.equals(curAct)) {
+					Log.d("pos", Long.valueOf(id).toString());
+					menuToHide = true;
+					Intent intent = new Intent(act, items[position].action);
 					intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 					act.startActivity(intent);
 					} else {
@@ -177,31 +179,58 @@ public class SlideMenu {
     		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(false);
     		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(false);
     	} catch(Exception e) {
-    		//no viewpager :)
+    		//no viewpager to disable :)
     	}
     	menuShown = true;
     	this.fill();
 	}
 	public void fill() {
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
-		SlideMenuAdapter.MenuDesc[] items = new SlideMenuAdapter.MenuDesc[6];
-		for(int i = 0; i < 6; i++) {
-			items[i] = new SlideMenuAdapter.MenuDesc();
+		if (prefs.getBoolean(Functions.IS_LOGGED_IN, false)) {
+			items = new SlideMenuAdapter.MenuDesc[6];
+			for (int i = 0; i < 6; i++) {
+				items[i] = new SlideMenuAdapter.MenuDesc();
+			}
+			items[0].icon = R.drawable.ic_launcher;
+			items[0].label = "Stundenplan";
+			items[0].action = TimeTable.class;
+			items[1].icon = R.drawable.ic_launcher;
+			items[1].label = "Vertretungsplan";
+			items[1].action = VPlan.class;
+			items[2].icon = R.drawable.ic_launcher;
+			items[2].label = "Termine";
+			items[2].action = Events.class;
+			items[3].icon = R.drawable.ic_launcher;
+			items[3].label = "SMVBlog";
+			items[3].action = SMVBlog.class;
+			items[4].icon = R.drawable.ic_launcher;
+			items[4].label = "Einstellungen";
+			items[4].action = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
+					: Settings.class;
+			items[5].type = Functions.TYPE_INFO;
+			items[5].title = "Aktuell";
+			items[5].icon = R.drawable.ic_launcher;
+			items[5].label = "test";
+		} else {
+
+			items = new SlideMenuAdapter.MenuDesc[3];
+			for (int i = 0; i < 3; i++) {
+				items[i] = new SlideMenuAdapter.MenuDesc();
+			}
+			items[0].icon = R.drawable.ic_launcher;
+			items[0].label = "Setup-Assistent";
+			items[0].action = SetupAssistant.class;
+			items[1].icon = R.drawable.ic_launcher;
+			items[1].label = "Termine";
+			items[1].action = Events.class;
+			items[2].icon = R.drawable.ic_launcher;
+			items[2].label = "SMVBlog";
+			items[2].action = SMVBlog.class;/*
+			items[4].icon = R.drawable.ic_launcher;
+			items[4].label = "Einstellungen";
+			items[4].action = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
+					: Settings.class;*/
 		}
-		items[0].icon = R.drawable.ic_launcher;
-		items[0].label = "Stundenplan";
-		items[1].icon = R.drawable.ic_launcher;
-		items[1].label = "Vertretungsplan";
-		items[2].icon = R.drawable.ic_launcher;
-		items[2].label = "Termine";
-		items[3].icon = R.drawable.ic_launcher;
-		items[3].label = "SMVBlog";
-		items[4].icon = R.drawable.ic_launcher;
-		items[4].label = "Einstellungen";
-		items[5].type = Functions.TYPE_INFO;
-		items[5].title = "Aktuell";
-		items[5].icon = R.drawable.ic_launcher;
-		items[5].label = "test";
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
 	}

@@ -36,4 +36,9 @@
         <item>Männlich</item>
         <item>Weiblich</item>
     </string-array>
+    <string-array name="timetable_actions">
+        <item>Mein Stundenplan</item>
+        <item>Schülerstundenpläne</item>
+        <item>Lehrerstundenpläne</item>
+    </string-array>
 </resources>
