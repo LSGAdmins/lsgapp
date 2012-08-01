@@ -584,7 +584,6 @@ public class SetupAssistant extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		Functions.init(this);
 		Functions.setTheme(false, false, this);
@@ -592,7 +591,27 @@ public class SetupAssistant extends Activity {
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		edit = prefs.edit();
-		setup(step, false);
+		if(!prefs.getBoolean(Functions.IS_LOGGED_IN, false))
+			setup(step, false);
+		else {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("Wollen sie den Setup-Assistenten wirklich noch einmal ausführen?")
+			       .setCancelable(false)
+			       .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			                dialog.cancel();
+			                setup(step, false);
+			           }
+			       })
+			       .setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			                dialog.cancel();
+			                finish();
+			           }
+			       });
+			AlertDialog alert = builder.create();
+			alert.show();
+		}
 		/*
 		 * setContentView(R.layout.main_nav);
 		 * 
@@ -652,9 +671,6 @@ public class SetupAssistant extends Activity {
 		((EditText) findViewById(R.id.password)).setText(prefs.getString(
 				"password", ""));
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		/*InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		// only will trigger it if no physical keyboard is open
-		mgr.showSoftInput(((EditText) findViewById(R.id.username)), InputMethodManager.SHOW_FORCED);*/
 		((EditText) findViewById(R.id.password)).setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
