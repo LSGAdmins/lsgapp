@@ -1,19 +1,23 @@
 package com.lsg.app;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.view.Menu;
 import android.webkit.WebView;
 
 public class AdvancedWrapper {
-	public void dropDownNav(Activity context, int actionArrayRes) {
-		Advanced.dropDownNav(context, actionArrayRes);
+	public void dropDownNav(Activity context, int actionArrayRes, SelectedCallback navlistener, int selPosition) {
+		Advanced.dropDownNav(context, actionArrayRes, navlistener, selPosition);
 	}
 
-	public void selectedItem(int position, SetupAssistant act) {
-		Advanced.selectedItem(position, act);
+	public void setSelectedItem(int position, Activity act) {
+		Advanced.setSelectedItem(position, act);
 	}
 
+	public void getSelectedItem(Activity act) {
+		Advanced.getSelectedItem(act);
+	}
 	public void searchBar(Menu menu, SQLlist list) {
 		Advanced adv = new Advanced();
 		adv.searchBarInit(menu, list);

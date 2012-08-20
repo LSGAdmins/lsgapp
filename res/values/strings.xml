@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="hello">Hello World, lsgapp!</string>
     <string name="versionname">beta1</string>
     <string name="app_name">LSGäpp</string>
@@ -17,6 +18,7 @@
     <string name="useac2dm_off">Vertretungsplan wird nicht gepusht</string>
     <string name="vplan_info">Info</string>
     <string name="ok">OK</string>
+    <string name="select_class">Klasse auswählen:</string>
     <string name="number_all">Anzahl der Vertretungen:</string>
     <string name="number_mine">Vertretungen, die mich betreffen:</string>
     <string name="actdate">Aktualisierungsdatum:</string>
@@ -45,6 +47,7 @@
     <string name="female">Weiblich</string>
     <string name="class_">Klasse</string>
     <string name="run_setup_assistant">Bitte den Setup-Assistenten ausführen!\nAndernfalls können leider nur Termine und die Startseite des SMVBlogs eingesehen werden.</string>
+    <string name="setup_assistant_opening">Der Setup-Assistant wird ausgeführt.</string>
     <string name="setup_assistant">Setup-Assistent</string>
     <string name="setup_assistant_again">Den Setup-Assistenten nochmals ausführen</string>
     <string name="choose_lessons">Bitte die jeweils besuchte Stunde wählen:</string>
@@ -91,8 +94,8 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="next">Weiter</string>
-    <string name ="previous">Zurück</string>
-    <string name ="login_setup">Login</string>
+    <string name="previous">Zurück</string>
+    <string name="login_setup">Login</string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
     <string name="all">Alle Vertretungen</string>
@@ -115,8 +118,7 @@
         Die Icons stammen von Dominik Philp (philp.dominik@gmail.com). \n
         Der Sourcecode ist auf Launchpad zu finden: http://launchpad.net/lsgapp \n
         Der Bugtracker ist auch auf Launchpad: http://bugs.launchpad.net/lsgapp \n
-        Wer keinen Launchpad-Account hat, kann Wünsche, Kritik und Fehler an lsgadmins@googlegroups.com mailen.
-        </string>
+        Wer keinen Launchpad-Account hat, kann Wünsche, Kritik und Fehler an lsgadmins@googlegroups.com mailen.</string>
     <string name="help">Hilfe</string>
     <string name="help_vplan_head">Vertretungsplan</string>
     <string name="help_vplan_content">Beim ersten Aufruf des Vertretungsplans öffnen sich automatisch die Einstellungen, wo ihr euch mit euren normalen Schulaccounts
@@ -132,10 +134,9 @@
     <string name="help_smvblog_head">SMVBlog</string>
     <string name="help_smvblog_content">Hier wird der SMV-Blog angezeigt. Wenn ihr in den Einstellungen euren Account angegeben habt,
         werdet ihr hier automatisch angemeldet.</string>
-    <string name="help_bottom">
-	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden
-	</string>
+    <string name="help_bottom">	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden</string>
     <string name="vplan_mine_empty">Keine Vertretungen für mich!</string>
     <string name="events_empty">Keine Termine!</string>
     <string name="subjectlist_info">Lange drücken und halten, um Vertretungen bestimmter Fächer immer anzuzeigen / immer zu verbergen.</string>
+
 </resources>

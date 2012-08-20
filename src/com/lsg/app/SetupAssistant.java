@@ -499,12 +499,6 @@ public class SetupAssistant extends Activity {
 					}
 					long count = stmt.simpleQueryForLong();
 					if (count > 1) {
-						/*
-						 * SQLiteStatement stmt =
-						 * myDB.compileStatement("UPDATE " +
-						 * Functions.DB_TIME_TABLE + " SET " +
-						 * Functions.DB_DISABLED + " =?");
-						 */
 						Cursor c = myDB.query(
 								Functions.DB_TIME_TABLE,
 								new String[] { Functions.DB_RAW_FACH,

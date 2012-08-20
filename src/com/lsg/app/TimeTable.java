@@ -40,7 +40,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TimeTable extends Activity {
+public class TimeTable extends Activity implements SelectedCallback {
 	public static class TimetableAdapter extends CursorAdapter {
 		private SQLiteDatabase myDB;
 
@@ -155,23 +155,12 @@ public class TimeTable extends Activity {
 		private final Context context;
 		private final SharedPreferences prefs;
 		private String[] titles = new String[5];
+		private String klasse;
+		private boolean ownClass;
 
 		public TimeTableViewPagerAdapter(TimeTable act) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
-			exclude_subjects[1] = (prefs.getString(Functions.GENDER, "")
-					.equals("m")) ? "Sw" : "Sm";
-			if (prefs.getString(Functions.RELIGION, "").equals(
-					Functions.KATHOLISCH)) {
-				exclude_subjects[2] = Functions.EVANGELISCH;
-				exclude_subjects[3] = Functions.ETHIK;
-			} else if (prefs.getString(Functions.RELIGION, "").equals(
-					Functions.EVANGELISCH)) {
-				exclude_subjects[2] = Functions.KATHOLISCH;
-				exclude_subjects[3] = Functions.ETHIK;
-			} else {
-				exclude_subjects[2] = Functions.KATHOLISCH;
-				exclude_subjects[3] = Functions.EVANGELISCH;
-			}
+			setClass("", true);
 			context = (Context) act;
 			titles = getResources().getStringArray(R.array.days);
 
@@ -321,50 +310,51 @@ public class TimeTable extends Activity {
 			return lay;
 		}
 
+		public void updateExclude() {
+			if (ownClass) {
+				exclude_subjects[1] = (prefs.getString(Functions.GENDER, "")
+						.equals("m")) ? "Sw" : "Sm";
+				if (prefs.getString(Functions.RELIGION, "").equals(
+						Functions.KATHOLISCH)) {
+					exclude_subjects[2] = Functions.EVANGELISCH;
+					exclude_subjects[3] = Functions.ETHIK;
+				} else if (prefs.getString(Functions.RELIGION, "").equals(
+						Functions.EVANGELISCH)) {
+					exclude_subjects[2] = Functions.KATHOLISCH;
+					exclude_subjects[3] = Functions.ETHIK;
+				} else {
+					exclude_subjects[2] = Functions.KATHOLISCH;
+					exclude_subjects[3] = Functions.EVANGELISCH;
+				}
+			}
+			else {
+				exclude_subjects[1] = "%";
+				exclude_subjects[2] = "%";
+				exclude_subjects[3] = "%";
+			}
+		}
+
+		public void setClass(String klasse, boolean ownClass) {
+			this.klasse = klasse;
+			this.ownClass = ownClass;
+			if(ownClass)
+				this.klasse = prefs.getString(Functions.FULL_CLASS, "null");
+			updateExclude();
+		}
 		public void updateCursor() {
 			exclude_subjects[0] = "0";
-			exclude_subjects[4] = "1";
-			exclude_subjects[5] = "%"
-					+ prefs.getString(Functions.FULL_CLASS, "null").substring(0, 2)
-					+ "%"
-					+ prefs.getString(Functions.FULL_CLASS, "null").substring(2, 3)
-					+ "%";
+			exclude_subjects[4] = (ownClass) ? "1" : "%";
+			if (ownClass)
+				exclude_subjects[5] = "%" + klasse.substring(0, 2) + "%"
+						+ klasse.substring(2, 3) + "%";
+			else
+				exclude_subjects[5] = klasse;
 			String wherecond = Functions.DB_DAY + "=? AND  "
 					+ Functions.DB_RAW_FACH + " != ? AND "
 					+ Functions.DB_RAW_FACH + " != ? AND "
 					+ Functions.DB_RAW_FACH + " != ? AND "
 					+ Functions.DB_DISABLED + " != ? AND " + Functions.DB_CLASS
 					+ " LIKE ?";
-
-			String query = "SELECT  "
-					+ Functions.DB_TIME_TABLE + "." + Functions.DB_ROWID + " AS _id, "
-					+ Functions.DB_TIME_TABLE + "." + Functions.DB_LEHRER
-					+ ", " + Functions.DB_TIME_TABLE + "." + Functions.DB_FACH
-					+ ", " + Functions.DB_TIME_TABLE + "." + Functions.DB_RAUM
-					+ ", " + Functions.DB_TIME_TABLE + "."
-					+ Functions.DB_LENGTH + ", " + Functions.DB_TIME_TABLE
-					+ "." + Functions.DB_HOUR + ", " + Functions.DB_TIME_TABLE
-					+ "." + Functions.DB_DAY + ", " + Functions.DB_TIME_TABLE
-					+ "." + Functions.DB_RAW_FACH + " FROM "
-					+ Functions.DB_TIME_TABLE + " LEFT OUTER JOIN "
-					+ Functions.EXCLUDE_TABLE + " ON "
-					+ Functions.DB_TIME_TABLE + "." + Functions.DB_RAW_FACH
-					+ "=" + Functions.EXCLUDE_TABLE + "."
-					+ Functions.DB_RAW_FACH + " WHERE "
-					+ Functions.DB_TIME_TABLE + "." + Functions.DB_RAW_LEHRER
-					+ "=" + Functions.EXCLUDE_TABLE + "."
-					+ Functions.DB_TEACHER + " AND " + Functions.DB_TIME_TABLE
-					+ "." + Functions.DB_HOUR + "=" + Functions.EXCLUDE_TABLE
-					+ "." + Functions.DB_HOUR + " AND "
-					+ Functions.DB_TIME_TABLE + "." + Functions.DB_DAY + "="
-					+ Functions.EXCLUDE_TABLE + "." + Functions.DB_DAY
-					+ " /*AND " + Functions.EXCLUDE_TABLE + "."
-					+ Functions.DB_DAY + "=" + "null*/";
-			Log.d("lines", Integer.valueOf(query.length()).toString());
-			timetable_monday = myDB.rawQuery(query, new String[] {});
-			Log.d("query", query);
-			//timetable_monday.moveToFirst();
-			//Log.d("query", timetable_monday.getString(timetable_monday.getColumnIndex(Functions.DB_ROWID)));
 			timetable_monday = myDB.query(Functions.DB_TIME_TABLE,
 					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
 							Functions.DB_FACH, Functions.DB_RAUM,
@@ -485,8 +475,10 @@ public class TimeTable extends Activity {
 					JSONArray classes = new JSONArray(get);
 					SQLiteDatabase myDB = context.openOrCreateDatabase(
 							Functions.DB_NAME, Context.MODE_PRIVATE, null);
-					myDB.delete(Functions.DB_TIME_TABLE, null, null); // clear
-																		// timetable
+					// clear timetable
+					myDB.delete(Functions.DB_TIME_TABLE, null, null);
+					// clear headers
+					myDB.delete(Functions.DB_TIME_TABLE_HEADERS, null, null);
 					for (int i = 0; i < classes.length(); i++) {
 						JSONArray one_class = classes.getJSONArray(i);
 						JSONObject class_info = one_class.getJSONObject(0);
@@ -607,8 +599,14 @@ public class TimeTable extends Activity {
 		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);
 		if(!((SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this)).getBoolean(Functions.IS_LOGGED_IN, false)) {
-			Toast.makeText(this, getString(R.string.run_setup_assistant), Toast.LENGTH_LONG).show();
-			startActivity(new Intent(TimeTable.this, Events.class));
+			if(!((SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this)).getString("username", "null").equals("null")) {
+				Toast.makeText(this, getString(R.string.setup_assistant_opening), Toast.LENGTH_LONG).show();
+				startActivity(new Intent(TimeTable.this, SetupAssistant.class));
+			} else {
+				Toast.makeText(this, getString(R.string.run_setup_assistant),
+						Toast.LENGTH_LONG).show();
+				startActivity(new Intent(TimeTable.this, Events.class));
+			}
 			Functions.init(this);
 			this.finish();
 			return;
@@ -652,10 +650,27 @@ public class TimeTable extends Activity {
 		slidemenu.checkEnabled();
 		if(Functions.getSDK() >= 11) {
 			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.dropDownNav(this, R.array.timetable_actions);
+			adv.dropDownNav(this, R.array.timetable_actions, this, 0);
 		}
 	}
-
+	public void showMine() {
+		viewpageradap.setClass("", true);
+	}
+	public void showClasses() {
+		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS, new String[] {Functions.DB_ROWID, Functions.DB_KLASSE}, null, null, null, null, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(TimeTable.this);
+		builder.setTitle(R.string.select_class);
+		builder.setCursor(c, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		    	c.moveToPosition(item);
+		        viewpageradap.setClass(c.getString(c.getColumnIndex(Functions.DB_KLASSE)), false);
+		        ((TextView) findViewById(R.id.footer_text)).setText(c.getString(c.getColumnIndex(Functions.DB_KLASSE)));
+		        viewpageradap.updateCursor();
+		    }}, Functions.DB_KLASSE);
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.timetable, menu);
@@ -689,5 +704,48 @@ public class TimeTable extends Activity {
 		} catch(NullPointerException e) {
 			//viewpager not yet initialized
 		}
+	}
+	private int selPos;
+	private boolean suppressSelect = false;
+	@Override
+	public boolean selected(int position, long id) {
+		selPos = position;
+		if(suppressSelect) {
+			suppressSelect = false;
+			return true;
+		}
+		switch(position) {
+		case 0:
+			((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);
+			showMine();
+			break;
+		case 1:
+			((TextView) findViewById(R.id.footer_text)).setVisibility(View.VISIBLE);
+			showClasses();
+			break;
+			default:
+				showMine();
+				break;
+		}
+		return false;
+	}
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  savedInstanceState.putInt("navlistselected", selPos);
+	  savedInstanceState.putBoolean("ownclass", viewpageradap.ownClass);
+	  savedInstanceState.putString("selclass", viewpageradap.klasse);
+	  Log.d("save", "onsaveinstancestate");
+	}
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		viewpageradap.setClass((String) savedInstanceState.getString("selclass"), savedInstanceState.getBoolean("ownclass", true));
+		viewpageradap.updateCursor();
+		if(Functions.getSDK() >= 11) {
+			suppressSelect = true;
+			AdvancedWrapper adv = new AdvancedWrapper();
+			adv.setSelectedItem(savedInstanceState.getInt("navlistselected"), this);
+		}
+		super.onRestoreInstanceState(savedInstanceState);
 	}
 }
