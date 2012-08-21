@@ -655,6 +655,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 	}
 	public void showMine() {
 		viewpageradap.setClass("", true);
+		viewpageradap.updateCursor();
 	}
 	public void showClasses() {
 		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
