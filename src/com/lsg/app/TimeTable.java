@@ -652,6 +652,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.dropDownNav(this, R.array.timetable_actions, this, 0);
 		}
+		Functions.init(this);
 	}
 	public void showMine() {
 		viewpageradap.setClass("", true);
