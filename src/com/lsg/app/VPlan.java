@@ -205,16 +205,16 @@ public class VPlan extends Activity {
 					+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 			String mine_cond = first + include_cond +  sec + exclude_cond;
 			String all_cond = first + sec;
-			cursor_mine = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-					Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, mine_cond, where_conds, null, null, null);
+			cursor_mine = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
+					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
+					Functions.DB_CLASS_LEVEL, Functions.DB_DATE, Functions.DB_LENGTH}, mine_cond, where_conds, null, null, null);
 			where_conds[0] = "%";
-			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-					Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);
-			cursor_teachers = myDB.query(Functions.DB_VPLAN_TEACHER, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_ART, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_RAUM,
-					Functions.DB_KLASSENSTUFE, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);;
+			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
+					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
+					Functions.DB_CLASS_LEVEL, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);
+			cursor_teachers = myDB.query(Functions.DB_VPLAN_TEACHER, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
+					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
+					Functions.DB_CLASS_LEVEL, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);;
 			vadapter_mine.changeCursor(cursor_mine);
 			vadapter_all.changeCursor(cursor_all);
 			vadapter_teachers.changeCursor(cursor_teachers);
@@ -320,7 +320,7 @@ public class VPlan extends Activity {
 			if(position > 0) {
 				cursor.moveToPosition(position-1);
 				olddate  = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
-				oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
+				oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_CLASS_LEVEL));
 				cursor.moveToPosition(position);
 				}
 			
@@ -333,7 +333,7 @@ public class VPlan extends Activity {
 				oldclass = "";
 				}
 			
-			String klassenstufe = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSENSTUFE));
+			String klassenstufe = cursor.getString(cursor.getColumnIndex(Functions.DB_CLASS_LEVEL));
 			String klasse = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSE));
 			if(!klasse.equals("infotext")) {
 				//hide
@@ -359,7 +359,7 @@ public class VPlan extends Activity {
 				
 				String fach = cursor.getString(cursor.getColumnIndex(Functions.DB_FACH));
 				holder.title.setText(klasse + " (" + fach + ")");
-				String type = cursor.getString(cursor.getColumnIndex(Functions.DB_ART));
+				String type = cursor.getString(cursor.getColumnIndex(Functions.DB_TYPE));
 				holder.type.setText(type);
 				Integer lesson;
 				try {
@@ -387,11 +387,11 @@ public class VPlan extends Activity {
 					holder.vtext.setText("[" + vtext + "]");
 					}
 				String lehrer    = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
-				if(cursor.getString(cursor.getColumnIndex(Functions.DB_ART)).equals("Entfall")){
+				if(cursor.getString(cursor.getColumnIndex(Functions.DB_TYPE)).equals("Entfall")){
 					holder.bottom.setText(context.getString(R.string.at) + " " + lehrer);
 					} else {
 						String vertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
-						String raum = cursor.getString(cursor.getColumnIndex(Functions.DB_RAUM));
+						String raum = cursor.getString(cursor.getColumnIndex(Functions.DB_ROOM));
 						String raumInsert = "";
 						if(!raum.equals("null"))
 							raumInsert = '\n' + context.getString(R.string.room) + " " + raum;
@@ -437,15 +437,15 @@ public class VPlan extends Activity {
 					while(i < jArray.length() - 1) {
 						JSONObject jObject = jArray.getJSONObject(i);
 						ContentValues values = new ContentValues();
-						values.put(Functions.DB_KLASSENSTUFE, jObject.getString("klassenstufe"));
+						values.put(Functions.DB_CLASS_LEVEL, jObject.getString("klassenstufe"));
 						values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
 						values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
 						values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
 						values.put(Functions.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
 						values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
 						values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
-						values.put(Functions.DB_RAUM, jObject.getString("raum"));
-						values.put(Functions.DB_ART, jObject.getString("art"));
+						values.put(Functions.DB_ROOM, jObject.getString("raum"));
+						values.put(Functions.DB_TYPE, jObject.getString("art"));
 						values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
 						values.put(Functions.DB_FACH, jObject.getString("fach"));
 						values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
@@ -496,15 +496,15 @@ public class VPlan extends Activity {
 						while(i < jArray.length() - 1) {
 							JSONObject jObject = jArray.getJSONObject(i);
 							ContentValues values = new ContentValues();
-							values.put(Functions.DB_KLASSENSTUFE, jObject.getString("klassenstufe"));
+							values.put(Functions.DB_CLASS_LEVEL, jObject.getString("klassenstufe"));
 							values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
 							values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
 							values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
 							values.put(Functions.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
 							values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
 							values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
-							values.put(Functions.DB_RAUM, jObject.getString("raum"));
-							values.put(Functions.DB_ART, jObject.getString("art"));
+							values.put(Functions.DB_ROOM, jObject.getString("raum"));
+							values.put(Functions.DB_TYPE, jObject.getString("art"));
 							values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
 							values.put(Functions.DB_FACH, jObject.getString("fach"));
 							values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));

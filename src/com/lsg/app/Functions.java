@@ -66,6 +66,7 @@ public class Functions {
 	public static final String   SUBJECT_URL          = "http://linux.lsg.musin.de/cp/fach_kuerzel.php";
 	public static final String   REGISTRATION_URL     = "http://linux.lsg.musin.de/cp/register_client.php";
 	public static final String   TIMETABLE_URL        = "http://linux.lsg.musin.de/cp/timetable.php";
+	public static final String   TIMETABLE_TEACHERS_URL        = "http://linux.lsg.musin.de/cp/timetable_teachers.php";
 	public static final String   LOGIN_TEST_URL       = "http://linux.lsg.musin.de/cp/setup.php?act=checklogin";
 	public static final String   PERSON_DATA_URL      = "http://linux.lsg.musin.de/cp/setup.php?act=getdata";
 	public static final String   PERSON_DATA_SEND_URL = "http://linux.lsg.musin.de/cp/setup.php?act=setdata";
@@ -83,52 +84,58 @@ public class Functions {
 	//VPlan
 	public static final String DB_VPLAN_TABLE     = "vertretungen";
 	public static final String DB_VPLAN_TEACHER   = "lehrervertretungen";
-	public static final String DB_KLASSENSTUFE    = "klassenstufe";
+	public static final String DB_CLASS_LEVEL    = "klassenstufe";
 	public static final String DB_KLASSE          = "klasse";
 	public static final String DB_STUNDE          = "stunde";
 	public static final String DB_VERTRETER       = "vertreter";
 	public static final String DB_RAW_VERTRETER   = "rawvertreter";
 	public static final String DB_LEHRER          = "lehrer";
 	public static final String DB_RAW_LEHRER      = "rawlehrer";
-	public static final String DB_RAUM            = "raum";
-	public static final String DB_ART             = "art";
+	public static final String DB_ROOM            = "raum";
+	public static final String DB_TYPE             = "art";
 	public static final String DB_VERTRETUNGSTEXT = "vertretungstext";
 	public static final String DB_FACH            = "fach";
 	public static final String DB_RAW_FACH        = "rawfach";
 	public static final String DB_DATE            = "date";
-	public static final String DB_LENGTH          = "length";
-	//Termine
-	public static final String DB_EVENTS_TABLE    = "events";
-	public static final String DB_DATES    		  = "dates";
-	public static final String DB_ENDDATES        = "enddates";
-	public static final String DB_TIMES           = "times";
-	public static final String DB_ENDTIMES        = "endtimes";
-	public static final String DB_TITLE           = "title";
-	public static final String DB_VENUE           = "venue";
-	//exclude & include
-	public static final String EXCLUDE_TABLE      = "exclude";
-	public static final String INCLUDE_TABLE      = "include";
-	public static final String DB_NEEDS_SYNC      = "needssync";
-	//subjects
-	public static final String DB_SUBJECT_TABLE   = "subjects";
-	//timetable
-	public static final String DB_TIME_TABLE      = "timetable";
-	public static final String DB_DAY             = "day";
-	public static final String DB_HOUR            = "hour";
-	public static final String DB_DISABLED        = "disabled";
-	//timetable headers
-	public static final String DB_TIME_TABLE_HEADERS = "tt_headers";
-	public static final String DB_TEACHER         = "teacher";
-	public static final String DB_SECOND_TEACHER  = "secteacher";
-	//classes
-	public static final String DB_CLASS_TABLE     = "classes";
-	public static final String DB_CLASS           = "class";
-	
-	public static final String RELIGION           = "religion";
-	public static final String KATHOLISCH         = "K";
-	public static final String EVANGELISCH        = "Ev";
-	public static final String ETHIK              = "Eth";
-	
+	public static final String DB_LENGTH = "length";
+	// Termine
+	public static final String DB_EVENTS_TABLE = "events";
+	public static final String DB_DATES = "dates";
+	public static final String DB_ENDDATES = "enddates";
+	public static final String DB_TIMES = "times";
+	public static final String DB_ENDTIMES = "endtimes";
+	public static final String DB_TITLE = "title";
+	public static final String DB_VENUE = "venue";
+	// exclude & include
+	public static final String EXCLUDE_TABLE = "exclude";
+	public static final String INCLUDE_TABLE = "include";
+	public static final String DB_NEEDS_SYNC = "needssync";
+	// subjects
+	public static final String DB_SUBJECT_TABLE = "subjects";
+	// timetable
+	public static final String DB_TIME_TABLE = "timetable";
+	public static final String DB_DAY = "day";
+	public static final String DB_HOUR = "hour";
+	public static final String DB_DISABLED = "disabled";
+	// for teachers
+	public static final String DB_TIME_TABLE_TEACHERS = "timetable_teachers";
+	public static final String DB_BREAK_SURVEILLANCE = "pausenaufsicht";
+	// timetable headers
+	public static final String DB_TIME_TABLE_HEADERS_PUPILS = "tt_headers";
+	public static final String DB_TEACHER = "teacher";
+	public static final String DB_SECOND_TEACHER = "secteacher";
+	// for teachers
+	public static final String DB_TIME_TABLE_HEADERS_TEACHERS = "tt_headers_teacher";
+	public static final String DB_SHORT = "short";
+	// classes
+	public static final String DB_CLASS_TABLE = "classes";
+	public static final String DB_CLASS = "class";
+
+	public static final String RELIGION = "religion";
+	public static final String KATHOLISCH = "K";
+	public static final String EVANGELISCH = "Ev";
+	public static final String ETHIK = "Eth";
+
 	public static final String GENDER             = "gender";
 	
 	public static final String FULL_CLASS         = "full_class";
@@ -325,26 +332,26 @@ public class Functions {
     		//vertretungen
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TABLE
     				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
-    	    		+ Functions.DB_KLASSENSTUFE       + " INTEGER,"
+    	    		+ Functions.DB_CLASS_LEVEL       + " INTEGER,"
     	    	    + Functions.DB_KLASSE	          + " TEXT,"
     	    	    + Functions.DB_STUNDE             + " INTEGER,"
     	    	    + Functions.DB_VERTRETER          + " TEXT,"
     	     	    + Functions.DB_LEHRER             + " TEXT,"
-    	    	    + Functions.DB_RAUM               + " TEXT,"
-    	    	    + Functions.DB_ART                + " TEXT,"
+    	    	    + Functions.DB_ROOM               + " TEXT,"
+    	    	    + Functions.DB_TYPE                + " TEXT,"
     	    	    + Functions.DB_VERTRETUNGSTEXT    + " TEXT,"
     	    	    + Functions.DB_FACH               + " TEXT,"
     	    	    + Functions.DB_DATE               + " TEXT"
     				+");");
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TEACHER
     				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
-    	    		+ Functions.DB_KLASSENSTUFE       + " INTEGER,"
+    	    		+ Functions.DB_CLASS_LEVEL       + " INTEGER,"
     	    	    + Functions.DB_KLASSE	          + " TEXT,"
     	    	    + Functions.DB_STUNDE             + " INTEGER,"
     	    	    + Functions.DB_VERTRETER          + " TEXT,"
     	     	    + Functions.DB_LEHRER             + " TEXT,"
-    	    	    + Functions.DB_RAUM               + " TEXT,"
-    	    	    + Functions.DB_ART                + " TEXT,"
+    	    	    + Functions.DB_ROOM               + " TEXT,"
+    	    	    + Functions.DB_TYPE                + " TEXT,"
     	    	    + Functions.DB_VERTRETUNGSTEXT    + " TEXT,"
     	    	    + Functions.DB_FACH               + " TEXT,"
     	    	    + Functions.DB_DATE               + " TEXT,"
@@ -383,21 +390,34 @@ public class Functions {
     				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
     	    	    + Functions.DB_LEHRER              + " TEXT,"
     	     	    + Functions.DB_FACH                + " TEXT,"
-    	    	    + Functions.DB_RAUM                + " TEXT,"
+    	    	    + Functions.DB_ROOM                + " TEXT,"
     	    	    + Functions.DB_LENGTH              + " INTEGER,"
     	    	    + Functions.DB_DAY                 + " INTEGER,"
     	    	    + Functions.DB_HOUR                + " INTEGER"
     				+");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_HEADERS
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_HEADERS_PUPILS
     				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
     				+ Functions.DB_TEACHER + " TEXT,"
     				+ Functions.DB_SECOND_TEACHER + " TEXT,"
     				+ Functions.DB_KLASSE + " TEXT"
     				+ ");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_CLASS_TABLE
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_TEACHERS
     				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
-    	    	    + Functions.DB_CLASS              + " TEXT"
+    				+ Functions.DB_SHORT               + " TEXT,"
+    	    	    + Functions.DB_BREAK_SURVEILLANCE  + " TEXT,"
+    	    	    + Functions.DB_RAW_FACH            + " TEXT,"
+    	     	    + Functions.DB_FACH                + " TEXT,"
+    	    	    + Functions.DB_ROOM                + " TEXT,"
+    	    	    + Functions.DB_CLASS               + " TEXT,"
+    	    	    + Functions.DB_LENGTH              + " INTEGER,"
+    	    	    + Functions.DB_DAY                 + " INTEGER,"
+    	    	    + Functions.DB_HOUR                + " INTEGER"
     				+");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_HEADERS_TEACHERS
+    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
+    				+ Functions.DB_SHORT + " TEXT,"
+    				+ Functions.DB_TEACHER + " TEXT"
+    				+ ");");
     		//upgrades for table
     		if(myDB.getVersion() == 0) {
     			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_FACH);

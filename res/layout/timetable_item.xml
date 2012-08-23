@@ -5,6 +5,15 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@layout/background" >
+    <!-- break surveillance -->
+    <TextView 
+        android:id="@+id/break_surveillance"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5sp"
+        android:textSize="16sp"
+        android:textColor="@color/darkblue"
+        android:background="@layout/background" />
     <!-- possible seperators -->
     <TextView
         style="?android:attr/listSeparatorTextViewStyle"

@@ -31,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -46,10 +47,11 @@ public class TimeTable extends Activity implements SelectedCallback {
 
 		class TimetableItem {
 			public LinearLayout lay;
+			public TextView break_surveillance;
 			public TextView timetable_day;
 			public TextView timetable_hour;
-			public TextView timetable_subject;
-			public TextView timetable_teacher;
+			public TextView header;
+			public TextView subtitle;
 			public TextView timetable_room;
 		}
 
@@ -68,13 +70,14 @@ public class TimeTable extends Activity implements SelectedCallback {
 			TimetableItem holder = new TimetableItem();
 			holder.lay = (LinearLayout) rowView
 					.findViewById(R.id.timetable_lay);
+			holder.break_surveillance = (TextView) rowView.findViewById(R.id.break_surveillance);
 			holder.timetable_day = (TextView) rowView
 					.findViewById(R.id.timetable_day);
 			holder.timetable_hour = (TextView) rowView
 					.findViewById(R.id.timetable_hour);
-			holder.timetable_subject = (TextView) rowView
+			holder.header = (TextView) rowView
 					.findViewById(R.id.timetable_subject);
-			holder.timetable_teacher = (TextView) rowView
+			holder.subtitle = (TextView) rowView
 					.findViewById(R.id.timetable_teacher);
 			holder.timetable_room = (TextView) rowView
 					.findViewById(R.id.timetable_room);
@@ -106,7 +109,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 				when += ", " + Integer.valueOf(hour + i).toString();
 				i++;
 			}
-			String rawfach = cursor.getString(cursor
+			/*String rawfach = cursor.getString(cursor
 					.getColumnIndex(Functions.DB_RAW_FACH));
 			String lehrer = cursor.getString(cursor
 					.getColumnIndex(Functions.DB_LEHRER));
@@ -118,19 +121,43 @@ public class TimeTable extends Activity implements SelectedCallback {
 			if (c.getCount() > 0)
 				holder.lay.setBackgroundResource(R.layout.background_info);
 			else
-				holder.lay.setBackgroundResource(R.layout.background);
+				holder.lay.setBackgroundResource(R.layout.background);*/
 
 			holder.timetable_hour.setText(when + ". "
 					+ context.getString(R.string.hour));
-			holder.timetable_subject.setText(cursor.getString(cursor
-					.getColumnIndex(Functions.DB_FACH)));
-			holder.timetable_teacher.setText(cursor.getString(cursor
-					.getColumnIndex(Functions.DB_LEHRER)));
 			holder.timetable_room
 					.setText(context.getString(R.string.room)
 							+ " "
 							+ cursor.getString(cursor
-									.getColumnIndex(Functions.DB_RAUM)));
+									.getColumnIndex(Functions.DB_ROOM)));
+			String subtitle;
+			if (cursor.getColumnIndex(Functions.DB_BREAK_SURVEILLANCE) != -1) {
+				if (!cursor.getString(
+						cursor.getColumnIndex(Functions.DB_BREAK_SURVEILLANCE))
+						.equals("null")) {
+					holder.break_surveillance.setVisibility(View.VISIBLE);
+					holder.break_surveillance.setText(context.getString(R.string.break_surveillance) + " " + cursor.getString(cursor
+							.getColumnIndex(Functions.DB_BREAK_SURVEILLANCE)));
+				} else
+					holder.break_surveillance.setVisibility(View.GONE);
+				subtitle = Functions.DB_CLASS;
+			} else {
+				holder.break_surveillance.setVisibility(View.GONE);
+				subtitle = Functions.DB_LEHRER;
+			}
+			if(cursor.getString(cursor
+					.getColumnIndex(Functions.DB_ROOM)).equals("null"))
+				holder.timetable_room.setVisibility(View.GONE);
+			else
+				holder.timetable_room.setVisibility(View.VISIBLE);
+			holder.header.setText(cursor.getString(cursor
+					.getColumnIndex(Functions.DB_FACH)));
+			holder.subtitle.setText(cursor.getString(cursor
+					.getColumnIndex(subtitle)));
+			if(holder.subtitle.getText().equals("null"))
+				holder.subtitle.setVisibility(View.GONE);
+			else
+				holder.subtitle.setVisibility(View.VISIBLE);
 		}
 
 		public void close() {
@@ -142,20 +169,13 @@ public class TimeTable extends Activity implements SelectedCallback {
 			PagerTitles {
 		private String[] exclude_subjects = new String[6];
 		private final SQLiteDatabase myDB;
-		public Cursor timetable_monday;
-		public Cursor timetable_tuesday;
-		public Cursor timetable_wednesday;
-		public Cursor timetable_thursday;
-		public Cursor timetable_friday;
-		private TimetableAdapter timetableadap_monday;
-		private TimetableAdapter timetableadap_tuesday;
-		private TimetableAdapter timetableadap_wednesday;
-		private TimetableAdapter timetableadap_thursday;
-		private TimetableAdapter timetableadap_friday;
+		private Cursor[] timetable_cursors = new Cursor[5];
+		private TimetableAdapter[] timetableadapters = new TimetableAdapter[5];
 		private final Context context;
 		private final SharedPreferences prefs;
 		private String[] titles = new String[5];
 		private String klasse;
+		private String teacher;
 		private boolean ownClass;
 
 		public TimeTableViewPagerAdapter(TimeTable act) {
@@ -166,17 +186,9 @@ public class TimeTable extends Activity implements SelectedCallback {
 
 			myDB = context.openOrCreateDatabase(Functions.DB_NAME,
 					Context.MODE_PRIVATE, null);
-			timetableadap_monday = new TimetableAdapter(context,
-					timetable_monday);
-			timetableadap_tuesday = new TimetableAdapter(context,
-					timetable_tuesday);
-			timetableadap_wednesday = new TimetableAdapter(context,
-					timetable_wednesday);
-			timetableadap_thursday = new TimetableAdapter(context,
-					timetable_thursday);
-			timetableadap_friday = new TimetableAdapter(context,
-					timetable_friday);
-
+			for(int i = 0; i < 5; i++)
+				timetableadapters[i] =  new TimetableAdapter(context, timetable_cursors[i]);
+			
 			SQLiteStatement num_rows = myDB
 					.compileStatement("SELECT COUNT(*) FROM "
 							+ Functions.DB_TIME_TABLE);
@@ -209,26 +221,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 			LinearLayout lay = (LinearLayout) inflater.inflate(R.layout.list,
 					null);
 			ListView lv = (ListView) lay.findViewById(android.R.id.list);
-			switch (position) {
-			case 0:
-				lv.setAdapter(timetableadap_monday);
-				break;
-			case 1:
-				lv.setAdapter(timetableadap_tuesday);
-				break;
-			case 2:
-				lv.setAdapter(timetableadap_wednesday);
-				break;
-			case 3:
-				lv.setAdapter(timetableadap_thursday);
-				break;
-			case 4:
-				lv.setAdapter(timetableadap_friday);
-				break;
-			default:
-				lv.setAdapter(timetableadap_monday);
-				break;
-			}
+			lv.setAdapter(timetableadapters[position]);
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,
@@ -249,7 +242,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 									Functions.DB_STUNDE,
 									Functions.DB_VERTRETUNGSTEXT,
 									Functions.DB_LEHRER, Functions.DB_FACH,
-									Functions.DB_ART },
+									Functions.DB_TYPE },
 							Functions.DB_RAW_FACH + "=? AND "
 									+ Functions.DB_STUNDE + "=? AND "
 									+ Functions.DB_RAW_LEHRER + "=?",
@@ -284,7 +277,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 												+ "\n"
 												+ vtext
 												+ d.getString(d
-														.getColumnIndex(Functions.DB_ART))
+														.getColumnIndex(Functions.DB_TYPE))
 												+ " "
 												+ context
 														.getString(R.string.at)
@@ -306,6 +299,8 @@ public class TimeTable extends Activity implements SelectedCallback {
 					}
 				}
 			});
+			lv.setEmptyView(lay.findViewById(R.id.list_view_empty));
+			((TextView) lay.findViewById(R.id.list_view_empty)).setText(R.string.timetable_empty);
 			((ViewPager) pager).addView(lay, 0);
 			return lay;
 		}
@@ -341,8 +336,27 @@ public class TimeTable extends Activity implements SelectedCallback {
 				this.klasse = prefs.getString(Functions.FULL_CLASS, "null");
 			updateExclude();
 		}
+		public void setTeacher(String teacher) {
+			this.teacher = teacher;
+			this.klasse = null;
+		}
+
 		public void updateCursor() {
-			exclude_subjects[0] = "0";
+			if (this.klasse == null) {
+				for (int i = 0; i < getCount(); i++) {
+					timetable_cursors[i] = myDB.query(
+							Functions.DB_TIME_TABLE_TEACHERS, new String[] {
+									Functions.DB_ROWID,
+									Functions.DB_BREAK_SURVEILLANCE,
+									Functions.DB_FACH, Functions.DB_ROOM,
+									Functions.DB_CLASS, Functions.DB_LENGTH,
+									Functions.DB_HOUR, Functions.DB_DAY },
+							Functions.DB_SHORT + "=? AND " + Functions.DB_DAY + "=?",
+							new String[] { this.teacher, Integer.valueOf(i).toString() }, null, null, null);
+					timetableadapters[i].changeCursor(timetable_cursors[i]);
+				}
+				return;
+			}
 			exclude_subjects[4] = (ownClass) ? "1" : "%";
 			if (ownClass)
 				exclude_subjects[5] = "%" + klasse.substring(0, 2) + "%"
@@ -355,56 +369,21 @@ public class TimeTable extends Activity implements SelectedCallback {
 					+ Functions.DB_RAW_FACH + " != ? AND "
 					+ Functions.DB_DISABLED + " != ? AND " + Functions.DB_CLASS
 					+ " LIKE ?";
-			timetable_monday = myDB.query(Functions.DB_TIME_TABLE,
-					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-							Functions.DB_FACH, Functions.DB_RAUM,
-							Functions.DB_LENGTH, Functions.DB_HOUR,
-							Functions.DB_DAY, Functions.DB_RAW_FACH },
-					wherecond, exclude_subjects, null, null, null);
-			timetableadap_monday.changeCursor(timetable_monday);
-			exclude_subjects[0] = "1";
-			timetable_tuesday = myDB.query(Functions.DB_TIME_TABLE,
-					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-							Functions.DB_FACH, Functions.DB_RAUM,
-							Functions.DB_LENGTH, Functions.DB_HOUR,
-							Functions.DB_DAY, Functions.DB_RAW_FACH },
-					wherecond, exclude_subjects, null, null, null);
-			timetableadap_tuesday.changeCursor(timetable_tuesday);
-
-			exclude_subjects[0] = "2";
-			timetable_wednesday = myDB.query(Functions.DB_TIME_TABLE,
-					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-							Functions.DB_FACH, Functions.DB_RAUM,
-							Functions.DB_LENGTH, Functions.DB_HOUR,
-							Functions.DB_DAY, Functions.DB_RAW_FACH },
-					wherecond, exclude_subjects, null, null, null);
-			timetableadap_wednesday.changeCursor(timetable_wednesday);
-
-			exclude_subjects[0] = "3";
-			timetable_thursday = myDB.query(Functions.DB_TIME_TABLE,
-					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-							Functions.DB_FACH, Functions.DB_RAUM,
-							Functions.DB_LENGTH, Functions.DB_HOUR,
-							Functions.DB_DAY, Functions.DB_RAW_FACH },
-					wherecond, exclude_subjects, null, null, null);
-			timetableadap_thursday.changeCursor(timetable_thursday);
-
-			exclude_subjects[0] = "4";
-			timetable_friday = myDB.query(Functions.DB_TIME_TABLE,
-					new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-							Functions.DB_FACH, Functions.DB_RAUM,
-							Functions.DB_LENGTH, Functions.DB_HOUR,
-							Functions.DB_DAY, Functions.DB_RAW_FACH },
-					wherecond, exclude_subjects, null, null, Functions.DB_HOUR);
-			timetableadap_friday.changeCursor(timetable_friday);
+			for(int i = 0; i < getCount(); i++) {
+				exclude_subjects[0] = Integer.valueOf(i).toString();
+				timetable_cursors[i] = myDB.query(Functions.DB_TIME_TABLE,
+						new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
+								Functions.DB_FACH, Functions.DB_ROOM,
+								Functions.DB_LENGTH, Functions.DB_HOUR,
+								Functions.DB_DAY, Functions.DB_RAW_FACH },
+						wherecond, exclude_subjects, null, null, null);
+				timetableadapters[i].changeCursor(timetable_cursors[i]);
+			}
 		}
 
 		public void closeCursorsDB() {
-			timetable_monday.close();
-			timetable_tuesday.close();
-			timetable_wednesday.close();
-			timetable_thursday.close();
-			timetable_friday.close();
+			for(int i = 0; i < getCount(); i++)
+				timetable_cursors[i].close();
 			myDB.close();
 		}
 
@@ -443,7 +422,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 			context = c;
 		}
 
-		public String[] update() {
+		public String[] updatePupils() {
 			SharedPreferences prefs = PreferenceManager
 					.getDefaultSharedPreferences(context);
 			String add = "";
@@ -478,7 +457,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 					// clear timetable
 					myDB.delete(Functions.DB_TIME_TABLE, null, null);
 					// clear headers
-					myDB.delete(Functions.DB_TIME_TABLE_HEADERS, null, null);
+					myDB.delete(Functions.DB_TIME_TABLE_HEADERS_PUPILS, null, null);
 					for (int i = 0; i < classes.length(); i++) {
 						JSONArray one_class = classes.getJSONArray(i);
 						JSONObject class_info = one_class.getJSONObject(0);
@@ -494,7 +473,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 						headerval.put(Functions.DB_TEACHER, one);
 						headerval.put(Functions.DB_SECOND_TEACHER, two);
 						headerval.put(Functions.DB_KLASSE, klasse);
-						myDB.insert(Functions.DB_TIME_TABLE_HEADERS, null, headerval);
+						myDB.insert(Functions.DB_TIME_TABLE_HEADERS_PUPILS, null, headerval);
 						edit.putString("timetable_one", one);
 						edit.putString("timetable_two", two);
 						edit.putString("timetable_klasse", klasse);
@@ -509,7 +488,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 									jObject.getString("subject"));
 							values.put(Functions.DB_RAW_FACH,
 									jObject.getString("rawsubject"));
-							values.put(Functions.DB_RAUM,
+							values.put(Functions.DB_ROOM,
 									jObject.getString("room"));
 							values.put(Functions.DB_LENGTH,
 									jObject.getInt("length"));
@@ -554,6 +533,85 @@ public class TimeTable extends Activity implements SelectedCallback {
 						context.getString(R.string.loginerror) };
 			return new String[] { "success", "" };
 		}
+		public String[] updateTeachers() {
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(context);
+			String add = "";
+			try {
+				add = "&"
+						+ URLEncoder.encode("date", "UTF-8")
+						+ "="
+						+ URLEncoder.encode(
+								prefs.getString("timetable_teachers_date", ""), "UTF-8")
+						+ "&"
+						+ URLEncoder.encode("time", "UTF-8")
+						+ "="
+						+ URLEncoder.encode(
+								prefs.getString("timetable_teachers_time", ""), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				Log.d("encoding", e.getMessage());
+			}
+			String get = Functions.getData(Functions.TIMETABLE_TEACHERS_URL, context,
+					true, add);
+			if (!get.equals("networkerror") && !get.equals("loginerror")
+					&& !get.equals("noact")) {
+				try {
+					JSONArray classes = new JSONArray(get);
+					SQLiteDatabase myDB = context.openOrCreateDatabase(
+							Functions.DB_NAME, Context.MODE_PRIVATE, null);
+					// clear timetable
+					myDB.delete(Functions.DB_TIME_TABLE_TEACHERS, null, null);
+					// clear headers
+					myDB.delete(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, null, null);
+					for (int i = 0; i < classes.length(); i++) {
+						JSONArray one_teacher = classes.getJSONArray(i);
+						JSONObject teacher_info = one_teacher.getJSONObject(0);
+						String date = teacher_info.getString("date");
+						String time = teacher_info.getString("time");
+						String name = teacher_info.getString("name");
+						String short_ = teacher_info.getString("short");
+						SharedPreferences.Editor edit = prefs.edit();
+						edit.putString("timetable_teachers_date", date);
+						edit.putString("timetable_teachers_time", time);
+						ContentValues headerval = new ContentValues();
+						headerval.put(Functions.DB_TEACHER, name);
+						headerval.put(Functions.DB_SHORT, short_);
+						myDB.insert(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, null, headerval);
+						edit.commit();
+						for(int ii = 1; ii < one_teacher.length(); ii++) {
+							JSONObject jObject = one_teacher.getJSONObject(ii);
+							//Log.d("json", jObject.toString());
+							ContentValues values = new ContentValues();
+							values.put(Functions.DB_SHORT, short_);
+							values.put(Functions.DB_BREAK_SURVEILLANCE,
+									jObject.getString("pausenaufsicht"));
+							values.put(Functions.DB_FACH,
+									jObject.getString("fach"));
+							values.put(Functions.DB_ROOM,
+									jObject.getString("room"));
+							values.put(Functions.DB_CLASS,
+									jObject.getString("class"));
+							values.put(Functions.DB_LENGTH, jObject.getInt("length"));
+							values.put(Functions.DB_DAY, jObject.getInt("day"));
+							values.put(Functions.DB_HOUR,
+									jObject.getInt("hour"));
+							myDB.insert(Functions.DB_TIME_TABLE_TEACHERS, null, values);
+						}
+					}
+					myDB.close();
+				} catch (JSONException e) {
+					Log.d("json", e.getMessage());
+					return new String[] { "json",
+							context.getString(R.string.jsonerror) };
+				}
+			} else if (get.equals("networkerror")) {
+				return new String[] { "networkerror",
+						context.getString(R.string.networkerror) };
+			} else if (get.equals("loginerror"))
+				return new String[] { "loginerror",
+						context.getString(R.string.loginerror) };
+			return new String[] { "success", "" };
+		}
 	}
 
 	public class TimeTableUpdateTask extends AsyncTask<Void, Void, String[]> {
@@ -567,7 +625,8 @@ public class TimeTable extends Activity implements SelectedCallback {
 		@Override
 		protected String[] doInBackground(Void... params) {
 			TimeTableUpdater upd = new TimeTableUpdater(TimeTable.this);
-			return upd.update();
+			upd.updateTeachers();
+			return upd.updatePupils();
 		}
 
 		protected void onPostExecute(String[] res) {
@@ -593,6 +652,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
 	private SlideMenu slidemenu;
+	private TextView footer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -653,14 +713,17 @@ public class TimeTable extends Activity implements SelectedCallback {
 			adv.dropDownNav(this, R.array.timetable_actions, this, 0);
 		}
 		Functions.init(this);
+		footer = (TextView) findViewById(R.id.footer_text);
 	}
 	public void showMine() {
+		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);
 		viewpageradap.setClass("", true);
 		viewpageradap.updateCursor();
 	}
 	public void showClasses() {
+		footer.setVisibility(View.VISIBLE);
 		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS, new String[] {Functions.DB_ROWID, Functions.DB_KLASSE}, null, null, null, null, null);
+		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_PUPILS, new String[] {Functions.DB_ROWID, Functions.DB_KLASSE}, null, null, null, null, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(TimeTable.this);
 		builder.setTitle(R.string.select_class);
 		builder.setCursor(c, new DialogInterface.OnClickListener() {
@@ -670,6 +733,24 @@ public class TimeTable extends Activity implements SelectedCallback {
 		        ((TextView) findViewById(R.id.footer_text)).setText(c.getString(c.getColumnIndex(Functions.DB_KLASSE)));
 		        viewpageradap.updateCursor();
 		    }}, Functions.DB_KLASSE);
+		builder.setCancelable(false);
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	public void showTeachers() {
+		footer.setVisibility(View.VISIBLE);
+		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, new String[] {Functions.DB_ROWID, Functions.DB_TEACHER, Functions.DB_SHORT}, null, null, null, null, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(TimeTable.this);
+		builder.setTitle(R.string.select_teacher);
+		builder.setCursor(c, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		    	c.moveToPosition(item);
+		        viewpageradap.setTeacher(c.getString(c.getColumnIndex(Functions.DB_SHORT)));
+		        ((TextView) findViewById(R.id.footer_text)).setText(c.getString(c.getColumnIndex(Functions.DB_TEACHER)));
+		        viewpageradap.updateCursor();
+		    }}, Functions.DB_TEACHER);
+		builder.setCancelable(false);
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
@@ -718,12 +799,25 @@ public class TimeTable extends Activity implements SelectedCallback {
 		}
 		switch(position) {
 		case 0:
-			((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);
 			showMine();
 			break;
 		case 1:
-			((TextView) findViewById(R.id.footer_text)).setVisibility(View.VISIBLE);
+			footer.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showClasses();
+				}
+			});
 			showClasses();
+			break;
+		case 2:
+			footer.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showTeachers();
+				}
+			});
+			showTeachers();
 			break;
 			default:
 				showMine();

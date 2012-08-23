@@ -19,6 +19,7 @@
     <string name="vplan_info">Info</string>
     <string name="ok">OK</string>
     <string name="select_class">Klasse auswählen:</string>
+    <string name="select_teacher">Lehrer auswählen:</string>
     <string name="number_all">Anzahl der Vertretungen:</string>
     <string name="number_mine">Vertretungen, die mich betreffen:</string>
     <string name="actdate">Aktualisierungsdatum:</string>
@@ -137,6 +138,8 @@
     <string name="help_bottom">	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden</string>
     <string name="vplan_mine_empty">Keine Vertretungen für mich!</string>
     <string name="events_empty">Keine Termine!</string>
+    <string name="timetable_empty">Keine Stunden!</string>
+    <string name="break_surveillance">Pausenaufsicht:</string>
     <string name="subjectlist_info">Lange drücken und halten, um Vertretungen bestimmter Fächer immer anzuzeigen / immer zu verbergen.</string>
 
 </resources>

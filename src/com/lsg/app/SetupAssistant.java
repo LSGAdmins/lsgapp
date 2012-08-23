@@ -468,7 +468,7 @@ public class SetupAssistant extends Activity {
 		protected ArrayList<Integer[]> doInBackground(Void... params) {
 			ArrayList<Integer[]> conflicts = new ArrayList<Integer[]>();
 			TimeTableUpdater upd = new TimeTableUpdater(SetupAssistant.this);
-			upd.update();
+			upd.updatePupils();
 			SQLiteDatabase myDB = context.openOrCreateDatabase(
 					Functions.DB_NAME, Context.MODE_PRIVATE, null);
 			for (int day = 0; day < 7; day++) {
