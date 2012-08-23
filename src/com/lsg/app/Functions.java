@@ -48,6 +48,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
+import com.google.android.gcm.GCMRegistrar;
+
 public class Functions {
 	public static final String   TAG            = "LSGäpp";
 	
@@ -56,7 +58,7 @@ public class Functions {
 	public static final String   WHITELIST      = "whitelist";
 	
 	//c2dm
-	public static final String   EMAIL       = "noreply.lsg@googlemail.com";
+	public static final String   GCM_ID = "521051077972";
 	
 	public static final String   UPDATE_URL           = "http://linux.lsg.musin.de/cp/downloads/lsgapp.apk";
 	public static final String   UPDATE_CHECK_URL     = "http://linux.lsg.musin.de/cp/checkUpdate.php?version=";
@@ -117,6 +119,7 @@ public class Functions {
 	public static final String DB_DAY = "day";
 	public static final String DB_HOUR = "hour";
 	public static final String DB_DISABLED = "disabled";
+	public static final String DB_VERTRETUNG = "vertretung";
 	// for teachers
 	public static final String DB_TIME_TABLE_TEACHERS = "timetable_teachers";
 	public static final String DB_BREAK_SURVEILLANCE = "pausenaufsicht";
@@ -283,6 +286,7 @@ public class Functions {
 	 * @param context the app context to access the database
 	 */
 	public static void cleanVPlanTable(Context context) {
+		if(false) {
 		Calendar now  = Calendar.getInstance();
 		int year_now  = now.get(Calendar.YEAR);
 		int month_now = now.get(Calendar.MONTH)+1;
@@ -320,6 +324,7 @@ public class Functions {
 		}
 		result.close();
 		myDB.close();
+		}
 	}
 	/**
 	 * Set up database
@@ -479,6 +484,13 @@ public class Functions {
     			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
     			myDB.setVersion(10);
     		}
+    		if(myDB.getVersion() == 10) {
+    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_VERTRETUNG);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_VERTRETUNG + " TEXT");
+    			Log.d(Functions.DB_TIME_TABLE_TEACHERS, "adding column " + Functions.DB_VERTRETUNG);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE_TEACHERS + " ADD COLUMN " + Functions.DB_VERTRETUNG + " TEXT");
+    			myDB.setVersion(11);
+    		}
     		myDB.close();
         } catch (Exception e) {
         	myDB.close();
@@ -637,9 +649,15 @@ public class Functions {
 	public static void sendClientId(String id, Context context) {
 		String add = "";
 		try {
-			add = "&" + URLEncoder.encode("client_id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
-		} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
-		String get = Functions.getData(Functions.REGISTRATION_URL, context, true, add);
+			add = "&" + URLEncoder.encode("client_id", "UTF-8") + "="
+					+ URLEncoder.encode(id, "UTF-8") + "&"
+					+ URLEncoder.encode("type", "UTF-8") + "="
+					+ URLEncoder.encode("gcm", "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			Log.d("encoding", e.getMessage());
+		}
+		String get = Functions.getData(Functions.REGISTRATION_URL, context,
+				true, add);
 		if(!get.equals("networkerror")) {
 			Log.d("c2dm", get);
 			}
@@ -647,10 +665,32 @@ public class Functions {
 			Log.d("sendId", "networkerror");
 		}
 	}
-	/**
-	 * fire off an registration intent for ac2dm
-	 * @param context the app context
-	 */
+	public static void registerGCM(Context context) {
+		try {
+		GCMRegistrar.checkDevice(context);
+		GCMRegistrar.checkManifest(context);
+		final String regId = GCMRegistrar.getRegistrationId(context);
+		Log.v("regId", regId);
+		if (regId.equals("")) {
+		  GCMRegistrar.register(context, Functions.GCM_ID);
+		} else {
+		  Log.v(TAG, "Already registered");
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void unregisterGCM(Context context) {
+		try {
+		GCMRegistrar.checkDevice(context);
+		GCMRegistrar.checkManifest(context);
+		  GCMRegistrar.unregister(context);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	/*
 	public static void registerAC2DM(Context context) {
 		Log.d("ac2dm", "registration for ac2dm");
 		Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
@@ -661,12 +701,12 @@ public class Functions {
 	/**
 	 * unregister from ac2dm, if setting is disabled
 	 * @param context the app context
-	 */
+	 
 	public static void unregisterAC2DM(Context context) {
 		Intent unregIntent = new Intent("com.google.android.c2dm.intent.UNREGISTER");
 		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
 		context.startService(unregIntent);
-	}
+	}*/
 	/**
 	 * a little helper function to convert dp units to pixel on the specific device
 	 * @param dp the value in dp
@@ -761,5 +801,7 @@ public class Functions {
 		}
 		else
 			webv.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
+		if(prefs.getBoolean("useac2dm", false))
+		  Functions.registerGCM(act);
 	}
 	}

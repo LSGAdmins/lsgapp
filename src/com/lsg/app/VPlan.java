@@ -2,6 +2,11 @@ package com.lsg.app;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -31,21 +35,17 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -434,6 +434,10 @@ public class VPlan extends Activity {
 					int i = 0;
 					SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 					myDB.delete(Functions.DB_VPLAN_TABLE, null, null); //clear vertretungen
+					ContentValues vals = new ContentValues();
+					vals.put(Functions.DB_VERTRETUNG, "false");
+					myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
+					vals.put(Functions.DB_VERTRETUNG, "true");
 					while(i < jArray.length() - 1) {
 						JSONObject jObject = jArray.getJSONObject(i);
 						ContentValues values = new ContentValues();
@@ -452,6 +456,33 @@ public class VPlan extends Activity {
 						values.put(Functions.DB_DATE, jObject.getString("date"));
 						values.put(Functions.DB_LENGTH, jObject.getInt("length"));
 						myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
+						try {
+							Date vdate = new SimpleDateFormat("dd.MM.yyyy")
+									.parse(jObject.getString("date"));
+							Calendar cal = new GregorianCalendar(Integer.valueOf(
+									jObject.getString("date").split("\\.")[2]),
+									Integer.valueOf(jObject.getString("date")
+											.split("\\.")[1]), Integer.valueOf(
+											jObject.getString("date")
+													.split("\\.")[0]));
+							myDB.update(Functions.DB_TIME_TABLE, vals,
+									Functions.DB_DAY + "=? AND "
+											+ Functions.DB_HOUR + "=? AND "
+											+ Functions.DB_CLASS + " LIKE ? AND "
+											+ Functions.DB_FACH + "=?",
+									new String[] {
+											Integer.valueOf(
+													cal.get(Calendar.DAY_OF_WEEK)-3-cal.getFirstDayOfWeek())
+													.toString(),
+											Integer.valueOf(jObject.getInt("stunde")-1).toString(),
+											"%" + jObject.getString("klasse")
+													+ "%" , jObject.getString("fach")});
+							Log.d("day", Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)).toString());
+							Log.d("date", cal.toString());
+						} catch (ParseException e) {
+						      e.printStackTrace();
+						    }
+						
 						i++;
 						}
 					myDB.close();

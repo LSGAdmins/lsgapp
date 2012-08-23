@@ -96,9 +96,9 @@ public class SettingsAdvanced extends PreferenceActivity {
 				boolean useac2dm = prefs.getBoolean("useac2dm", false);
 				pull(!useac2dm);
 				if (useac2dm)
-					Functions.registerAC2DM(getActivity());
+					Functions.registerGCM(getActivity());
 				else
-					Functions.unregisterAC2DM(getActivity());
+					Functions.unregisterGCM(getActivity());
 			}
 			if ((key.equals("updatevplanonstart") || key
 					.equals("autopullvplan"))

@@ -1,67 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lsg.app"
+    android:installLocation="preferExternal"
     android:versionCode="5"
-    android:versionName="@string/versionname" android:installLocation="preferExternal">
+    android:versionName="@string/versionname" >
 
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    
-    <!-- Only this application can receive the messages and registration result --> 
-   <permission android:name="com.lsg.app.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-   <uses-permission android:name="com.lsg.app.permission.C2D_MESSAGE" />
+    <uses-sdk
+        android:minSdkVersion="4"
+        android:targetSdkVersion="15" />
 
-   <!-- This app has permission to register and receive message -->
-   <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    
-    <supports-screens android:resizeable="true"
-                  android:smallScreens="true"
-                  android:normalScreens="true"
-                  android:largeScreens="true"
-                  android:xlargeScreens="true"
-                  android:anyDensity="true" />
-    
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <permission
+        android:name="com.lsg.app.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.lsg.app.permission.C2D_MESSAGE" />
+
+    <!-- Only this application can receive the messages and registration result -->
+    <permission
+        android:name="com.lsg.app.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.lsg.app.permission.C2D_MESSAGE" />
+
+    <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- This app has permission to register and receive message -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
     <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:hardwareAccelerated="true"
-        android:allowBackup="true" android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".SetupAssistant"
             android:label="@string/app_name" />
-        <activity android:name="Settings" android:label="@string/settings"></activity>
-        <activity android:name="HelpAbout"></activity>
-        <activity android:label="@string/smvblog"
+        <activity
+            android:name="Settings"
+            android:label="@string/settings" >
+        </activity>
+        <activity android:name="HelpAbout" >
+        </activity>
+        <activity
             android:name="SMVBlog"
-            android:hardwareAccelerated="false"></activity>
-        <activity android:label="@string/subjectlist" android:name="SubjectList"></activity>
-        <activity android:name="BlackWhiteList"></activity>
-        <activity android:name="SettingsAdvanced" android:label="@string/settings" android:theme="@android:style/Theme.Holo.Light"></activity>
-        <receiver android:name="UpdateBroadcastReceiver" android:process=":remote" >
-          <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
-          <!-- Receive the actual message -->
-          <intent-filter>
-              <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-              <category android:name="com.lsg.app" />
-          </intent-filter>
-          <!-- Receive the registration id -->
-          <intent-filter>
-              <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-              <category android:name="com.lsg.app" />
-          </intent-filter>
-    </receiver>
-        <activity android:label="@string/app_name" android:name="TimeTable" android:theme="@style/AppTheme">
+            android:hardwareAccelerated="false"
+            android:label="@string/smvblog" >
+        </activity>
+        <activity
+            android:name="SubjectList"
+            android:label="@string/subjectlist" >
+        </activity>
+        <activity android:name="BlackWhiteList" >
+        </activity>
+        <activity
+            android:name="SettingsAdvanced"
+            android:label="@string/settings"
+            android:theme="@android:style/Theme.Holo.Light" >
+        </activity>
+
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.lsg.app" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name="TimeTable"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter></activity>
-        <activity android:label="@string/vplan" android:name="VPlan"></activity>
-        <activity android:label="@string/events" android:name="Events"></activity>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="VPlan"
+            android:label="@string/vplan" >
+        </activity>
+        <activity
+            android:name="Events"
+            android:label="@string/events" >
+        </activity>
+    <service android:name=".GCMIntentService" />
     </application>
+
 
 </manifest>

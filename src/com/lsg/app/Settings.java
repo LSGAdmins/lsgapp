@@ -79,9 +79,9 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	boolean useac2dm = prefs.getBoolean("useac2dm", false);
         	pull(!useac2dm);
         	if(useac2dm)
-        		Functions.registerAC2DM(this);
+        		Functions.registerGCM(this);
         	else
-        		Functions.unregisterAC2DM(this);
+        		Functions.unregisterGCM(this);
         }
         if((key.equals("updatevplanonstart") || key.equals("autopullvplan")) && !prefs.getBoolean("disableAC2DM", false)) {
         	push(!(prefs.getBoolean("autopullvplan", false) || prefs.getBoolean("updatevplanonstart", false)));

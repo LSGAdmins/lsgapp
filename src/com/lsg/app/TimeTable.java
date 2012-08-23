@@ -43,7 +43,6 @@ import android.widget.Toast;
 
 public class TimeTable extends Activity implements SelectedCallback {
 	public static class TimetableAdapter extends CursorAdapter {
-		private SQLiteDatabase myDB;
 
 		class TimetableItem {
 			public LinearLayout lay;
@@ -57,8 +56,6 @@ public class TimeTable extends Activity implements SelectedCallback {
 
 		public TimetableAdapter(Context context, Cursor c) {
 			super(context, c, false);
-			myDB = context.openOrCreateDatabase(Functions.DB_NAME,
-					Context.MODE_PRIVATE, null);
 		}
 
 		@Override
@@ -109,20 +106,14 @@ public class TimeTable extends Activity implements SelectedCallback {
 				when += ", " + Integer.valueOf(hour + i).toString();
 				i++;
 			}
-			/*String rawfach = cursor.getString(cursor
-					.getColumnIndex(Functions.DB_RAW_FACH));
-			String lehrer = cursor.getString(cursor
-					.getColumnIndex(Functions.DB_LEHRER));
-			Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {},
-					Functions.DB_STUNDE + "=? AND " + Functions.DB_RAW_FACH
-							+ "=? AND " + Functions.DB_RAW_LEHRER + "=?",
-					new String[] { Integer.valueOf(hour).toString(), rawfach,
-							lehrer }, null, null, null);
-			if (c.getCount() > 0)
+			if (cursor
+					.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNG)) != null
+					&& cursor.getString(
+							cursor.getColumnIndex(Functions.DB_VERTRETUNG))
+							.equals("true"))
 				holder.lay.setBackgroundResource(R.layout.background_info);
 			else
-				holder.lay.setBackgroundResource(R.layout.background);*/
-
+				holder.lay.setBackgroundResource(R.layout.background);
 			holder.timetable_hour.setText(when + ". "
 					+ context.getString(R.string.hour));
 			holder.timetable_room
@@ -158,10 +149,6 @@ public class TimeTable extends Activity implements SelectedCallback {
 				holder.subtitle.setVisibility(View.GONE);
 			else
 				holder.subtitle.setVisibility(View.VISIBLE);
-		}
-
-		public void close() {
-			myDB.close();
 		}
 	}
 
@@ -347,7 +334,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 					timetable_cursors[i] = myDB.query(
 							Functions.DB_TIME_TABLE_TEACHERS, new String[] {
 									Functions.DB_ROWID,
-									Functions.DB_BREAK_SURVEILLANCE,
+									Functions.DB_BREAK_SURVEILLANCE, Functions.DB_RAW_FACH, Functions.DB_VERTRETUNG,
 									Functions.DB_FACH, Functions.DB_ROOM,
 									Functions.DB_CLASS, Functions.DB_LENGTH,
 									Functions.DB_HOUR, Functions.DB_DAY },
@@ -373,7 +360,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 				exclude_subjects[0] = Integer.valueOf(i).toString();
 				timetable_cursors[i] = myDB.query(Functions.DB_TIME_TABLE,
 						new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-								Functions.DB_FACH, Functions.DB_ROOM,
+								Functions.DB_FACH, Functions.DB_ROOM, Functions.DB_VERTRETUNG,
 								Functions.DB_LENGTH, Functions.DB_HOUR,
 								Functions.DB_DAY, Functions.DB_RAW_FACH },
 						wherecond, exclude_subjects, null, null, null);
@@ -480,7 +467,6 @@ public class TimeTable extends Activity implements SelectedCallback {
 						edit.commit();
 						for(int ii = 1; ii < one_class.length(); ii++) {
 							JSONObject jObject = one_class.getJSONObject(ii);
-							//Log.d("json", jObject.toString());
 							ContentValues values = new ContentValues();
 							values.put(Functions.DB_LEHRER,
 									jObject.getString("teacher"));
@@ -495,27 +481,30 @@ public class TimeTable extends Activity implements SelectedCallback {
 							values.put(Functions.DB_DAY, jObject.getInt("day"));
 							values.put(Functions.DB_HOUR,
 									jObject.getInt("hour"));
-							values.put(Functions.DB_CLASS, jObject.getString("class"));
-							values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawteacher"));
-							Cursor c = myDB.query(Functions.EXCLUDE_TABLE,
-									new String[] { Functions.DB_ROWID },
-									Functions.DB_TEACHER + "=? AND "
-											+ Functions.DB_RAW_FACH
-											+ "=? AND "
-											+ Functions.DB_HOUR
-											+ "=? AND "
-											+ Functions.DB_DAY + "=?",
-									new String[] {
-											values.getAsString(Functions.DB_RAW_LEHRER),
-											values.getAsString(Functions.DB_RAW_FACH),
-											values.getAsString(Functions.DB_HOUR),
-											values.getAsString(Functions.DB_DAY) },
-									null, null, null);
-					c.moveToFirst();
-					if(c.getCount() > 0) {
-						values.put(Functions.DB_DISABLED, 1);
-					} else
-						values.put(Functions.DB_DISABLED, 2);
+							values.put(Functions.DB_CLASS,
+									jObject.getString("class"));
+							values.put(Functions.DB_RAW_LEHRER,
+									jObject.getString("rawteacher"));
+							Cursor c = myDB
+									.query(Functions.EXCLUDE_TABLE,
+											new String[] { Functions.DB_ROWID },
+											Functions.DB_TEACHER + "=? AND "
+													+ Functions.DB_RAW_FACH
+													+ "=? AND "
+													+ Functions.DB_HOUR
+													+ "=? AND "
+													+ Functions.DB_DAY + "=?",
+											new String[] {
+													values.getAsString(Functions.DB_RAW_LEHRER),
+													values.getAsString(Functions.DB_RAW_FACH),
+													values.getAsString(Functions.DB_HOUR),
+													values.getAsString(Functions.DB_DAY) },
+											null, null, null);
+							c.moveToFirst();
+							if (c.getCount() > 0) {
+								values.put(Functions.DB_DISABLED, 1);
+							} else
+								values.put(Functions.DB_DISABLED, 2);
 							myDB.insert(Functions.DB_TIME_TABLE, null, values);
 						}
 					}
@@ -585,6 +574,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 							values.put(Functions.DB_SHORT, short_);
 							values.put(Functions.DB_BREAK_SURVEILLANCE,
 									jObject.getString("pausenaufsicht"));
+							values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
 							values.put(Functions.DB_FACH,
 									jObject.getString("fach"));
 							values.put(Functions.DB_ROOM,

@@ -848,7 +848,7 @@ public class SetupAssistant extends Activity {
 			CheckBox chk = (CheckBox) findViewById(R.id.push_check);
 			edit.putBoolean("useac2dm", chk.isChecked());
 			if (chk.isChecked())
-				Functions.registerAC2DM(this);
+				Functions.registerGCM(this);
 			edit.commit();
 			SendData sd = new SendData(this, prefs);
 			sd.execute();
