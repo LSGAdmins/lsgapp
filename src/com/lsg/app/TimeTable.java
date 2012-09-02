@@ -342,29 +342,30 @@ public class TimeTable extends Activity implements SelectedCallback {
 							new String[] { this.teacher, Integer.valueOf(i).toString() }, null, null, null);
 					timetableadapters[i].changeCursor(timetable_cursors[i]);
 				}
-				return;
-			}
-			exclude_subjects[4] = (ownClass) ? "1" : "%";
-			if (ownClass)
-				exclude_subjects[5] = "%" + klasse.substring(0, 2) + "%"
-						+ klasse.substring(2, 3) + "%";
-			else
-				exclude_subjects[5] = klasse;
-			String wherecond = Functions.DB_DAY + "=? AND  "
-					+ Functions.DB_RAW_FACH + " != ? AND "
-					+ Functions.DB_RAW_FACH + " != ? AND "
-					+ Functions.DB_RAW_FACH + " != ? AND "
-					+ Functions.DB_DISABLED + " != ? AND " + Functions.DB_CLASS
-					+ " LIKE ?";
-			for(int i = 0; i < getCount(); i++) {
-				exclude_subjects[0] = Integer.valueOf(i).toString();
-				timetable_cursors[i] = myDB.query(Functions.DB_TIME_TABLE,
-						new String[] { Functions.DB_ROWID, Functions.DB_LEHRER,
-								Functions.DB_FACH, Functions.DB_ROOM, Functions.DB_VERTRETUNG,
-								Functions.DB_LENGTH, Functions.DB_HOUR,
-								Functions.DB_DAY, Functions.DB_RAW_FACH },
-						wherecond, exclude_subjects, null, null, null);
-				timetableadapters[i].changeCursor(timetable_cursors[i]);
+			} else {
+				exclude_subjects[4] = (this.ownClass) ? "1" : "%";
+				if (ownClass)
+					exclude_subjects[5] = "%" + klasse.substring(0, 2) + "%"
+							+ klasse.substring(2, 3) + "%";
+				else
+					exclude_subjects[5] = klasse;
+				String wherecond = Functions.DB_DAY + "=? AND  "
+						+ Functions.DB_RAW_FACH + " != ? AND "
+						+ Functions.DB_RAW_FACH + " != ? AND "
+						+ Functions.DB_RAW_FACH + " != ? AND "
+						+ Functions.DB_DISABLED + " != ? AND "
+						+ Functions.DB_CLASS + " LIKE ?";
+				for (int i = 0; i < getCount(); i++) {
+					exclude_subjects[0] = Integer.valueOf(i).toString();
+					timetable_cursors[i] = myDB.query(Functions.DB_TIME_TABLE,
+							new String[] { Functions.DB_ROWID,
+									Functions.DB_LEHRER, Functions.DB_FACH,
+									Functions.DB_ROOM, Functions.DB_VERTRETUNG,
+									Functions.DB_LENGTH, Functions.DB_HOUR,
+									Functions.DB_DAY, Functions.DB_RAW_FACH },
+							wherecond, exclude_subjects, null, null, null);
+					timetableadapters[i].changeCursor(timetable_cursors[i]);
+				}
 			}
 		}
 

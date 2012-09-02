@@ -13,6 +13,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -128,10 +132,6 @@ public class SlideMenu {
     	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
     	parm.setMargins(menuSize, 0, -menuSize, 0);
     	content.setLayoutParams(parm);
-    	TranslateAnimation ta = new TranslateAnimation(-menuSize, 0, 0, 0);
-    	ta.setDuration(500);
-    	if(animate)
-    		content.startAnimation(ta);
     	parent = (FrameLayout) content.getParent();
     	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	menu = inflater.inflate(R.layout.menu, null);
@@ -165,8 +165,6 @@ public class SlideMenu {
 					}
 				}
 			});
-    	if(animate)
-    		menu.startAnimation(ta);
     	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
     		@Override
     		public void onClick(View v) {
@@ -177,12 +175,45 @@ public class SlideMenu {
     	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
     	try {    		
     		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(false);
-    		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(false);
-    	} catch(Exception e) {
-    		//no viewpager to disable :)
-    	}
-    	menuShown = true;
-    	this.fill();
+			((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs))
+					.setNavEnabled(false);
+		} catch (Exception e) {
+			// no viewpager to disable :)
+		}
+
+		TranslateAnimation slideoutanim = new TranslateAnimation(-menuSize, 0,
+				0, 0);
+		slideoutanim.setDuration(500);
+		if (animate) {
+			TranslateAnimation slideinanim = new TranslateAnimation(
+					
+					-(menuSize / 2), 0, 0, 0);
+			slideinanim.setDuration(500);
+			menu.startAnimation(slideinanim);
+			content.startAnimation(slideoutanim);
+
+			content.setBackgroundResource(R.layout.background);
+			content.bringToFront();
+			slideinanim.setAnimationListener(new AnimationListener() {
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					// to enable view that is clicked for slide-back
+					menu.bringToFront();
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+					// not needed here
+				}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					// not needed here
+				}
+			});
+		}
+		menuShown = true;
+		this.fill();
 	}
 	public void fill() {
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
@@ -225,27 +256,32 @@ public class SlideMenu {
 			items[1].action = Events.class;
 			items[2].icon = R.drawable.ic_launcher;
 			items[2].label = "SMVBlog";
-			items[2].action = SMVBlog.class;/*
-			items[4].icon = R.drawable.ic_launcher;
-			items[4].label = "Einstellungen";
-			items[4].action = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
-					: Settings.class;*/
+			items[2].action = SMVBlog.class;
 		}
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
 	}
 	public void hide() {
-		TranslateAnimation ta = new TranslateAnimation(0, -menuSize, 0, 0);
-		ta.setDuration(500);
-		menu.startAnimation(ta);
+    	//contentToFront(null, false);
+		AnimationSet menuAnimations = new AnimationSet(true);
+		menuAnimations.setDuration(500);
+		AlphaAnimation menuFadeOut = new AlphaAnimation(1.0F, 0.0F);
+		menuFadeOut.setDuration(500);
+		TranslateAnimation menuSlideOut = new TranslateAnimation(0, -(menuSize / 3), 0, 0);
+		menuSlideOut.setDuration(500);
+		menuAnimations.addAnimation(menuFadeOut);
+		menuAnimations.addAnimation(menuSlideOut);
+		menu.startAnimation(menuAnimations);
 		parent.removeView(menu);
 		
-		TranslateAnimation tra = new TranslateAnimation(menuSize, 0, 0, 0);
-		tra.setDuration(500);
-		content.startAnimation(tra);
+		TranslateAnimation content_in = new TranslateAnimation(menuSize, 0, 0, 0);
+		content_in.setDuration(500);
+		content.startAnimation(content_in);
+		//((LinearLayout) act.findViewById(android.R.id.content).getParent()).bringToFront();
 		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
     	parm.setMargins(0, 0, 0, 0);
     	content.setLayoutParams(parm);
+    	
     	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
     	try {
     		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
