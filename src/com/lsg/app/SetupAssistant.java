@@ -19,6 +19,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -49,265 +50,7 @@ public class SetupAssistant extends Activity {
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor edit;
 
-	class CommonData {
-		Context context;
-
-		CommonData(Context c) {
-			context = c;
-		}
-
-		public String[] updateSubjectList() {
-			SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(context);
-			String add = "";
-			try {
-				add = "&"
-						+ URLEncoder.encode("date", "UTF-8")
-						+ "="
-						+ URLEncoder.encode(
-								prefs.getString("subject_update_time", ""),
-								"UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				Log.d("encoding", e.getMessage());
-			}
-			String get = Functions.getData(Functions.SUBJECT_URL, context,
-					true, add);
-			if (!get.equals("networkerror") && !get.equals("loginerror")
-					&& !get.equals("noupdate")) {
-				try {
-					JSONArray jArray = new JSONArray(get);
-					int i = 0;
-					SQLiteDatabase myDB = context.openOrCreateDatabase(
-							Functions.DB_NAME, Context.MODE_PRIVATE, null);
-					myDB.delete(Functions.DB_SUBJECT_TABLE, null, null); // clear
-																			// subjectlist
-					while (i < jArray.length() - 1) {
-						JSONObject jObject = jArray.getJSONObject(i);
-						ContentValues values = new ContentValues();
-						values.put(Functions.DB_RAW_FACH,
-								jObject.getString("kuerzel"));
-						values.put(Functions.DB_FACH, jObject.getString("name"));
-						myDB.insert(Functions.DB_SUBJECT_TABLE, null, values);
-						i++;
-					}
-					JSONObject jObject = jArray.getJSONObject(i);
-					String update_time = jObject.getString("update_time");
-					SharedPreferences.Editor edit = prefs.edit();
-					edit.putString("subject_update_time", update_time);
-					edit.commit();
-					myDB.close();
-				} catch (JSONException e) {
-					Log.d("json", e.getMessage());
-					return new String[] { "json",
-							context.getString(R.string.jsonerror) };
-				}
-			} else if (get.equals("networkerror"))
-				return new String[] { "networkerror",
-						context.getString(R.string.networkerror) };
-			else if (get.equals("loginerror"))
-				return new String[] { "loginerror",
-						context.getString(R.string.loginerror) };
-			return new String[] { "success", "" };
-		}
-
-		public boolean getClasses() {
-			SQLiteDatabase myDB = context.openOrCreateDatabase(
-					Functions.DB_NAME, Context.MODE_PRIVATE, null);
-			SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(context);
-			try {
-				String get = Functions.getData(Functions.CLASS_URL, context,
-						true, "");
-				Log.d("classes", get);
-				if (!get.equals("loginerror")) {
-					JSONArray jArray = new JSONArray(get);
-					int i = 0;
-					myDB.delete(Functions.DB_CLASS_TABLE, null, null);
-					while (i < jArray.length() - 1) {
-						ContentValues vals = new ContentValues();
-						vals.put(Functions.DB_CLASS, jArray.getString(i));
-						myDB.insert(Functions.DB_CLASS_TABLE, null, vals);
-						i++;
-					}
-					SharedPreferences.Editor editor = prefs.edit();
-					editor.putString("class", jArray.getString(i));
-					editor.commit();
-					myDB.close();
-				} else {
-					myDB.close();
-					return false;
-				}
-			} catch (Exception e) {
-				myDB.close();
-				Log.d("getClass()", e.getMessage());
-			}
-			return true;
-		}
-	}
-
-	class CommonDataTask extends AsyncTask<Void, Void, String[]> {
-		protected void onPreExecute() {
-			super.onPreExecute();
-			Functions.lockRotation(SetupAssistant.this);
-			loading = ProgressDialog.show(SetupAssistant.this, "",
-					SetupAssistant.this.getString(R.string.loading_common_data));
-		}
-
-		@Override
-		protected String[] doInBackground(Void... params) {
-			CommonData cd = new CommonData(SetupAssistant.this);
-			boolean login = cd.getClasses();
-			String res[] = cd.updateSubjectList();
-			if (!login) {
-				res[0] = "loginerror";
-				res[1] = SetupAssistant.this.getString(R.string.loginerror);
-			}
-			return res;
-		}
-
-		protected void onPostExecute(final String[] res) {
-			loading.cancel();
-			if (!res[0].equals("success"))
-				Toast.makeText(SetupAssistant.this, res[1], Toast.LENGTH_LONG).show();
-			if (res[0].equals("loginerror")) {
-				Intent intent;
-				if (Functions.getSDK() >= 11)
-					intent = new Intent(SetupAssistant.this, SettingsAdvanced.class);
-				else
-					intent = new Intent(SetupAssistant.this, Settings.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-				SetupAssistant.this.startActivity(intent);
-			} else if (res[0].equals("success")) {
-				if (prefs.getString(Functions.FULL_CLASS, "-1").equals("-1")
-						|| !prefs.getString(Functions.FULL_CLASS, "").contains(
-								prefs.getString(Functions.class_key, "-1"))) {
-					SQLiteDatabase myDB = openOrCreateDatabase(
-							Functions.DB_NAME, MODE_PRIVATE, null);
-					myDB.delete(Functions.DB_TIME_TABLE, null, null);
-					SQLiteStatement num_rows = myDB
-							.compileStatement("SELECT COUNT(*) FROM "
-									+ Functions.DB_CLASS_TABLE);
-					long count = num_rows.simpleQueryForLong();
-					num_rows.close();
-					Cursor cur = myDB.query(Functions.DB_CLASS_TABLE,
-							new String[] { Functions.DB_CLASS },
-							Functions.DB_CLASS + " LIKE ?", new String[] { "%"
-									+ prefs.getString("class", "")
-											.toLowerCase() + "%" }, null, null,
-							null);
-					cur.moveToFirst();
-					if (count == 1) {
-						edit.putString(Functions.FULL_CLASS, cur.getString(cur
-								.getColumnIndex(Functions.DB_CLASS)));
-						edit.commit();
-						myDB.close();
-						cur.close();
-					} else if (count > 1) {
-						final CharSequence[] items = new CharSequence[cur
-								.getCount()];
-						int i = 0;
-						while (i < cur.getCount()) {
-							items[i] = cur.getString(cur
-									.getColumnIndex(Functions.DB_CLASS));
-							i++;
-							cur.moveToNext();
-						}
-						AlertDialog.Builder builder = new AlertDialog.Builder(
-								SetupAssistant.this);
-						builder.setTitle(R.string.your_class);
-						builder.setItems(items,
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int item) {
-										edit.putString(Functions.FULL_CLASS,
-												(String) items[item]);
-										edit.commit();
-									}
-								});
-						AlertDialog alert = builder.create();
-						alert.show();
-						myDB.close();
-						cur.close();
-					}
-				}
-			}
-			Functions.unlockRotation(SetupAssistant.this);
-		}
-	}
-
-	class UpdateCheckTask extends AsyncTask<Void, Void, String[]> {
-		protected void onPreExecute() {
-			super.onPreExecute();
-		}
-
-		@Override
-		protected String[] doInBackground(Void... params) {
-			String get = Functions.getData(Functions.UPDATE_CHECK_URL
-					+ getString(R.string.versionname), SetupAssistant.this, false, "");
-			try {
-				JSONObject jObject = new JSONObject(get);
-				if (!jObject.getBoolean("act")) {
-					return new String[] { "notact",
-							jObject.getString("actversion"),
-							jObject.getString("changelog") };
-				} else
-					return new String[] { "act" };
-			} catch (JSONException e) {
-				Log.d("json", e.getMessage());
-				Log.d("asdf", e.getMessage());
-			}
-			return new String[] { "act" };
-		}
-
-		protected void onPostExecute(final String[] data) {
-			if (data[0].equals("notact")) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						SetupAssistant.this);
-				builder.setMessage(
-						getString(R.string.update_available) + '\n' + data[1]
-								+ ": " + '\n' + data[2])
-						.setCancelable(false)
-						.setPositiveButton(getString(R.string.update),
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										Toast.makeText(
-												SetupAssistant.this,
-												getString(R.string.downloading),
-												Toast.LENGTH_LONG).show();
-										if (Functions.getSDK() >= 11) { // could
-																		// also
-																		// be 9,
-																		// but
-																		// there
-																		// are
-																		// some
-																		// failed
-																		// downloads
-																		// on
-																		// sgs2
-											down.download();
-										} else {
-											Intent intent = new Intent(
-													Intent.ACTION_VIEW);
-											intent.setData(Uri
-													.parse(Functions.UPDATE_URL));
-											startActivity(intent);
-										}
-									}
-								})
-						.setNegativeButton(getString(R.string.no_update),
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.cancel();
-									}
-								});
-				AlertDialog alert = builder.create();
-				alert.show();
-			}
-		}
-	}
+	
 
 	class LoginTest extends AsyncTask<Void, Void, String> {
 		Context context;
@@ -384,11 +127,16 @@ public class SetupAssistant extends Activity {
 				gender = jarr.getString("gender").charAt(0);
 				religion = jarr.getString("religion");
 				usr_class = jarr.getString("class");
+				pupil = jarr.getBoolean("pupil");
+				teacher = jarr.getBoolean("teacher");
+				admin = jarr.getBoolean("admin");
 				JSONArray json_cls = jarr.getJSONArray("classes");
 				classes = new String[json_cls.length()];
 				for (int i = 0; i < json_cls.length(); i++)
 					classes[i] = json_cls.getString(i);
 			} catch (Exception e) {
+				Log.d("e", e.getMessage());
+				e.printStackTrace();
 			}
 			dataUser = prefs.getString("username", "");
 			setVPlanData();
@@ -447,7 +195,14 @@ public class SetupAssistant extends Activity {
 		protected void onPostExecute(Boolean parm) {
 			super.onPostExecute(parm);
 			loading.cancel();
-			step += 1;
+			if (!prefs.getString(Functions.FULL_CLASS, "null").equals("null"))
+				step += 1;
+			else {
+
+				edit.putBoolean(Functions.IS_LOGGED_IN, true);
+				edit.commit();
+				startActivity(new Intent(SetupAssistant.this, TimeTable.class));
+			}
 			setup(step, false);
 		}
 	}
@@ -469,6 +224,8 @@ public class SetupAssistant extends Activity {
 			ArrayList<Integer[]> conflicts = new ArrayList<Integer[]>();
 			TimeTableUpdater upd = new TimeTableUpdater(SetupAssistant.this);
 			upd.updatePupils();
+			if(teacher || admin)
+				upd.updateTeachers();
 			SQLiteDatabase myDB = context.openOrCreateDatabase(
 					Functions.DB_NAME, Context.MODE_PRIVATE, null);
 			for (int day = 0; day < 7; day++) {
@@ -569,6 +326,9 @@ public class SetupAssistant extends Activity {
 	private static int step = 0;
 	private static boolean loginsuccess = false;
 	private static char gender = '0';
+	private static boolean pupil = false;
+	private static boolean teacher = false;
+	private static boolean admin = false;
 	private static String religion = null;
 	private static String dataUser = null;
 	private static String[] classes;
@@ -700,23 +460,43 @@ public class SetupAssistant extends Activity {
 		else
 			genderrg.check(R.id.female);
 		RadioGroup religionrg = (RadioGroup) findViewById(R.id.religiongroup);
+		Log.d("religion", religion);
 		if (religion.equals("K"))
 			religionrg.check(R.id.catholic);
 		else if (religion.equals("Ev"))
 			religionrg.check(R.id.protestant);
 		else if (religion.equals("Eth"))
 			religionrg.check(R.id.ethics);
-		RadioButton[] rb = new RadioButton[classes.length];
-		for (int i = 0; i < classes.length; i++) {
-			rb[i] = new RadioButton(this);
-			rb[i].setText(classes[i]);
-			rb[i].setId(i);
-			if (classes[i].equals(usr_class))
-				rb[i].toggle();
-		}
+
 		RadioGroup classrg = (RadioGroup) findViewById(R.id.classgroup);
-		for (int i = 0; i < classes.length; i++)
-			classrg.addView(rb[i], i);
+		if (classes != null) {
+			RadioButton[] rb = new RadioButton[classes.length];
+			for (int i = 0; i < classes.length; i++) {
+				rb[i] = new RadioButton(this);
+				rb[i].setText(classes[i]);
+				rb[i].setId(i);
+				if (classes[i].equals(usr_class))
+					rb[i].toggle();
+			}
+			for (int i = 0; i < classes.length; i++)
+				classrg.addView(rb[i], i);
+		} else {
+			classrg.setVisibility(View.GONE);
+			findViewById(R.id.classtext).setVisibility(View.GONE);
+		}
+		//strike through non-available permissions
+		TextView tv = ((TextView) findViewById(R.id.pupil));
+		tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+		if (pupil)
+			tv.setPaintFlags(tv.getPaintFlags() ^ Paint.STRIKE_THRU_TEXT_FLAG);
+		tv = ((TextView) findViewById(R.id.teacher));
+		tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+		if (teacher)
+			tv.setPaintFlags(tv.getPaintFlags() ^ Paint.STRIKE_THRU_TEXT_FLAG);
+		tv = ((TextView) findViewById(R.id.admin));
+		tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+		if (admin)
+			tv.setPaintFlags(tv.getPaintFlags() ^ Paint.STRIKE_THRU_TEXT_FLAG);
 	}
 
 	public void setupTimeTable() {
@@ -843,12 +623,20 @@ public class SetupAssistant extends Activity {
 			edit.putString(Functions.GENDER, (genderrg
 					.getCheckedRadioButtonId() == R.id.female) ? "w" : "m");
 			RadioGroup classrg = (RadioGroup) findViewById(R.id.classgroup);
-			edit.putString(Functions.FULL_CLASS,
-					classes[classrg.getCheckedRadioButtonId()]);
+			try {
+				edit.putString(Functions.FULL_CLASS,
+						classes[classrg.getCheckedRadioButtonId()]);
+			} catch (NullPointerException e) {
+				// user doesn't have a class
+				edit.putString(Functions.FULL_CLASS, "null");
+			}
 			CheckBox chk = (CheckBox) findViewById(R.id.push_check);
 			edit.putBoolean("useac2dm", chk.isChecked());
 			if (chk.isChecked())
 				Functions.registerGCM(this);
+			edit.putBoolean("pupil", pupil);
+			edit.putBoolean("teacher", teacher);
+			edit.putBoolean("admin", admin);
 			edit.commit();
 			SendData sd = new SendData(this, prefs);
 			sd.execute();
@@ -964,8 +752,8 @@ public class SetupAssistant extends Activity {
 			startActivity(about);
 			return true;
 		case R.id.refresh:
-			CommonDataTask cdt = new CommonDataTask();
-			cdt.execute();
+			/*CommonDataTask cdt = new CommonDataTask();
+			cdt.execute();*/
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

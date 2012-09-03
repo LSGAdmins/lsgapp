@@ -462,9 +462,6 @@ public class TimeTable extends Activity implements SelectedCallback {
 						headerval.put(Functions.DB_SECOND_TEACHER, two);
 						headerval.put(Functions.DB_KLASSE, klasse);
 						myDB.insert(Functions.DB_TIME_TABLE_HEADERS_PUPILS, null, headerval);
-						edit.putString("timetable_one", one);
-						edit.putString("timetable_two", two);
-						edit.putString("timetable_klasse", klasse);
 						edit.commit();
 						for(int ii = 1; ii < one_class.length(); ii++) {
 							JSONObject jObject = one_class.getJSONObject(ii);
@@ -649,9 +646,15 @@ public class TimeTable extends Activity implements SelectedCallback {
 	public void onCreate(Bundle savedInstanceState) {
 		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);
-		if(!((SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this)).getBoolean(Functions.IS_LOGGED_IN, false)) {
-			if(!((SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this)).getString("username", "null").equals("null")) {
-				Toast.makeText(this, getString(R.string.setup_assistant_opening), Toast.LENGTH_LONG).show();
+		if (!((SharedPreferences) PreferenceManager
+				.getDefaultSharedPreferences(this)).getBoolean(
+				Functions.IS_LOGGED_IN, false)) {
+			if (!((SharedPreferences) PreferenceManager
+					.getDefaultSharedPreferences(this)).getString("username",
+					"null").equals("null")) {
+				Toast.makeText(this,
+						getString(R.string.setup_assistant_opening),
+						Toast.LENGTH_LONG).show();
 				startActivity(new Intent(TimeTable.this, SetupAssistant.class));
 			} else {
 				Toast.makeText(this, getString(R.string.run_setup_assistant),
@@ -699,7 +702,11 @@ public class TimeTable extends Activity implements SelectedCallback {
 		pager.setCurrentItem(day, true);
 		slidemenu = new SlideMenu(this, TimeTable.class);
 		slidemenu.checkEnabled();
-		if(Functions.getSDK() >= 11) {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		if (Functions.getSDK() >= 11
+				&& (prefs.getBoolean("teacher", false) || prefs.getBoolean(
+						"pupil", false))) {
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.dropDownNav(this, R.array.timetable_actions, this, 0);
 		}
@@ -711,36 +718,55 @@ public class TimeTable extends Activity implements SelectedCallback {
 		viewpageradap.setClass("", true);
 		viewpageradap.updateCursor();
 	}
+
 	public void showClasses() {
 		footer.setVisibility(View.VISIBLE);
-		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_PUPILS, new String[] {Functions.DB_ROWID, Functions.DB_KLASSE}, null, null, null, null, null);
+		final SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME,
+				Context.MODE_PRIVATE, null);
+		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_PUPILS,
+				new String[] { Functions.DB_ROWID, Functions.DB_KLASSE }, null,
+				null, null, null, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(TimeTable.this);
 		builder.setTitle(R.string.select_class);
 		builder.setCursor(c, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	c.moveToPosition(item);
-		        viewpageradap.setClass(c.getString(c.getColumnIndex(Functions.DB_KLASSE)), false);
-		        ((TextView) findViewById(R.id.footer_text)).setText(c.getString(c.getColumnIndex(Functions.DB_KLASSE)));
-		        viewpageradap.updateCursor();
-		    }}, Functions.DB_KLASSE);
+			public void onClick(DialogInterface dialog, int item) {
+				c.moveToPosition(item);
+				viewpageradap.setClass(
+						c.getString(c.getColumnIndex(Functions.DB_KLASSE)),
+						false);
+				((TextView) findViewById(R.id.footer_text)).setText(c
+						.getString(c.getColumnIndex(Functions.DB_KLASSE)));
+				viewpageradap.updateCursor();
+				c.close();
+				myDB.close();
+			}
+		}, Functions.DB_KLASSE);
 		builder.setCancelable(false);
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
+
 	public void showTeachers() {
 		footer.setVisibility(View.VISIBLE);
-		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, new String[] {Functions.DB_ROWID, Functions.DB_TEACHER, Functions.DB_SHORT}, null, null, null, null, null);
+		final SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME,
+				Context.MODE_PRIVATE, null);
+		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_TEACHERS,
+				new String[] { Functions.DB_ROWID, Functions.DB_TEACHER,
+						Functions.DB_SHORT }, null, null, null, null, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(TimeTable.this);
 		builder.setTitle(R.string.select_teacher);
 		builder.setCursor(c, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	c.moveToPosition(item);
-		        viewpageradap.setTeacher(c.getString(c.getColumnIndex(Functions.DB_SHORT)));
-		        ((TextView) findViewById(R.id.footer_text)).setText(c.getString(c.getColumnIndex(Functions.DB_TEACHER)));
-		        viewpageradap.updateCursor();
-		    }}, Functions.DB_TEACHER);
+			public void onClick(DialogInterface dialog, int item) {
+				c.moveToPosition(item);
+				viewpageradap.setTeacher(c.getString(c
+						.getColumnIndex(Functions.DB_SHORT)));
+				((TextView) findViewById(R.id.footer_text)).setText(c
+						.getString(c.getColumnIndex(Functions.DB_TEACHER)));
+				viewpageradap.updateCursor();
+				c.close();
+				myDB.close();
+			}
+		}, Functions.DB_TEACHER);
 		builder.setCancelable(false);
 		AlertDialog alert = builder.create();
 		alert.show();
@@ -822,7 +848,6 @@ public class TimeTable extends Activity implements SelectedCallback {
 	  savedInstanceState.putInt("navlistselected", selPos);
 	  savedInstanceState.putBoolean("ownclass", viewpageradap.ownClass);
 	  savedInstanceState.putString("selclass", viewpageradap.klasse);
-	  Log.d("save", "onsaveinstancestate");
 	}
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
