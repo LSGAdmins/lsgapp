@@ -1,12 +1,25 @@
 package com.lsg.app;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ListActivity;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -15,10 +28,68 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
+	public static class SubjectListUpdater {
+		Context context;
+		SubjectListUpdater(Context c) {
+			context = c;
+		}
+		public String[] updateSubjectList() {
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(context);
+			String add = "";
+			try {
+				add = "&"
+						+ URLEncoder.encode("date", "UTF-8")
+						+ "="
+						+ URLEncoder.encode(
+								prefs.getString("subject_update_time", ""),
+								"UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				Log.d("encoding", e.getMessage());
+			}
+			String get = Functions.getData(Functions.SUBJECT_URL, context,
+					true, add);
+			if (!get.equals("networkerror") && !get.equals("loginerror")
+					&& !get.equals("noupdate")) {
+				try {
+					JSONArray jArray = new JSONArray(get);
+					int i = 0;
+					SQLiteDatabase myDB = context.openOrCreateDatabase(
+							Functions.DB_NAME, Context.MODE_PRIVATE, null);
+					myDB.delete(Functions.DB_SUBJECT_TABLE, null, null); // clear
+																			// subjectlist
+					while (i < jArray.length() - 1) {
+						JSONObject jObject = jArray.getJSONObject(i);
+						ContentValues values = new ContentValues();
+						values.put(Functions.DB_RAW_FACH,
+								jObject.getString("kuerzel"));
+						values.put(Functions.DB_FACH, jObject.getString("name"));
+						myDB.insert(Functions.DB_SUBJECT_TABLE, null, values);
+						i++;
+					}
+					JSONObject jObject = jArray.getJSONObject(i);
+					String update_time = jObject.getString("update_time");
+					SharedPreferences.Editor edit = prefs.edit();
+					edit.putString("subject_update_time", update_time);
+					edit.commit();
+					myDB.close();
+				} catch (JSONException e) {
+					Log.d("json", e.getMessage());
+					return new String[] { "json",
+							context.getString(R.string.jsonerror) };
+				}
+			} else if (get.equals("networkerror"))
+				return new String[] { "networkerror",
+						context.getString(R.string.networkerror) };
+			else if (get.equals("loginerror"))
+				return new String[] { "loginerror",
+						context.getString(R.string.loginerror) };
+			return new String[] { "success", "" };
+		}
+	}
 	private Cursor c;
 	private SimpleCursorAdapter adap;
 	private SQLiteDatabase myDB;

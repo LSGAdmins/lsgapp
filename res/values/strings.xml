@@ -145,4 +145,6 @@
     <string name="pupil">Schüler</string>
     <string name="teacher">Lehrer</string>
     <string name="admin">Admin</string>
+    <string name="teacher_short">Kürzel</string>
+    <string name="select_short">Kürzel auswählen</string>
 </resources>

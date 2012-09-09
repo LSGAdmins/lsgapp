@@ -130,6 +130,7 @@ public class Functions {
 	// for teachers
 	public static final String DB_TIME_TABLE_HEADERS_TEACHERS = "tt_headers_teacher";
 	public static final String DB_SHORT = "short";
+	public static final String TEACHER_SHORT = DB_SHORT;
 	// classes
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
@@ -146,6 +147,10 @@ public class Functions {
 	public static final int TYPE_PAGE             = 0;
 	public static final int TYPE_INFO             = 1;
 	public static final String IS_LOGGED_IN       = "isloggedin";
+	//rights
+	public static final String RIGHTS_PUPIL = "pupil";
+	public static final String RIGHTS_TEACHER = "teacher";
+	public static final String RIGHTS_ADMIN = "admin";
 	
 	/**
 	 * set holo theme in android 4

@@ -147,7 +147,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 					Functions.DB_FACH }, null, null, null, null, null);
 
 			adap = new SimpleCursorAdapter(getActivity(),
-					R.layout.main_listitem_black, c,
+					R.layout.main_listitem, c,
 					new String[] { Functions.DB_FACH },
 					new int[] { R.id.main_textview }, 0);
 			setListAdapter(adap);

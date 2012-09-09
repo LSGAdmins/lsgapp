@@ -167,7 +167,12 @@ public class TimeTable extends Activity implements SelectedCallback {
 
 		public TimeTableViewPagerAdapter(TimeTable act) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
-			setClass("", true);
+			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
+				Log.d("teacher", prefs.getString(Functions.TEACHER_SHORT, ""));
+				setTeacher(prefs.getString(Functions.TEACHER_SHORT, ""));
+			}
+			else
+				setClass("", true);
 			context = (Context) act;
 			titles = getResources().getStringArray(R.array.days);
 
@@ -498,11 +503,12 @@ public class TimeTable extends Activity implements SelectedCallback {
 													values.getAsString(Functions.DB_HOUR),
 													values.getAsString(Functions.DB_DAY) },
 											null, null, null);
-							c.moveToFirst();
+//							c.moveToFirst();
 							if (c.getCount() > 0) {
 								values.put(Functions.DB_DISABLED, 1);
 							} else
 								values.put(Functions.DB_DISABLED, 2);
+							c.close();
 							myDB.insert(Functions.DB_TIME_TABLE, null, values);
 						}
 					}
@@ -602,7 +608,46 @@ public class TimeTable extends Activity implements SelectedCallback {
 		}
 	}
 
-	public class TimeTableUpdateTask extends AsyncTask<Void, Void, String[]> {
+	public static void blacklistTimeTable(Context context) {
+		Log.d("timetable", "blacklisttimetable");
+		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
+				Context.MODE_PRIVATE, null);
+		Cursor allSubjects = myDB.query(Functions.DB_TIME_TABLE, new String[] { Functions.DB_ROWID,
+				Functions.DB_DAY, Functions.DB_HOUR, Functions.DB_RAW_FACH,
+				Functions.DB_RAW_LEHRER }, null, null, null, null, null);
+		allSubjects.moveToFirst();
+		ContentValues vals = new ContentValues();
+		vals.put(Functions.DB_DISABLED, 2);
+		myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
+		do {
+			Cursor exclude = myDB.query(
+					Functions.EXCLUDE_TABLE,
+					new String[] { Functions.DB_ROWID },
+					Functions.DB_TEACHER + "=? AND " + Functions.DB_RAW_FACH
+							+ "=? AND " + Functions.DB_HOUR + "=? AND "
+							+ Functions.DB_DAY + "=?",
+					new String[] { allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_RAW_LEHRER)),
+							allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_RAW_FACH)),
+							allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_HOUR)),
+							allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_DAY)) }, null, null,
+					null);
+			if (exclude.getCount() > 0) {
+				myDB.execSQL("UPDATE " + Functions.DB_TIME_TABLE + " SET "
+						+ Functions.DB_DISABLED + "=? WHERE " + Functions.DB_ROWID + "=?",
+						new String[] { "1", allSubjects.getString(allSubjects
+								.getColumnIndex(Functions.DB_ROWID)) });
+			} /*else
+				myDB.execSQL("UPDATE " + Functions.DB_TIME_TABLE + " SET "
+						+ Functions.DB_DISABLED + "=? WHERE " + Functions.DB_ROWID + "=?",
+						new String[] { "2", allSubjects.getString(allSubjects
+								.getColumnIndex(Functions.DB_ROWID)) });*/
+			exclude.close();
+		} while (allSubjects.moveToNext());
+		allSubjects.close();
+		myDB.close();
+	}
+
+	public class TimeTableUpdateTask extends AsyncTask<Void, Void, Void> {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			Functions.lockRotation(TimeTable.this);
@@ -611,15 +656,22 @@ public class TimeTable extends Activity implements SelectedCallback {
 		}
 
 		@Override
-		protected String[] doInBackground(Void... params) {
+		protected Void doInBackground(Void... params) {
 			TimeTableUpdater upd = new TimeTableUpdater(TimeTable.this);
 			upd.updateTeachers();
-			return upd.updatePupils();
+			upd.updatePupils();
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			Log.d("teacher", new Boolean(prefs.getBoolean(Functions.RIGHTS_TEACHER, false)).toString());
+			if(!prefs.getBoolean(Functions.RIGHTS_TEACHER, false))
+				blacklistTimeTable(getApplicationContext());
+			return null;
 		}
 
-		protected void onPostExecute(String[] res) {
+		protected void onPostExecute(Void res) {
+			super.onPostExecute(res);
+			Log.d("asdf", "postexecute");
 			loading.cancel();
-			if (!res[0].equals("success"))
+			/*if (!res[0].equals("success"))
 				Toast.makeText(TimeTable.this, res[1], Toast.LENGTH_LONG)
 						.show();
 			if (res[0].equals("loginerror")) {
@@ -630,7 +682,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 					intent = new Intent(TimeTable.this, Settings.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 				TimeTable.this.startActivity(intent);
-			}
+			}*/
 			viewpageradap.updateCursor();
 			Functions.unlockRotation(TimeTable.this);
 		}
@@ -715,8 +767,14 @@ public class TimeTable extends Activity implements SelectedCallback {
 	}
 	public void showMine() {
 		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);
-		viewpageradap.setClass("", true);
-		viewpageradap.updateCursor();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
+			viewpageradap.setTeacher(prefs.getString(Functions.TEACHER_SHORT, ""));
+			viewpageradap.updateCursor();
+		} else {
+			viewpageradap.setClass("", true);
+			viewpageradap.updateCursor();
+		}
 	}
 
 	public void showClasses() {

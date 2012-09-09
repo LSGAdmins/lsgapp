@@ -1,26 +1,23 @@
 package com.lsg.app;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -40,8 +37,8 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.lsg.app.TimeTable.TimeTableUpdater;
 
@@ -49,8 +46,6 @@ public class SetupAssistant extends Activity {
 	Download down;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor edit;
-
-	
 
 	class LoginTest extends AsyncTask<Void, Void, String> {
 		Context context;
@@ -121,7 +116,6 @@ public class SetupAssistant extends Activity {
 		@Override
 		protected void onPostExecute(String data) {
 			super.onPostExecute(data);
-			loading.cancel();
 			try {
 				JSONObject jarr = new JSONObject(data);
 				gender = jarr.getString("gender").charAt(0);
@@ -130,6 +124,7 @@ public class SetupAssistant extends Activity {
 				pupil = jarr.getBoolean("pupil");
 				teacher = jarr.getBoolean("teacher");
 				admin = jarr.getBoolean("admin");
+				teacher_short = jarr.getString("short");
 				JSONArray json_cls = jarr.getJSONArray("classes");
 				classes = new String[json_cls.length()];
 				for (int i = 0; i < json_cls.length(); i++)
@@ -139,8 +134,31 @@ public class SetupAssistant extends Activity {
 				e.printStackTrace();
 			}
 			dataUser = prefs.getString("username", "");
-			setVPlanData();
+			if (!teacher) {
+				loading.cancel();
+				setVPlanData();
+			}
+			else {
+				RetrieveTeacherVPlan rtv = new RetrieveTeacherVPlan();
+				rtv.execute();
+			}
 		}
+	}
+	
+	class RetrieveTeacherVPlan extends AsyncTask <Void, Void, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+			TimeTable.TimeTableUpdater upd = new TimeTable.TimeTableUpdater(getApplicationContext());
+			upd.updateTeachers();
+			return null;
+		}
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			loading.cancel();
+			setVPlanTeacherData();
+		}
+		
 	}
 
 	class SendData extends AsyncTask<Void, Void, Boolean> {
@@ -184,10 +202,11 @@ public class SetupAssistant extends Activity {
 										+ "="
 										+ URLEncoder.encode(prefs.getString(
 												Functions.RELIGION, ""),
-												"UTF-8"));
+												"UTF-8") + "&" + URLEncoder.encode("short", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.TEACHER_SHORT, ""), "UTF-8"));
 			} catch (Exception e) {
 			}
 			Log.d("res", res);
+			Log.d("res", usr_class);
 			return res.equals("success");
 		}
 
@@ -221,27 +240,38 @@ public class SetupAssistant extends Activity {
 
 		@Override
 		protected ArrayList<Integer[]> doInBackground(Void... params) {
+			SubjectList.SubjectListUpdater supdater = new SubjectList.SubjectListUpdater(
+					context);
+			supdater.updateSubjectList();
 			ArrayList<Integer[]> conflicts = new ArrayList<Integer[]>();
 			TimeTableUpdater upd = new TimeTableUpdater(SetupAssistant.this);
 			upd.updatePupils();
-			if(teacher || admin)
+			if (teacher || admin)
 				upd.updateTeachers();
 			SQLiteDatabase myDB = context.openOrCreateDatabase(
 					Functions.DB_NAME, Context.MODE_PRIVATE, null);
 			for (int day = 0; day < 7; day++) {
 				for (int hour = 0; hour < 12; hour++) {
-					SQLiteStatement stmt = myDB.compileStatement("SELECT COUNT(*) FROM "
-							+ Functions.DB_TIME_TABLE + " WHERE "
-							+ Functions.DB_DAY + "=? AND " + Functions.DB_HOUR
-							+ "=? AND " + Functions.DB_RAW_FACH + "!=? AND "
-							+ Functions.DB_RAW_FACH + "!=? AND "
-							+ Functions.DB_RAW_FACH + "!=? AND "
-							+ Functions.DB_CLASS + " LIKE ?");
+					SQLiteStatement stmt = myDB
+							.compileStatement("SELECT COUNT(*) FROM "
+									+ Functions.DB_TIME_TABLE + " WHERE "
+									+ Functions.DB_DAY + "=? AND "
+									+ Functions.DB_HOUR + "=? AND "
+									+ Functions.DB_RAW_FACH + "!=? AND "
+									+ Functions.DB_RAW_FACH + "!=? AND "
+									+ Functions.DB_RAW_FACH + "!=? AND "
+									+ Functions.DB_CLASS + " LIKE ?");
 					stmt.bindString(1, Integer.valueOf(day).toString());
 					stmt.bindString(2, Integer.valueOf(hour).toString());
 					stmt.bindString(3, prefs.getString(Functions.GENDER, "m")
 							.equals("m") ? "Sw" : "Sm");
-					stmt.bindString(6, "%" + prefs.getString(Functions.FULL_CLASS, "").substring(0, 2) + "%" + prefs.getString(Functions.FULL_CLASS, "").substring(2, 3) + "%");
+					stmt.bindString(6,
+							"%"
+									+ prefs.getString(Functions.FULL_CLASS, "")
+											.substring(0, 2)
+									+ "%"
+									+ prefs.getString(Functions.FULL_CLASS, "")
+											.substring(2, 3) + "%");
 					if (prefs.getString(Functions.RELIGION, "").equals(
 							Functions.KATHOLISCH)) {
 						stmt.bindString(4, Functions.EVANGELISCH);
@@ -256,28 +286,57 @@ public class SetupAssistant extends Activity {
 					}
 					long count = stmt.simpleQueryForLong();
 					if (count > 1) {
-						Cursor c = myDB.query(
-								Functions.DB_TIME_TABLE,
+						String selectionArgs[] = new String[6];
+						selectionArgs[0] = Integer.valueOf(day).toString();
+						selectionArgs[1] = Integer.valueOf(hour).toString();
+						selectionArgs[2] = prefs.getString(Functions.GENDER,
+								"m").equals("m") ? "Sw" : "Sm";
+						if (prefs.getString(Functions.RELIGION, "").equals(
+								Functions.KATHOLISCH)) {
+							selectionArgs[3] = Functions.EVANGELISCH;
+							selectionArgs[4] = Functions.ETHIK;
+						} else if (prefs.getString(Functions.RELIGION, "")
+								.equals(Functions.EVANGELISCH)) {
+							selectionArgs[3] = Functions.KATHOLISCH;
+							selectionArgs[4] = Functions.ETHIK;
+						} else {
+							selectionArgs[3] = Functions.EVANGELISCH;
+							selectionArgs[4] = Functions.KATHOLISCH;
+						}
+						selectionArgs[5] = "%"
+								+ prefs.getString(Functions.FULL_CLASS, "")
+										.substring(0, 2)
+								+ "%"
+								+ prefs.getString(Functions.FULL_CLASS, "")
+										.substring(2, 3) + "%";
+						Cursor c = myDB.query(Functions.DB_TIME_TABLE,
 								new String[] { Functions.DB_RAW_FACH,
-										Functions.DB_FACH,
+										Functions.DB_ROWID, Functions.DB_FACH,
+										Functions.DB_LEHRER,
 										Functions.DB_RAW_LEHRER },
-								Functions.DB_HOUR + "=? AND "
-										+ Functions.DB_DAY + "=? AND "
+								Functions.DB_DAY + "=? AND "
+										+ Functions.DB_HOUR + "=? AND "
+										+ Functions.DB_RAW_FACH + "!=? AND "
+										+ Functions.DB_RAW_FACH + "!=? AND "
+										+ Functions.DB_RAW_FACH + "!=? AND "
 										+ Functions.DB_CLASS + " LIKE ?",
-								new String[] {
-										Integer.valueOf(hour).toString(),
-										Integer.valueOf(day).toString(),
-										"%"
-												+ prefs.getString(
-														Functions.FULL_CLASS,
-														"").substring(0, 2)
-												+ "%"
-												+ prefs.getString(
-														Functions.FULL_CLASS,
-														"").substring(2, 3)
-												+ "%" }, null, null, null);
+								selectionArgs, null, null, null);
+
+						/*
+						 * Cursor c = myDB.query( Functions.DB_TIME_TABLE, new
+						 * String[] { Functions.DB_RAW_FACH, Functions.DB_FACH,
+						 * Functions.DB_RAW_LEHRER }, Functions.DB_HOUR +
+						 * "=? AND " + Functions.DB_DAY + "=? AND " +
+						 * Functions.DB_CLASS + " LIKE ?", new String[] {
+						 * Integer.valueOf(hour).toString(),
+						 * Integer.valueOf(day).toString(), "%" +
+						 * prefs.getString( Functions.FULL_CLASS,
+						 * "").substring(0, 2) + "%" + prefs.getString(
+						 * Functions.FULL_CLASS, "").substring(2, 3) + "%" },
+						 * null, null, null);
+						 */
 						c.moveToFirst();
-						while (c.moveToNext()) {
+						do {
 							stmt = myDB.compileStatement("INSERT INTO "
 									+ Functions.EXCLUDE_TABLE + " ("
 									+ Functions.DB_TEACHER + ", "
@@ -286,27 +345,31 @@ public class SetupAssistant extends Activity {
 									+ Functions.DB_HOUR + ", "
 									+ Functions.DB_DAY
 									+ ") VALUES (?, ?, ?, ?, ?)");
-							stmt.bindString(1, c.getString(c.getColumnIndex(Functions.DB_RAW_LEHRER)));
-							stmt.bindString(2, c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)));
-							stmt.bindString(3, c.getString(c.getColumnIndex(Functions.DB_FACH)));
+							stmt.bindString(1, c.getString(c
+									.getColumnIndex(Functions.DB_RAW_LEHRER)));
+							stmt.bindString(2, c.getString(c
+									.getColumnIndex(Functions.DB_RAW_FACH)));
+							stmt.bindString(3, c.getString(c
+									.getColumnIndex(Functions.DB_FACH)));
 							stmt.bindLong(4, hour);
 							stmt.bindLong(5, day);
 							stmt.execute();
-							Log.d("rawfach", c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)));
-						}
+							stmt.close();
+							Log.d("rawfach", c.getString(c
+									.getColumnIndex(Functions.DB_RAW_FACH)));
+						} while (c.moveToNext());
 						conflicts.add(new Integer[] { day, hour });
-						/*SQLiteStatement rmstmt = myDB
-								.compileStatement("UPDATE "
-										+ Functions.DB_TIME_TABLE + " SET "
-										+ Functions.DB_DISABLED + "=? WHERE "
-										+ Functions.DB_DAY + "=? AND "
-										+ Functions.DB_HOUR + "=? AND "
-										+ Functions.DB_CLASS + "=?");
-						rmstmt.bindLong(1, 1);
-						rmstmt.bindLong(2, day);
-						rmstmt.bindLong(3, hour);
-						rmstmt.bindString(4, prefs.getString(Functions.FULL_CLASS, ""));
-						rmstmt.execute();*/
+						/*
+						 * SQLiteStatement rmstmt = myDB
+						 * .compileStatement("UPDATE " + Functions.DB_TIME_TABLE
+						 * + " SET " + Functions.DB_DISABLED + "=? WHERE " +
+						 * Functions.DB_DAY + "=? AND " + Functions.DB_HOUR +
+						 * "=? AND " + Functions.DB_CLASS + "=?");
+						 * rmstmt.bindLong(1, 1); rmstmt.bindLong(2, day);
+						 * rmstmt.bindLong(3, hour); rmstmt.bindString(4,
+						 * prefs.getString(Functions.FULL_CLASS, ""));
+						 * rmstmt.execute();
+						 */
 					}
 				}
 			}
@@ -333,6 +396,7 @@ public class SetupAssistant extends Activity {
 	private static String dataUser = null;
 	private static String[] classes;
 	private static String usr_class;
+	private static String teacher_short;
 	private static ArrayList<Integer[]> timetable_conflicts;
 	private static ArrayList<RadioGroup> timetable_conflicts_rg;
 
@@ -345,24 +409,29 @@ public class SetupAssistant extends Activity {
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		edit = prefs.edit();
-		if(!prefs.getBoolean(Functions.IS_LOGGED_IN, false))
+		if (!prefs.getBoolean(Functions.IS_LOGGED_IN, false))
 			setup(step, false);
 		else {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Wollen sie den Setup-Assistenten wirklich noch einmal ausführen?")
-			       .setCancelable(false)
-			       .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			                dialog.cancel();
-			                setup(step, false);
-			           }
-			       })
-			       .setNegativeButton("Nein", new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			                dialog.cancel();
-			                finish();
-			           }
-			       });
+			builder.setMessage(
+					"Wollen sie den Setup-Assistenten wirklich noch einmal ausführen?")
+					.setCancelable(false)
+					.setPositiveButton("Ja",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+									setup(step, false);
+								}
+							})
+					.setNegativeButton("Nein",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+									finish();
+								}
+							});
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
@@ -424,31 +493,62 @@ public class SetupAssistant extends Activity {
 				"username", ""));
 		((EditText) findViewById(R.id.password)).setText(prefs.getString(
 				"password", ""));
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		((EditText) findViewById(R.id.password)).setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-	                next(null);
-	            }
-				return false;
-			}
-			
-		});
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+		((EditText) findViewById(R.id.password))
+				.setOnEditorActionListener(new OnEditorActionListener() {
+					@Override
+					public boolean onEditorAction(TextView v, int actionId,
+							KeyEvent event) {
+						if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+								|| (actionId == EditorInfo.IME_ACTION_DONE)) {
+							next(null);
+						}
+						return false;
+					}
+
+				});
 	}
 
 	public void setupVPlan() {
-		setContentView(R.layout.setup_vplan);
 		if (dataUser == null
 				|| !dataUser.equals(prefs.getString("username", ""))) {
 			PersonData pd = new PersonData(this);
 			pd.execute();
-		} else
-			setVPlanData();
+		} else {
+			if (!teacher)
+				setVPlanData();
+			else
+				setVPlanTeacherData();
+		}
+	}
+
+	public void setVPlanTeacherData() {
+		setContentView(R.layout.setup_vplan_teacher);
+		((Button) findViewById(R.id.teacher_short)).setText(teacher_short);
+		setPermissions();
+	}
+
+	public void selectShort(View v) {
+		final SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
+		final Cursor allShorts = myDB.query(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, new String[] {Functions.DB_SHORT, Functions.DB_ROWID}, null, null, null, null, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.select_short);
+		builder.setCursor(allShorts, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				allShorts.moveToPosition(which);
+				teacher_short = allShorts.getString(allShorts.getColumnIndex(Functions.DB_SHORT));
+				allShorts.close();
+				myDB.close();
+				setVPlanTeacherData();
+			}}, Functions.DB_SHORT);
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	public void setVPlanData() {
+		setContentView(R.layout.setup_vplan);
 		if (prefs.getBoolean("disableAC2DM", false)) {
 			CheckBox chk = (CheckBox) findViewById(R.id.push_check);
 			chk.setChecked(false);
@@ -484,7 +584,10 @@ public class SetupAssistant extends Activity {
 			classrg.setVisibility(View.GONE);
 			findViewById(R.id.classtext).setVisibility(View.GONE);
 		}
-		//strike through non-available permissions
+		setPermissions();
+	}
+	public void setPermissions() {
+		// strike through non-available permissions
 		TextView tv = ((TextView) findViewById(R.id.pupil));
 		tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 		if (pupil)
@@ -531,15 +634,19 @@ public class SetupAssistant extends Activity {
 				selectionArgs[3] = Functions.EVANGELISCH;
 				selectionArgs[4] = Functions.KATHOLISCH;
 			}
-			selectionArgs[5] = "%" + prefs.getString(Functions.FULL_CLASS, "").substring(0, 2) + "%" + prefs.getString(Functions.FULL_CLASS, "").substring(2, 3) + "%";
+			selectionArgs[5] = "%"
+					+ prefs.getString(Functions.FULL_CLASS, "").substring(0, 2)
+					+ "%"
+					+ prefs.getString(Functions.FULL_CLASS, "").substring(2, 3)
+					+ "%";
 			Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {
 					Functions.DB_RAW_FACH, Functions.DB_ROWID,
 					Functions.DB_FACH, Functions.DB_LEHRER }, Functions.DB_DAY
 					+ "=? AND " + Functions.DB_HOUR + "=? AND "
 					+ Functions.DB_RAW_FACH + "!=? AND "
 					+ Functions.DB_RAW_FACH + "!=? AND "
-					+ Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_CLASS + " LIKE ?", selectionArgs, null, null,
-					null);
+					+ Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_CLASS
+					+ " LIKE ?", selectionArgs, null, null, null);
 			c.moveToFirst();
 			RadioGroup rg = new RadioGroup(this);
 			TextView tv = new TextView(this);
@@ -567,7 +674,8 @@ public class SetupAssistant extends Activity {
 				}
 				RadioButton option = new RadioButton(this);
 				option.setText(c.getString(c.getColumnIndex(Functions.DB_FACH))
-						+ " bei " + c.getString(c.getColumnIndex(Functions.DB_LEHRER)));
+						+ " bei "
+						+ c.getString(c.getColumnIndex(Functions.DB_LEHRER)));
 				option.setId(c.getInt(c.getColumnIndex(Functions.DB_ROWID)));
 				if (ii == 0)
 					option.setChecked(true);
@@ -598,45 +706,50 @@ public class SetupAssistant extends Activity {
 					(((EditText) findViewById(R.id.password))).getText()
 							.toString());
 			edit.commit();
-			InputMethodManager imm = (InputMethodManager)getSystemService(
-				      Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(((EditText) findViewById(R.id.password)).getWindowToken(), 0);
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(
+					((EditText) findViewById(R.id.password)).getWindowToken(),
+					0);
 			testUser();
 			break;
 		case 1:
-			RadioGroup religionrg = (RadioGroup) findViewById(R.id.religiongroup);
-			String religion;
-			switch (religionrg.getCheckedRadioButtonId()) {
-			case R.id.catholic:
-				religion = Functions.KATHOLISCH;
-				break;
-			case R.id.protestant:
-				religion = Functions.EVANGELISCH;
-				break;
-			case R.id.ethics:
-			default:
-				religion = Functions.ETHIK;
-				break;
-			}
-			edit.putString(Functions.RELIGION, religion);
-			RadioGroup genderrg = (RadioGroup) findViewById(R.id.gendergroup);
-			edit.putString(Functions.GENDER, (genderrg
-					.getCheckedRadioButtonId() == R.id.female) ? "w" : "m");
-			RadioGroup classrg = (RadioGroup) findViewById(R.id.classgroup);
-			try {
-				edit.putString(Functions.FULL_CLASS,
-						classes[classrg.getCheckedRadioButtonId()]);
-			} catch (NullPointerException e) {
-				// user doesn't have a class
-				edit.putString(Functions.FULL_CLASS, "null");
+			if (!teacher) {
+				RadioGroup religionrg = (RadioGroup) findViewById(R.id.religiongroup);
+				String religion;
+				switch (religionrg.getCheckedRadioButtonId()) {
+				case R.id.catholic:
+					religion = Functions.KATHOLISCH;
+					break;
+				case R.id.protestant:
+					religion = Functions.EVANGELISCH;
+					break;
+				case R.id.ethics:
+				default:
+					religion = Functions.ETHIK;
+					break;
+				}
+				edit.putString(Functions.RELIGION, religion);
+				RadioGroup genderrg = (RadioGroup) findViewById(R.id.gendergroup);
+				edit.putString(Functions.GENDER, (genderrg
+						.getCheckedRadioButtonId() == R.id.female) ? "w" : "m");
+				RadioGroup classrg = (RadioGroup) findViewById(R.id.classgroup);
+				try {
+					edit.putString(Functions.FULL_CLASS,
+							classes[classrg.getCheckedRadioButtonId()]);
+				} catch (NullPointerException e) {
+					// user doesn't have a class
+					edit.putString(Functions.FULL_CLASS, "null");
+				}
+			} else {
+				edit.putString(Functions.TEACHER_SHORT, teacher_short);
 			}
 			CheckBox chk = (CheckBox) findViewById(R.id.push_check);
 			edit.putBoolean("useac2dm", chk.isChecked());
 			if (chk.isChecked())
 				Functions.registerGCM(this);
-			edit.putBoolean("pupil", pupil);
-			edit.putBoolean("teacher", teacher);
-			edit.putBoolean("admin", admin);
+			edit.putBoolean(Functions.RIGHTS_PUPIL, pupil);
+			edit.putBoolean(Functions.RIGHTS_TEACHER, teacher);
+			edit.putBoolean(Functions.RIGHTS_ADMIN, admin);
 			edit.commit();
 			SendData sd = new SendData(this, prefs);
 			sd.execute();
@@ -686,6 +799,7 @@ public class SetupAssistant extends Activity {
 			edit.putBoolean(Functions.IS_LOGGED_IN, true);
 			edit.commit();
 			startActivity(new Intent(this, TimeTable.class));
+			TimeTable.blacklistTimeTable(this);
 			break;
 		}
 		// step += 1;
@@ -752,8 +866,9 @@ public class SetupAssistant extends Activity {
 			startActivity(about);
 			return true;
 		case R.id.refresh:
-			/*CommonDataTask cdt = new CommonDataTask();
-			cdt.execute();*/
+			/*
+			 * CommonDataTask cdt = new CommonDataTask(); cdt.execute();
+			 */
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
