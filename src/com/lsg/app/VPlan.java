@@ -107,8 +107,9 @@ public class VPlan extends Activity {
 			if(count == 0 || count2 == 0)
 				act.updateVP();
 			num_rows.close();
+			vadapter_mine = new VPlan.VertretungAdapter(context, cursor_mine,
+					prefs.getBoolean(Functions.RIGHTS_TEACHER, false));
 			vadapter_all = new VPlan.VertretungAdapter(context, cursor_all, false);
-			vadapter_mine = new VPlan.VertretungAdapter(context, cursor_mine, false);
 			vadapter_teachers = new VPlan.VertretungAdapter(context, cursor_teachers, true);
 			updateCursor();
 			}
@@ -205,9 +206,31 @@ public class VPlan extends Activity {
 					+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 			String mine_cond = first + include_cond +  sec + exclude_cond;
 			String all_cond = first + sec;
-			cursor_mine = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
-					Functions.DB_CLASS_LEVEL, Functions.DB_DATE, Functions.DB_LENGTH}, mine_cond, where_conds, null, null, null);
+			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
+				cursor_mine = myDB.query(Functions.DB_VPLAN_TEACHER,
+						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
+								Functions.DB_TYPE, Functions.DB_STUNDE,
+								Functions.DB_LEHRER, Functions.DB_FACH,
+								Functions.DB_VERTRETUNGSTEXT,
+								Functions.DB_VERTRETER, Functions.DB_ROOM,
+								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
+								Functions.DB_LENGTH },
+						Functions.DB_RAW_VERTRETER + "=? OR "
+								+ Functions.DB_RAW_LEHRER + "=?", new String[] {
+								prefs.getString(Functions.TEACHER_SHORT, ""),
+								prefs.getString(Functions.TEACHER_SHORT, "") },
+						null, null, null);
+			} else {
+				cursor_mine = myDB.query(Functions.DB_VPLAN_TABLE,
+						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
+								Functions.DB_TYPE, Functions.DB_STUNDE,
+								Functions.DB_LEHRER, Functions.DB_FACH,
+								Functions.DB_VERTRETUNGSTEXT,
+								Functions.DB_VERTRETER, Functions.DB_ROOM,
+								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
+								Functions.DB_LENGTH }, mine_cond, where_conds,
+						null, null, null);
+			}
 			where_conds[0] = "%";
 			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
 					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
