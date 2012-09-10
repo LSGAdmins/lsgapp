@@ -110,13 +110,7 @@ public class SlideMenu {
 	public void checkEnabled() {
 		if(menuShown)
 			this.show(false);
-	}/*
-	public void checkHide() {
-		if(menuToHide) {
-			this.hide();
-			menuToHide = false;
-		}
-	}*/
+	}
 	public void show() {
 		if(statusHeight == 0) {
 			Rect rectgle = new Rect();
@@ -132,6 +126,31 @@ public class SlideMenu {
     	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
     	parm.setMargins(menuSize, 0, -menuSize, 0);
     	content.setLayoutParams(parm);
+    	
+    	
+    	/*FrameLayout _content = (FrameLayout) act.findViewById(android.R.id.content);
+    	LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) _content.getLayoutParams();
+    	parms.setMargins(menuSize, 0, -menuSize, 0);
+    	_content.setLayoutParams(parms);
+    	LinearLayout title = (LinearLayout) act.findViewById(R.id.title).getParent();
+    	title.setLayoutParams(parm);*/
+    	ViewGroup _content;
+    	try {
+			_content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
+		}
+		catch(ClassCastException e) {
+			/*
+			 * When there is no title bar (android:theme="@android:style/Theme.NoTitleBar"),
+			 * the android.R.id.content FrameLayout is directly attached to the DecorView,
+			 * without the intermediate LinearLayout that holds the titlebar plus content.
+			 */
+			_content = (FrameLayout) act.findViewById(android.R.id.content);
+		}
+		FrameLayout.LayoutParams parms = new FrameLayout.LayoutParams(-1, -1, 3);
+		parms.setMargins(menuSize, 0, -menuSize, 0);
+		content.setLayoutParams(parms);
+    	
+    	
     	parent = (FrameLayout) content.getParent();
     	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	menu = inflater.inflate(R.layout.menu, null);
@@ -186,7 +205,6 @@ public class SlideMenu {
 		slideoutanim.setDuration(500);
 		if (animate) {
 			TranslateAnimation slideinanim = new TranslateAnimation(
-					
 					-(menuSize / 2), 0, 0, 0);
 			slideinanim.setDuration(500);
 			menu.startAnimation(slideinanim);

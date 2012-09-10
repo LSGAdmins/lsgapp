@@ -4,6 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.lsg.app.TitleCompat.HomeCall;
+
+import android.R.menu;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -12,22 +15,28 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem.OnActionExpandListener;
+import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lsg.app.VPlan.VPlanUpdater;
-
-public class Events extends ListActivity implements SQLlist {
+public class Events extends ListActivity implements SQLlist, HomeCall {
 	public static class EventAdapter extends CursorAdapter {
 		class Standard {
 			public TextView month;
@@ -179,10 +188,11 @@ public class Events extends ListActivity implements SQLlist {
 	private Cursor events;
 	private SQLiteDatabase myDB;
 	private SlideMenu slidemenu;
+	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Functions.setTheme(false, true, this);
+		titlebar = new TitleCompat(this, true);
 		myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		updateWhereCond("%");
 		events = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
@@ -202,6 +212,8 @@ public class Events extends ListActivity implements SQLlist {
 		num_rows.close();
 		slidemenu = new SlideMenu(this, Events.class);
 		slidemenu.checkEnabled();
+		titlebar.init(this);
+		titlebar.setTitle(getTitle());
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -223,7 +235,7 @@ public class Events extends ListActivity implements SQLlist {
 	    	updateEvents();
 	    	return true;
         case android.R.id.home:
-        	slidemenu.show();
+        	onHomePress();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -255,5 +267,10 @@ public class Events extends ListActivity implements SQLlist {
 		super.onDestroy();
 		events.close();
 		myDB.close();
+	}
+
+	@Override
+	public void onHomePress() {
+		slidemenu.show();
 	}
 }

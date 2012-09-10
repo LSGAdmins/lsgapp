@@ -39,7 +39,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -47,6 +49,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -159,22 +162,17 @@ public class Functions {
 	 * @param act the calling activity
 	 */
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
-		int theme = android.R.style.Theme_Light;
-		if(Functions.getSDK() >= 11) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
-			if(Functions.getSDK() >= 14 && prefs.getBoolean("dark_actionbar", false))
-				theme = android.R.style.Theme_Holo_Light_DarkActionBar;
-			else
-				theme = android.R.style.Theme_Holo_Light;
-			if(dialog)
-				theme = android.R.style.Theme_Holo_Light_Dialog;
-		} else {
-			if(dialog) {
-				theme = android.R.style.Theme_Dialog;
-			}
-		}
-		act.setTheme(theme);
-		
+		/*
+		 * int theme = android.R.style.Theme_Light; if(Functions.getSDK() >= 11)
+		 * { SharedPreferences prefs =
+		 * PreferenceManager.getDefaultSharedPreferences(act);
+		 * if(Functions.getSDK() >= 14 && prefs.getBoolean("dark_actionbar",
+		 * false)) theme = android.R.style.Theme_Holo_Light_DarkActionBar; else
+		 * theme = android.R.style.Theme_Holo_Light; if(dialog) theme =
+		 * android.R.style.Theme_Holo_Light_Dialog; } else { if(dialog) { theme
+		 * = android.R.style.Theme_Dialog; } } act.setTheme(theme);
+		 */
+
 		if(homeasup && Functions.getSDK() >= 11) {
 			homeUp(act);
 		}

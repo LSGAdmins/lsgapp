@@ -1,5 +1,7 @@
 package com.lsg.app;
 
+import com.lsg.app.TitleCompat.HomeCall;
+
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,13 +11,14 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-public class SMVBlog extends Activity {
+public class SMVBlog extends Activity implements HomeCall {
 	private SlideMenu slidemenu;
+	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.d("smv", "oncreate");
+		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
-		getWindow().requestFeature(Window.FEATURE_PROGRESS);
+		//getWindow().requestFeature(Window.FEATURE_PROGRESS);
 		Functions.setTheme(false, true, this);
 		
 		/*WebView webview = new WebView(this);
@@ -55,6 +58,8 @@ public class SMVBlog extends Activity {
 		Log.d("SMVBlog", "load");
 		slidemenu = new SlideMenu(this, SMVBlog.class);
 		slidemenu.checkEnabled();
+		titlebar.init(this);
+		titlebar.setTitle(getTitle());
 	}
 	@Override
 	public void onConfigurationChanged(Configuration newConfig){        
@@ -66,7 +71,7 @@ public class SMVBlog extends Activity {
 	    // Handle item selection
 	    switch (item.getItemId()) {
         case android.R.id.home:
-            slidemenu.show();
+            onHomePress();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -81,5 +86,9 @@ public class SMVBlog extends Activity {
 		par.removeAllViewsInLayout();
 		LinearLayout parpar = (LinearLayout) par.getParent();
 		parpar.removeAllViews();
+	}
+	@Override
+	public void onHomePress() {
+		slidemenu.show();
 	}
 }

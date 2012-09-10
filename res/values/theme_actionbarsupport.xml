@@ -1,0 +1,6 @@
+<resources>
+    <style name="ActionBarSupportTheme" parent="android:Theme.Light">
+        <item name="android:windowTitleSize">50dip</item>
+        <!--<item name="android:windowTitleBackgroundStyle">@style/CustomWindowTitleBackground</item>-->
+    </style>
+</resources>

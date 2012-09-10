@@ -117,6 +117,7 @@ public class SetupAssistant extends Activity {
 		protected void onPostExecute(String data) {
 			super.onPostExecute(data);
 			try {
+				Log.d("data", data);
 				JSONObject jarr = new JSONObject(data);
 				gender = jarr.getString("gender").charAt(0);
 				religion = jarr.getString("religion");
@@ -137,8 +138,7 @@ public class SetupAssistant extends Activity {
 			if (!teacher) {
 				loading.cancel();
 				setVPlanData();
-			}
-			else {
+			} else {
 				RetrieveTeacherVPlan rtv = new RetrieveTeacherVPlan();
 				rtv.execute();
 			}
