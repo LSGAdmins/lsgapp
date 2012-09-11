@@ -644,18 +644,18 @@ public class Functions {
 		  }
 		  return true;
 	}
-	/**
-	 * send the ac2dm id to the server, when it's demanded
-	 * @param id the ac2dm device id
-	 * @param context the app context
-	 */
 	public static void sendClientId(String id, Context context) {
+		sendClientId(id, context, false);
+	}
+	public static void sendClientId(String id, Context context, boolean unregister) {
 		String add = "";
 		try {
 			add = "&" + URLEncoder.encode("client_id", "UTF-8") + "="
 					+ URLEncoder.encode(id, "UTF-8") + "&"
 					+ URLEncoder.encode("type", "UTF-8") + "="
-					+ URLEncoder.encode("gcm", "UTF-8");
+					+ URLEncoder.encode("gcm", "UTF-8") + "&" + URLEncoder.encode("enabled", "UTF-8") + "="
+					+ URLEncoder.encode(Boolean.valueOf(!unregister).toString(), "UTF-8");
+			Log.d("add", add);
 		} catch (UnsupportedEncodingException e) {
 			Log.d("encoding", e.getMessage());
 		}

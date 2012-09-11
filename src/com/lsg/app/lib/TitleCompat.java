@@ -54,7 +54,8 @@ public class TitleCompat {
 						}
 					});
 			(activity.findViewById(R.id.search_item)).setVisibility(View.GONE);
-			(activity.findViewById(R.id.titlebar_spinner)).setVisibility(View.GONE);
+			(activity.findViewById(R.id.titlebar_spinner))
+					.setVisibility(View.GONE);
 		}
 	}
 
@@ -82,13 +83,16 @@ public class TitleCompat {
 					});
 		}
 	}
+
 	public void addSpinnerNavigation(final SelectedCallback callback, int listId) {
-		if(Functions.getSDK() < 11) {
+		if (Functions.getSDK() < 11) {
 			(activity.findViewById(R.id.title)).setVisibility(View.GONE);
-			Spinner spinner = (Spinner) activity.findViewById(R.id.titlebar_spinner);
+			Spinner spinner = (Spinner) activity
+					.findViewById(R.id.titlebar_spinner);
 			spinner.setVisibility(View.VISIBLE);
 			int spinnerType = android.R.layout.simple_spinner_dropdown_item;
-			SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(activity, listId, spinnerType);
+			SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(
+					activity, listId, spinnerType);
 			spinner.setAdapter(mSpinnerAdapter);
 			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 				@Override
@@ -98,9 +102,7 @@ public class TitleCompat {
 				}
 
 				@Override
-				public void onNothingSelected(AdapterView<?> arg0) {
-					// TODO Auto-generated method stub
-					
+				public void onNothingSelected(AdapterView<?> parent) {
 				}
 			});
 		} else {

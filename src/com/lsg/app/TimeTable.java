@@ -642,11 +642,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 						+ Functions.DB_DISABLED + "=? WHERE " + Functions.DB_ROWID + "=?",
 						new String[] { "1", allSubjects.getString(allSubjects
 								.getColumnIndex(Functions.DB_ROWID)) });
-			} /*else
-				myDB.execSQL("UPDATE " + Functions.DB_TIME_TABLE + " SET "
-						+ Functions.DB_DISABLED + "=? WHERE " + Functions.DB_ROWID + "=?",
-						new String[] { "2", allSubjects.getString(allSubjects
-								.getColumnIndex(Functions.DB_ROWID)) });*/
+			}
 			exclude.close();
 		} while (allSubjects.moveToNext());
 		allSubjects.close();
@@ -879,10 +875,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	@Override
 	public boolean selected(int position, long id) {
 		selPos = position;
-		if(suppressSelect) {
-			suppressSelect = false;
-			return true;
-		}
 		switch(position) {
 		case 0:
 			showMine();
@@ -894,7 +886,8 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 					showClasses();
 				}
 			});
-			showClasses();
+			if (!suppressSelect)
+				showClasses();
 			break;
 		case 2:
 			footer.setOnClickListener(new OnClickListener() {
@@ -903,12 +896,15 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 					showTeachers();
 				}
 			});
-			showTeachers();
+			if (!suppressSelect)
+				showTeachers();
 			break;
-			default:
-				showMine();
-				break;
+		default:
+			showMine();
+			break;
 		}
+		if (suppressSelect)
+			suppressSelect = false;
 		return false;
 	}
 	@Override
@@ -921,12 +917,20 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	}
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		if (savedInstanceState.getString("selclass") != null)
+		if (savedInstanceState.getString("selclass") != null) {
 			viewpageradap.setClass(
 					(String) savedInstanceState.getString("selclass"),
 					savedInstanceState.getBoolean("ownclass", true));
-		else
+			if(!savedInstanceState.getBoolean("ownclass", true)) {
+				footer.setVisibility(View.VISIBLE);
+				footer.setText(savedInstanceState.getString("selclass"));
+			}
+		}
+		else {
 			viewpageradap.setTeacher(savedInstanceState.getString("selshort"));
+			footer.setVisibility(View.VISIBLE);
+			footer.setText(savedInstanceState.getString("selshort"));
+		}
 		viewpageradap.updateCursor();
 		if(Functions.getSDK() >= 11) {
 			suppressSelect = true;

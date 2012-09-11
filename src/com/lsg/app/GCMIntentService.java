@@ -26,9 +26,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 	}
 
 	@Override
-	protected void onUnregistered(Context arg0, String arg1) {
-		// TODO Auto-generated method stub
-
+	protected void onUnregistered(Context context, String regId) {
+		Log.d("unregister", regId);
+		Functions.sendClientId(regId, context, true);
 	}
 
 }

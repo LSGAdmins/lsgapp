@@ -499,14 +499,14 @@ public class VPlan extends Activity implements HomeCall, RefreshCall {
 							myDB.update(Functions.DB_TIME_TABLE, vals,
 									Functions.DB_DAY + "=? AND "
 											+ Functions.DB_HOUR + "=? AND "
-											+ Functions.DB_CLASS + " LIKE ? AND "
+											+ Functions.DB_RAW_LEHRER + " LIKE ? AND "
 											+ Functions.DB_FACH + "=?",
 									new String[] {
 											Integer.valueOf(
 													cal.get(Calendar.DAY_OF_WEEK)-3-cal.getFirstDayOfWeek())
 													.toString(),
 											Integer.valueOf(jObject.getInt("stunde")-1).toString(),
-											"%" + jObject.getString("klasse")
+											"%" + jObject.getString("rawlehrer")
 													+ "%" , jObject.getString("fach")});
 							Log.d("day", Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)).toString());
 							Log.d("date", cal.toString());
