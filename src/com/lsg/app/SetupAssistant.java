@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -37,7 +38,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.lsg.app.TimeTable.TimeTableUpdater;
@@ -125,7 +125,12 @@ public class SetupAssistant extends Activity {
 				pupil = jarr.getBoolean("pupil");
 				teacher = jarr.getBoolean("teacher");
 				admin = jarr.getBoolean("admin");
+				try {
 				teacher_short = jarr.getString("short");
+				} catch(JSONException e) {
+					Log.v(SetupAssistant.class.getName(), "seems like no teacher :)");
+					e.printStackTrace();
+				}
 				JSONArray json_cls = jarr.getJSONArray("classes");
 				classes = new String[json_cls.length()];
 				for (int i = 0; i < json_cls.length(); i++)

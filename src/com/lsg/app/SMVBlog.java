@@ -1,6 +1,9 @@
 package com.lsg.app;
 
-import com.lsg.app.TitleCompat.HomeCall;
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -11,7 +14,7 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-public class SMVBlog extends Activity implements HomeCall {
+public class SMVBlog extends Activity implements HomeCall, RefreshCall {
 	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
 	@Override
@@ -59,6 +62,7 @@ public class SMVBlog extends Activity implements HomeCall {
 		slidemenu = new SlideMenu(this, SMVBlog.class);
 		slidemenu.checkEnabled();
 		titlebar.init(this);
+		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
 	}
 	@Override
@@ -90,5 +94,9 @@ public class SMVBlog extends Activity implements HomeCall {
 	@Override
 	public void onHomePress() {
 		slidemenu.show();
+	}
+	@Override
+	public void onRefreshPress() {
+		Functions.webv.reload();
 	}
 }

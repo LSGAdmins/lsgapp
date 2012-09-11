@@ -1,5 +1,9 @@
 package com.lsg.app;
 
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,11 +20,13 @@ import android.view.KeyEvent;
 
 //code for old devices -> deprecated
 @SuppressLint("deprecated")
-public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener, HomeCall {
 	private SlideMenu slidemenu;
+	private TitleCompat titlebar;
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		
 		Functions.setTheme(false, false, this);
@@ -72,6 +78,8 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         }
         slidemenu = new SlideMenu(this, Settings.class);
         slidemenu.checkEnabled();
+        titlebar.init(this);
+        titlebar.setTitle(getTitle());
 	}
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -105,5 +113,9 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	    }
 	    else
 	    	return super.onKeyDown(keyCode, event);
+	}
+	@Override
+	public void onHomePress() {
+		slidemenu.show();
 	}
 }

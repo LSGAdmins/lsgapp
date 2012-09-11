@@ -2,6 +2,8 @@ package com.lsg.app;
 
 import java.util.List;
 
+import com.lsg.app.lib.SlideMenu;
+
 import android.annotation.TargetApi;
 import android.app.ListFragment;
 import android.content.SharedPreferences;

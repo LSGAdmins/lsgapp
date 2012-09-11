@@ -8,6 +8,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -41,7 +46,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TimeTable extends Activity implements SelectedCallback {
+public class TimeTable extends Activity implements SelectedCallback, HomeCall, RefreshCall {
 	public static class TimetableAdapter extends CursorAdapter {
 
 		class TimetableItem {
@@ -619,6 +624,7 @@ public class TimeTable extends Activity implements SelectedCallback {
 		ContentValues vals = new ContentValues();
 		vals.put(Functions.DB_DISABLED, 2);
 		myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
+		if(allSubjects.getCount() > 0)
 		do {
 			Cursor exclude = myDB.query(
 					Functions.EXCLUDE_TABLE,
@@ -693,9 +699,11 @@ public class TimeTable extends Activity implements SelectedCallback {
 	private ViewPager pager;
 	private SlideMenu slidemenu;
 	private TextView footer;
+	private TitleCompat titlebar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		titlebar = new TitleCompat(this, true);
 		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);
 		if (!((SharedPreferences) PreferenceManager
@@ -756,14 +764,15 @@ public class TimeTable extends Activity implements SelectedCallback {
 		slidemenu.checkEnabled();
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		if (Functions.getSDK() >= 11
-				&& (prefs.getBoolean("teacher", false) || prefs.getBoolean(
-						"pupil", false))) {
-			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.dropDownNav(this, R.array.timetable_actions, this, 0);
-		}
 		Functions.init(this);
 		footer = (TextView) findViewById(R.id.footer_text);
+		titlebar.init(this);
+		titlebar.addRefresh(this);
+		titlebar.setTitle(getTitle());
+		if ((prefs.getBoolean("teacher", false) || prefs.getBoolean("pupil",
+				false))) {
+			titlebar.addSpinnerNavigation( this, R.array.timetable_actions);
+		}
 	}
 	public void showMine() {
 		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);
@@ -832,6 +841,8 @@ public class TimeTable extends Activity implements SelectedCallback {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.timetable, menu);
+		if(Functions.getSDK() < 11)
+			menu.removeItem(R.id.refresh);
 		return true;
 	}
 
@@ -840,10 +851,10 @@ public class TimeTable extends Activity implements SelectedCallback {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.refresh:
-			updateTimeTable();
+			onRefreshPress();
 			return true;
 		case android.R.id.home:
-			slidemenu.show();
+			onHomePress();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -906,10 +917,16 @@ public class TimeTable extends Activity implements SelectedCallback {
 	  savedInstanceState.putInt("navlistselected", selPos);
 	  savedInstanceState.putBoolean("ownclass", viewpageradap.ownClass);
 	  savedInstanceState.putString("selclass", viewpageradap.klasse);
+	  savedInstanceState.putString("selshort", viewpageradap.teacher);
 	}
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		viewpageradap.setClass((String) savedInstanceState.getString("selclass"), savedInstanceState.getBoolean("ownclass", true));
+		if (savedInstanceState.getString("selclass") != null)
+			viewpageradap.setClass(
+					(String) savedInstanceState.getString("selclass"),
+					savedInstanceState.getBoolean("ownclass", true));
+		else
+			viewpageradap.setTeacher(savedInstanceState.getString("selshort"));
 		viewpageradap.updateCursor();
 		if(Functions.getSDK() >= 11) {
 			suppressSelect = true;
@@ -917,5 +934,13 @@ public class TimeTable extends Activity implements SelectedCallback {
 			adv.setSelectedItem(savedInstanceState.getInt("navlistselected"), this);
 		}
 		super.onRestoreInstanceState(savedInstanceState);
+	}
+	@Override
+	public void onHomePress() {
+		slidemenu.show();
+	}
+	@Override
+	public void onRefreshPress() {
+		updateTimeTable();
 	}
 }

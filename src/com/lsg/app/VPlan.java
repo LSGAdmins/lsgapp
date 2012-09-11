@@ -12,6 +12,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,7 +54,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class VPlan extends Activity {
+public class VPlan extends Activity implements HomeCall, RefreshCall {
 	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
 		private String[] where_conds = new String[4];
 		private String[] where_conds_events = new String[6];
@@ -116,7 +121,10 @@ public class VPlan extends Activity {
 		
 		@Override
 		public int getCount() {
-			return 3;
+			if(prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
+				return 3;
+			else
+				return 2;
 			}
 		
 		public String getTitle(int pos) {
@@ -631,8 +639,9 @@ public class VPlan extends Activity {
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
 	private SlideMenu slidemenu;
-	private Menu menu;
+	private TitleCompat titlebar;
 	public void onCreate(Bundle savedInstanceState) {
+		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
         getWindow().setBackgroundDrawableResource(R.layout.background);
@@ -644,17 +653,20 @@ public class VPlan extends Activity {
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    slidemenu = new SlideMenu(this, VPlan.class);
 	    slidemenu.checkEnabled();
+	    titlebar.init(this);
+	    titlebar.addRefresh(this);
+	    titlebar.setTitle(getTitle());
 	    }
 	public boolean onCreateOptionsMenu(Menu menu) {
-		this.menu = menu;
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.vplan, menu);
 	    if(Functions.getSDK() >= 11) {
 	    	AdvancedWrapper ahelp = new AdvancedWrapper();
-	    	ahelp.searchBar(menu, adapter);
-	    }
-	    else
-	    	menu.removeItem(R.id.search);
+			ahelp.searchBar(menu, adapter);
+		} else {
+			menu.removeItem(R.id.search);
+			menu.removeItem(R.id.refresh);
+		}
 	    return true;
 	}
 	@Override
@@ -670,7 +682,7 @@ public class VPlan extends Activity {
 	    	startActivity(settings);
 	        return true;
 	    case R.id.refresh:
-	    	updateVP();
+	    	onRefreshPress();
 	    	return true;
 	    case R.id.subjects:
 	    	Toast.makeText(this, getString(R.string.subjectlist_info), Toast.LENGTH_LONG).show();
@@ -692,7 +704,7 @@ public class VPlan extends Activity {
 	    	alert.show();
 	    	return true;
         case android.R.id.home:
-            slidemenu.show();
+            onHomePress();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -715,5 +727,13 @@ public class VPlan extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		adapter.closeCursorsDB();
+	}
+	@Override
+	public void onHomePress() {
+		slidemenu.show();
+	}
+	@Override
+	public void onRefreshPress() {
+		updateVP();
 	}
 }

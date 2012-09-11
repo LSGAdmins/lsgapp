@@ -4,9 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.lsg.app.TitleCompat.HomeCall;
-
-import android.R.menu;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -15,28 +12,28 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem.OnActionExpandListener;
-import android.view.MenuItem.OnMenuItemClickListener;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.CursorAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Events extends ListActivity implements SQLlist, HomeCall {
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
+
+public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCall, TextWatcher {
 	public static class EventAdapter extends CursorAdapter {
 		class Standard {
 			public TextView month;
@@ -136,7 +133,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 						values.put(Functions.DB_VENUE, jObject.getString("venue"));
 						myDB.insert(Functions.DB_EVENTS_TABLE, null, values);
 						i++;
-						Log.d(jObject.getString("dates"), jObject.getString("venue"));
 						}
 					myDB.close();
 					} catch(JSONException e) {
@@ -200,6 +196,14 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 				where_conds_events, null, null, null);
 		evadap = new EventAdapter(this, events);
 		setContentView(R.layout.list);
+		//set header search bar
+		if(Functions.getSDK() < 11) {
+			LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+			View search = inflater.inflate(R.layout.search, null);
+			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
+			searchEdit.addTextChangedListener(this);
+			getListView().addHeaderView(search);
+			}
 		getListView().setAdapter(evadap);
 		getListView().setEmptyView(getListView().findViewById(R.id.list_view_empty));
 		((TextView) findViewById(R.id.list_view_empty)).setText(R.string.events_empty);
@@ -213,6 +217,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 		slidemenu = new SlideMenu(this, Events.class);
 		slidemenu.checkEnabled();
 		titlebar.init(this);
+		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
 	}
 
@@ -220,11 +225,12 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.events, menu);
 	    if(Functions.getSDK() >= 11) {
-	    	AdvancedWrapper ahelp = new AdvancedWrapper();
-	    	ahelp.searchBar(menu, this);
-	    }
-	    else
-	    	menu.removeItem(R.id.search);
+			AdvancedWrapper ahelp = new AdvancedWrapper();
+			ahelp.searchBar(menu, this);
+		} else {
+			menu.removeItem(R.id.search);
+			menu.removeItem(R.id.refresh);
+		}
 	    return true;
 	}
 	@Override
@@ -232,7 +238,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.refresh:
-	    	updateEvents();
+	    	onRefreshPress();
 	    	return true;
         case android.R.id.home:
         	onHomePress();
@@ -260,7 +266,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
 				where_conds_events, null, null, null);
 		evadap.changeCursor(events);
-		Log.d("search", "updateList");
 	}
 	@Override
 	public void onDestroy() {
@@ -272,5 +277,25 @@ public class Events extends ListActivity implements SQLlist, HomeCall {
 	@Override
 	public void onHomePress() {
 		slidemenu.show();
+	}
+
+	@Override
+	public void onRefreshPress() {
+		updateEvents();
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		updateWhereCond(s.toString());
+		updateList();
 	}
 }
