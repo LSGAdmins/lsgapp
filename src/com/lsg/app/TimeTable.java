@@ -904,7 +904,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	    // Create a new Messenger for the communication back
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
-	    intent.putExtra(WorkerService.ACTION, WorkerService.TIMETABLE);
 	    intent.putExtra(WorkerService.WORKER_CLASS, TimeTable.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
 	    startService(intent);
@@ -1005,7 +1004,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		updateTimeTable();
 	}
 	public void update(int what, Context c) {
-		Log.d("what", Integer.valueOf(what).toString());
 		TimeTableUpdater udp = new TimeTableUpdater(c);
 		switch(what) {
 		case WorkerService.UPDATE_ALL:

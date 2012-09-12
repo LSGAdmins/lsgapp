@@ -1,18 +1,12 @@
 package com.lsg.app;
 
-import com.lsg.app.TimeTable.TimeTableUpdater;
-
 import android.app.IntentService;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 
 public class WorkerService extends IntentService {
 	public interface WorkerClass {
@@ -36,7 +30,6 @@ public class WorkerService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Bundle extras = intent.getExtras();
-		String action = extras.getString(ACTION);
 		ClassLoader loader = WorkerClass.class.getClassLoader();
 		try {
 		Class class_ = loader.loadClass(extras.getString(WORKER_CLASS));
@@ -52,8 +45,8 @@ public class WorkerService extends IntentService {
 			msg.arg1 = RESULT_OK;
 			try {
 				messenger.send(msg);
-			} catch (android.os.RemoteException e1) {
-				Log.w(getClass().getName(), "Exception sending message", e1);
+			} catch (Exception e) {
+				Log.w(getClass().getName(), "Exception sending message", e);
 			}
 
 		}

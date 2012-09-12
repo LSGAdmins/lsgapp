@@ -771,7 +771,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    // Create a new Messenger for the communication back
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
-	    intent.putExtra(WorkerService.ACTION, WorkerService.TIMETABLE);
 	    intent.putExtra(WorkerService.WORKER_CLASS, VPlan.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
 	    startService(intent);

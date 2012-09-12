@@ -290,7 +290,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	    // Create a new Messenger for the communication back
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
-	    intent.putExtra(WorkerService.ACTION, WorkerService.TIMETABLE);
 	    intent.putExtra(WorkerService.WORKER_CLASS, Events.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
 	    startService(intent);
