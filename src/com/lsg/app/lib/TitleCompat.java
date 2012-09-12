@@ -16,7 +16,7 @@ import com.lsg.app.Advanced;
 import com.lsg.app.AdvancedWrapper;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
-import com.lsg.app.SelectedCallback;
+import com.lsg.app.interfaces.SelectedCallback;
 
 public class TitleCompat {
 	public interface HomeCall {

@@ -1,5 +1,8 @@
 package com.lsg.app;
 
+import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.interfaces.SelectedCallback;
+
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;

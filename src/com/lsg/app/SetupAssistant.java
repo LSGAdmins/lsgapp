@@ -41,6 +41,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.lsg.app.TimeTable.TimeTableUpdater;
+import com.lsg.app.lib.Download;
 
 public class SetupAssistant extends Activity {
 	Download down;

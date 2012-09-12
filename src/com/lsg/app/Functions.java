@@ -52,6 +52,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
+import com.lsg.app.interfaces.SQLlist;
 
 public class Functions {
 	public static final String   TAG            = "LSGäpp";
@@ -645,17 +646,16 @@ public class Functions {
 		  return true;
 	}
 	public static void sendClientId(String id, Context context) {
-		sendClientId(id, context, false);
+		sendClientId(id, context, true);
 	}
-	public static void sendClientId(String id, Context context, boolean unregister) {
+	public static void sendClientId(String id, Context context, boolean enabled) {
 		String add = "";
 		try {
 			add = "&" + URLEncoder.encode("client_id", "UTF-8") + "="
 					+ URLEncoder.encode(id, "UTF-8") + "&"
 					+ URLEncoder.encode("type", "UTF-8") + "="
 					+ URLEncoder.encode("gcm", "UTF-8") + "&" + URLEncoder.encode("enabled", "UTF-8") + "="
-					+ URLEncoder.encode(Boolean.valueOf(!unregister).toString(), "UTF-8");
-			Log.d("add", add);
+					+ URLEncoder.encode(Boolean.valueOf(enabled).toString(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.d("encoding", e.getMessage());
 		}

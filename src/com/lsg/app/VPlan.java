@@ -12,11 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.lsg.app.lib.SlideMenu;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,8 +24,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Messenger;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
@@ -51,10 +47,18 @@ import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class VPlan extends Activity implements HomeCall, RefreshCall {
+import com.lsg.app.TimeTable.TimeTableUpdater;
+import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
+
+public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerService.WorkerClass {
 	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
 		private String[] where_conds = new String[4];
 		private String[] where_conds_events = new String[6];
@@ -599,41 +603,41 @@ public class VPlan extends Activity implements HomeCall, RefreshCall {
 				return new String[] {"success", " "};
 				}
 		}
-	public class VPlanUpdateTask extends AsyncTask<Void, Void, String[]> {
-		@TargetApi(11)
-		protected void onPreExecute() {
-			super.onPreExecute();
-			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vplan));
-			Functions.lockRotation(VPlan.this);
-		}
-		@Override
-		protected String[] doInBackground(Void... params) {
-			VPlanUpdater vpup = new VPlanUpdater(VPlan.this);
-			vpup.updateTeachers();
-			return vpup.update();
-		}
-		protected void onPostExecute(String[] res) {
-			loading.cancel();
-			Log.d("ready", "finished");
-			if(!res[0].equals("success"))
-				Toast.makeText(VPlan.this, res[1], Toast.LENGTH_LONG).show();
-			if(res[0].equals("loginerror")) {
-				Intent intent;
-				if(Functions.getSDK() >= 11)
-					intent = new Intent(VPlan.this, SettingsAdvanced.class);
-				else
-					intent = new Intent(VPlan.this, Settings.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-				VPlan.this.startActivity(intent);
-			}
-			else {
-				try {
-					adapter.updateCursor();
-				} catch(Exception e) {}
-			}
-			Functions.unlockRotation(VPlan.this);
-		}
-	}
+//	public class VPlanUpdateTask extends AsyncTask<Void, Void, String[]> {
+//		@TargetApi(11)
+//		protected void onPreExecute() {
+//			super.onPreExecute();
+//			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vplan));
+//			Functions.lockRotation(VPlan.this);
+//		}
+//		@Override
+//		protected String[] doInBackground(Void... params) {
+//			VPlanUpdater vpup = new VPlanUpdater(VPlan.this);
+//			vpup.updateTeachers();
+//			return vpup.update();
+//		}
+//		protected void onPostExecute(String[] res) {
+//			loading.cancel();
+//			Log.d("ready", "finished");
+//			if(!res[0].equals("success"))
+//				Toast.makeText(VPlan.this, res[1], Toast.LENGTH_LONG).show();
+//			if(res[0].equals("loginerror")) {
+//				Intent intent;
+//				if(Functions.getSDK() >= 11)
+//					intent = new Intent(VPlan.this, SettingsAdvanced.class);
+//				else
+//					intent = new Intent(VPlan.this, Settings.class);
+//				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//				VPlan.this.startActivity(intent);
+//			}
+//			else {
+//				try {
+//					adapter.updateCursor();
+//				} catch(Exception e) {}
+//			}
+//			Functions.unlockRotation(VPlan.this);
+//		}
+//	}
 	private VPlanPagerAdapter adapter;
 	private ExtendedViewPager pager;
 	private SharedPreferences prefs;
@@ -657,12 +661,16 @@ public class VPlan extends Activity implements HomeCall, RefreshCall {
 	    titlebar.addRefresh(this);
 	    titlebar.setTitle(getTitle());
 	    }
+	
+	private MenuItem refresh;
+	private boolean refreshing;
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.vplan, menu);
 	    if(Functions.getSDK() >= 11) {
 	    	AdvancedWrapper ahelp = new AdvancedWrapper();
 			ahelp.searchBar(menu, adapter);
+			refresh = menu.findItem(R.id.search);
 		} else {
 			menu.removeItem(R.id.search);
 			menu.removeItem(R.id.refresh);
@@ -711,6 +719,15 @@ public class VPlan extends Activity implements HomeCall, RefreshCall {
 	    }
 	}
 	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  savedInstanceState.putBoolean("refreshing", refreshing);
+	}
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		refreshing = savedInstanceState.getBoolean("refreshing");
+	}
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_VPLAN_TABLE);
@@ -719,9 +736,45 @@ public class VPlan extends Activity implements HomeCall, RefreshCall {
 	public boolean onContextItemSelected(final MenuItem item) {
 		return Functions.contextMenuSelect(item, this, adapter, Functions.DB_VPLAN_TABLE);
 	}
+	private static ServiceHandler hand;
+	@TargetApi(11)
 	public void updateVP() {
-	    VPlanUpdateTask vpup = new VPlanUpdateTask();
-	    vpup.execute();
+		refreshing = true;
+		final View actionView;
+		if (Functions.getSDK() >= 11) {
+			actionView = refresh.getActionView();
+			refresh.setActionView(new ProgressBar(this));
+		} else {
+			actionView = null;
+			loading = ProgressDialog.show(this, null,
+					"Lade...");
+		}
+		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
+			@Override
+			public void onServiceError() {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onFinishedService() {
+				Log.d("service", "finished without error");
+				if (Functions.getSDK() >= 11)
+					refresh.setActionView(actionView);
+				else
+					loading.cancel();
+				refreshing = false;
+			}
+		});
+		Handler handler = hand.getHandler();
+		
+		Intent intent = new Intent(this, WorkerService.class);
+	    // Create a new Messenger for the communication back
+	    Messenger messenger = new Messenger(handler);
+	    intent.putExtra(WorkerService.MESSENGER, messenger);
+	    intent.putExtra(WorkerService.ACTION, WorkerService.TIMETABLE);
+	    intent.putExtra(WorkerService.WORKER_CLASS, VPlan.class.getCanonicalName());
+	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
+	    startService(intent);
 	}
 	@Override
 	public void onDestroy() {
@@ -735,5 +788,20 @@ public class VPlan extends Activity implements HomeCall, RefreshCall {
 	@Override
 	public void onRefreshPress() {
 		updateVP();
+	}
+	public void update(int what, Context c) {
+		VPlanUpdater udp = new VPlanUpdater(c);
+		switch(what) {
+		case WorkerService.UPDATE_ALL:
+			udp.update();
+			udp.updateTeachers();
+			break;
+		case WorkerService.UPDATE_PUPILS:
+			udp.update();
+			break;
+		case WorkerService.UPDATE_TEACHERS:
+			udp.updateTeachers();
+			break;
+		}
 	}
 }

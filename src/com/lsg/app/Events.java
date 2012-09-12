@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.TargetApi;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -12,28 +13,33 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Messenger;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.lsg.app.VPlan.VPlanUpdater;
+import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 
-public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCall, TextWatcher {
+public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCall, TextWatcher, WorkerService.WorkerClass {
 	public static class EventAdapter extends CursorAdapter {
 		class Standard {
 			public TextView month;
@@ -146,35 +152,35 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			return new String[] {"success", ""};
 			}
 		}
-	public class EventUpdateTask extends AsyncTask<Void, Void, String[]> {
-		protected void onPreExecute() {
-			super.onPreExecute();
-			Functions.lockRotation(Events.this);
-			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events));
-		}
-		@Override
-		protected String[] doInBackground(Void... params) {
-			EventUpdate evup = new EventUpdate(Events.this);
-			return evup.refreshEvents();
-		}
-		protected void onPostExecute(String[] res) {
-			loading.cancel();
-			if(!res[0].equals("success"))
-				Toast.makeText(Events.this, res[1], Toast.LENGTH_LONG).show();
-			if(res[0].equals("loginerror")) {
-				Intent intent;
-				if(Functions.getSDK() >= 11)
-					intent = new Intent(Events.this, SettingsAdvanced.class);
-				else
-					intent = new Intent(Events.this, Settings.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-				Events.this.startActivity(intent);
-			}
-			else
-				updateList();
-			Functions.unlockRotation(Events.this);
-		}
-	}
+//	public class EventUpdateTask extends AsyncTask<Void, Void, String[]> {
+//		protected void onPreExecute() {
+//			super.onPreExecute();
+//			Functions.lockRotation(Events.this);
+//			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events));
+//		}
+//		@Override
+//		protected String[] doInBackground(Void... params) {
+//			EventUpdate evup = new EventUpdate(Events.this);
+//			return evup.refreshEvents();
+//		}
+//		protected void onPostExecute(String[] res) {
+//			loading.cancel();
+//			if(!res[0].equals("success"))
+//				Toast.makeText(Events.this, res[1], Toast.LENGTH_LONG).show();
+//			if(res[0].equals("loginerror")) {
+//				Intent intent;
+//				if(Functions.getSDK() >= 11)
+//					intent = new Intent(Events.this, SettingsAdvanced.class);
+//				else
+//					intent = new Intent(Events.this, Settings.class);
+//				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//				Events.this.startActivity(intent);
+//			}
+//			else
+//				updateList();
+//			Functions.unlockRotation(Events.this);
+//		}
+//	}
 	private ProgressDialog loading;
 	private EventAdapter evadap;
 	private String where_cond = " " + Functions.DB_DATES + " LIKE ? OR " + Functions.DB_ENDDATES + " LIKE ? OR "
@@ -220,13 +226,15 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
 	}
-
+	private boolean refreshing = false;
+	private MenuItem refresh;
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.events, menu);
 	    if(Functions.getSDK() >= 11) {
 			AdvancedWrapper ahelp = new AdvancedWrapper();
 			ahelp.searchBar(menu, this);
+			refresh = menu.findItem(R.id.refresh);
 		} else {
 			menu.removeItem(R.id.search);
 			menu.removeItem(R.id.refresh);
@@ -247,9 +255,45 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
+	private static ServiceHandler hand;
+	@TargetApi(11)
 	public void updateEvents() {
-		EventUpdateTask upd = new EventUpdateTask();
-		upd.execute();
+		refreshing = true;
+		final View actionView;
+		if (Functions.getSDK() >= 11) {
+			actionView = refresh.getActionView();
+			refresh.setActionView(new ProgressBar(this));
+		} else {
+			actionView = null;
+			loading = ProgressDialog.show(this, null,
+					"Lade...");
+		}
+		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
+			@Override
+			public void onServiceError() {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onFinishedService() {
+				Log.d("service", "finished without error");
+				if (Functions.getSDK() >= 11)
+					refresh.setActionView(actionView);
+				else
+					loading.cancel();
+				refreshing = false;
+			}
+		});
+		Handler handler = hand.getHandler();
+		
+		Intent intent = new Intent(this, WorkerService.class);
+	    // Create a new Messenger for the communication back
+	    Messenger messenger = new Messenger(handler);
+	    intent.putExtra(WorkerService.MESSENGER, messenger);
+	    intent.putExtra(WorkerService.ACTION, WorkerService.TIMETABLE);
+	    intent.putExtra(WorkerService.WORKER_CLASS, Events.class.getCanonicalName());
+	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
+	    startService(intent);
 	}
 	@Override
 	public void updateWhereCond(String searchText) {
@@ -297,5 +341,25 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		updateWhereCond(s.toString());
 		updateList();
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  savedInstanceState.putBoolean("refreshing", refreshing);
+	}
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		refreshing = savedInstanceState.getBoolean("refreshing");
+	}
+	@Override
+	public void update(int what, Context c) {
+		EventUpdate udp = new EventUpdate(c);
+		switch (what) {
+		case WorkerService.UPDATE_ALL:
+			udp.refreshEvents();
+			break;
+		}
 	}
 }

@@ -1,7 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <menu xmlns:android="http://schemas.android.com/apk/res/android">
-        <item android:id="@+id/refresh"
-            android:icon="@android:drawable/ic_menu_rotate"
-            android:title="@string/refresh"
-            android:showAsAction="ifRoom|withText" />
-    </menu>
+    <item
+        android:id="@+id/refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/refresh"/>
+
+</menu>

@@ -9,15 +9,13 @@ import com.google.android.gcm.GCMBaseIntentService;
 public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
-	protected void onError(Context arg0, String arg1) {
-		// TODO Auto-generated method stub
-
+	protected void onError(Context context, String error) {
+		Log.w("LSGäpp", "gcm error: " + error);
 	}
 
 	@Override
-	protected void onMessage(Context arg0, Intent arg1) {
-		// TODO Auto-generated method stub
-
+	protected void onMessage(Context context, Intent data) {
+		Log.d("data", data.getExtras().toString());
 	}
 
 	@Override
@@ -27,8 +25,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onUnregistered(Context context, String regId) {
-		Log.d("unregister", regId);
-		Functions.sendClientId(regId, context, true);
+		Functions.sendClientId(regId, context, false);
 	}
 
 }

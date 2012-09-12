@@ -103,6 +103,7 @@
             android:label="@string/events" >
         </activity>
     <service android:name=".GCMIntentService" />
+     <service android:name=".WorkerService" android:exported="false" />
     </application>
 
 

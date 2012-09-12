@@ -8,11 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.lsg.app.lib.SlideMenu;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
-
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -26,6 +22,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Messenger;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
@@ -43,10 +41,17 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TimeTable extends Activity implements SelectedCallback, HomeCall, RefreshCall {
+import com.lsg.app.interfaces.SelectedCallback;
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
+
+public class TimeTable extends Activity implements SelectedCallback, HomeCall, RefreshCall, WorkerService.WorkerClass {
 	public static class TimetableAdapter extends CursorAdapter {
 
 		class TimetableItem {
@@ -648,47 +653,46 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		allSubjects.close();
 		myDB.close();
 	}
-
-	public class TimeTableUpdateTask extends AsyncTask<Void, Void, Void> {
-		protected void onPreExecute() {
-			super.onPreExecute();
-			Functions.lockRotation(TimeTable.this);
-			loading = ProgressDialog.show(TimeTable.this, "",
-					getString(R.string.loading_timetable));
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			TimeTableUpdater upd = new TimeTableUpdater(TimeTable.this);
-			upd.updateTeachers();
-			upd.updatePupils();
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			Log.d("teacher", new Boolean(prefs.getBoolean(Functions.RIGHTS_TEACHER, false)).toString());
-			if(!prefs.getBoolean(Functions.RIGHTS_TEACHER, false))
-				blacklistTimeTable(getApplicationContext());
-			return null;
-		}
-
-		protected void onPostExecute(Void res) {
-			super.onPostExecute(res);
-			Log.d("asdf", "postexecute");
-			loading.cancel();
-			/*if (!res[0].equals("success"))
-				Toast.makeText(TimeTable.this, res[1], Toast.LENGTH_LONG)
-						.show();
-			if (res[0].equals("loginerror")) {
-				Intent intent;
-				if (Functions.getSDK() >= 11)
-					intent = new Intent(TimeTable.this, SettingsAdvanced.class);
-				else
-					intent = new Intent(TimeTable.this, Settings.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-				TimeTable.this.startActivity(intent);
-			}*/
-			viewpageradap.updateCursor();
-			Functions.unlockRotation(TimeTable.this);
-		}
-	}
+//	public class TimeTableUpdateTask extends AsyncTask<Void, Void, Void> {
+//		protected void onPreExecute() {
+//			super.onPreExecute();
+//			Functions.lockRotation(TimeTable.this);
+//			loading = ProgressDialog.show(TimeTable.this, "",
+//					getString(R.string.loading_timetable));
+//		}
+//
+//		@Override
+//		protected Void doInBackground(Void... params) {
+//			TimeTableUpdater upd = new TimeTableUpdater(TimeTable.this);
+//			upd.updateTeachers();
+//			upd.updatePupils();
+//			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//			Log.d("teacher", new Boolean(prefs.getBoolean(Functions.RIGHTS_TEACHER, false)).toString());
+//			if(!prefs.getBoolean(Functions.RIGHTS_TEACHER, false))
+//				blacklistTimeTable(getApplicationContext());
+//			return null;
+//		}
+//
+//		protected void onPostExecute(Void res) {
+//			super.onPostExecute(res);
+//			Log.d("asdf", "postexecute");
+//			loading.cancel();
+//			/*if (!res[0].equals("success"))
+//				Toast.makeText(TimeTable.this, res[1], Toast.LENGTH_LONG)
+//						.show();
+//			if (res[0].equals("loginerror")) {
+//				Intent intent;
+//				if (Functions.getSDK() >= 11)
+//					intent = new Intent(TimeTable.this, SettingsAdvanced.class);
+//				else
+//					intent = new Intent(TimeTable.this, Settings.class);
+//				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//				TimeTable.this.startActivity(intent);
+//			}*/
+//			viewpageradap.updateCursor();
+//			Functions.unlockRotation(TimeTable.this);
+//		}
+//	}
 
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
@@ -834,11 +838,19 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
+	private MenuItem refresh;
+	@TargetApi(11)
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.timetable, menu);
 		if(Functions.getSDK() < 11)
 			menu.removeItem(R.id.refresh);
+		else
+			refresh = menu.findItem(R.id.refresh);
+		if(refreshing && Functions.getSDK() >= 11)
+				refresh.setActionView(new ProgressBar(this));
+		else if(refreshing)
+			loading = ProgressDialog.show(this, null, "Lade...");
 		return true;
 	}
 
@@ -856,14 +868,56 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
+	private boolean refreshing = false;
+	private static ServiceHandler hand;
+	@TargetApi(11)
 	public void updateTimeTable() {
-		TimeTableUpdateTask upd = new TimeTableUpdateTask();
-		upd.execute();
+		refreshing = true;
+		final View actionView;
+		if (Functions.getSDK() >= 11) {
+			actionView = refresh.getActionView();
+			refresh.setActionView(new ProgressBar(this));
+		} else {
+			actionView = null;
+			loading = ProgressDialog.show(this, null,
+					"Lade...");
+		}
+		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
+			@Override
+			public void onServiceError() {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onFinishedService() {
+				Log.d("service", "finished without error");
+				if (Functions.getSDK() >= 11)
+					refresh.setActionView(actionView);
+				else
+					loading.cancel();
+				refreshing = false;
+			}
+		});
+		Handler handler = hand.getHandler();
+		
+		Intent intent = new Intent(this, WorkerService.class);
+	    // Create a new Messenger for the communication back
+	    Messenger messenger = new Messenger(handler);
+	    intent.putExtra(WorkerService.MESSENGER, messenger);
+	    intent.putExtra(WorkerService.ACTION, WorkerService.TIMETABLE);
+	    intent.putExtra(WorkerService.WORKER_CLASS, TimeTable.class.getCanonicalName());
+	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
+	    startService(intent);
+	    Log.d("class", TimeTableUpdater.class.getCanonicalName());
 	}
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		try {
+		loading.cancel();
+		} catch(NullPointerException e) {
+			//no dialog
+		}
 		try {
 			viewpageradap.closeCursorsDB();
 		} catch(NullPointerException e) {
@@ -914,6 +968,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	  savedInstanceState.putBoolean("ownclass", viewpageradap.ownClass);
 	  savedInstanceState.putString("selclass", viewpageradap.klasse);
 	  savedInstanceState.putString("selshort", viewpageradap.teacher);
+	  savedInstanceState.putBoolean("refreshing", refreshing);
 	}
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -937,7 +992,9 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.setSelectedItem(savedInstanceState.getInt("navlistselected"), this);
 		}
-		super.onRestoreInstanceState(savedInstanceState);
+		Log.d("extras", savedInstanceState.toString());
+		//super.onRestoreInstanceState(savedInstanceState);
+		refreshing = savedInstanceState.getBoolean("refreshing");
 	}
 	@Override
 	public void onHomePress() {
@@ -946,5 +1003,21 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	@Override
 	public void onRefreshPress() {
 		updateTimeTable();
+	}
+	public void update(int what, Context c) {
+		Log.d("what", Integer.valueOf(what).toString());
+		TimeTableUpdater udp = new TimeTableUpdater(c);
+		switch(what) {
+		case WorkerService.UPDATE_ALL:
+			udp.updatePupils();
+			udp.updateTeachers();
+			break;
+		case WorkerService.UPDATE_PUPILS:
+			udp.updatePupils();
+			break;
+		case WorkerService.UPDATE_TEACHERS:
+			udp.updateTeachers();
+			break;
+		}
 	}
 }

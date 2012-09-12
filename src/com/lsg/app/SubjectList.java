@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.lsg.app.interfaces.SQLlist;
+
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
