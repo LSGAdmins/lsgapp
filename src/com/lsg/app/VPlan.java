@@ -2,10 +2,7 @@ package com.lsg.app;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.json.JSONArray;
@@ -51,7 +48,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lsg.app.TimeTable.TimeTableUpdater;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
@@ -173,13 +169,13 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 
 		public void updateCondLists() {
 			exclude_cond = new String();
-			Cursor exclude = myDB.query(Functions.EXCLUDE_TABLE, new String[] {Functions.DB_FACH, Functions.DB_NEEDS_SYNC},
+			Cursor exclude = myDB.query(Functions.DB_EXCLUDE_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_NEEDS_SYNC},
 					null, null, null, null, null);
 			exclude.moveToFirst();
 			int i = 0;
 			while(i < exclude.getCount()) {
-				String fach = exclude.getString(exclude.getColumnIndex(Functions.DB_FACH));
-				exclude_cond += " AND " + Functions.DB_FACH + " != '" + fach + "' ";
+				String fach = exclude.getString(exclude.getColumnIndex(Functions.DB_RAW_FACH));
+				exclude_cond += " AND " + Functions.DB_RAW_FACH + " != '" + fach + "' ";
 				exclude.moveToNext();
 				i++;
 			}
@@ -218,6 +214,8 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 			String mine_cond = first + include_cond +  sec + exclude_cond;
 			String all_cond = first + sec;
+			Log.d("mine_cond", mine_cond);
+			Log.d("all_cond", all_cond);
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
 				cursor_mine = myDB.query(Functions.DB_VPLAN_TEACHER,
 						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
@@ -491,35 +489,42 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 						values.put(Functions.DB_DATE, jObject.getString("date"));
 						values.put(Functions.DB_LENGTH, jObject.getInt("length"));
 						myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
-						try {
-							Date vdate = new SimpleDateFormat("dd.MM.yyyy")
-									.parse(jObject.getString("date"));
-							Calendar cal = new GregorianCalendar(Integer.valueOf(
-									jObject.getString("date").split("\\.")[2]),
-									Integer.valueOf(jObject.getString("date")
-											.split("\\.")[1]), Integer.valueOf(
-											jObject.getString("date")
-													.split("\\.")[0]));
-							myDB.update(Functions.DB_TIME_TABLE, vals,
-									Functions.DB_DAY + "=? AND "
-											+ Functions.DB_HOUR + "=? AND "
-											+ Functions.DB_RAW_LEHRER + " LIKE ? AND "
-											+ Functions.DB_FACH + "=?",
-									new String[] {
-											Integer.valueOf(
-													cal.get(Calendar.DAY_OF_WEEK)-3-cal.getFirstDayOfWeek())
-													.toString(),
-											Integer.valueOf(jObject.getInt("stunde")-1).toString(),
-											"%" + jObject.getString("rawlehrer")
-													+ "%" , jObject.getString("fach")});
-							Log.d("day", Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)).toString());
-							Log.d("date", cal.toString());
-						} catch (ParseException e) {
-						      e.printStackTrace();
-						    }
-						
+						// Date vdate = new SimpleDateFormat("dd.MM.yyyy")
+						// .parse(jObject.getString("date"));
+						Calendar cal = new GregorianCalendar(
+								Integer.valueOf(jObject.getString("date")
+										.split("\\.")[2]),
+								Integer.valueOf(jObject.getString("date")
+										.split("\\.")[1]),
+								Integer.valueOf(jObject.getString("date")
+										.split("\\.")[0]));
+						myDB.update(
+								Functions.DB_TIME_TABLE,
+								vals,
+								Functions.DB_DAY + "=? AND "
+										+ Functions.DB_HOUR + "=? AND "
+										+ Functions.DB_RAW_LEHRER
+										+ " LIKE ? AND " + Functions.DB_FACH
+										+ "=?",
+								new String[] {
+										Integer.valueOf(
+												cal.get(Calendar.DAY_OF_WEEK)
+														- 3
+														- cal.getFirstDayOfWeek())
+												.toString(),
+										Integer.valueOf(
+												jObject.getInt("stunde") - 1)
+												.toString(),
+										"%" + jObject.getString("rawlehrer")
+												+ "%",
+										jObject.getString("fach") });
+						Log.d("day",
+								Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK))
+										.toString());
+						Log.d("date", cal.toString());
+
 						i++;
-						}
+					}
 					myDB.close();
 					JSONObject jObject            = jArray.getJSONObject(i);
 					String date                   = jObject.getString("date");
@@ -736,14 +741,57 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	public boolean onContextItemSelected(final MenuItem item) {
 		return Functions.contextMenuSelect(item, this, adapter, Functions.DB_VPLAN_TABLE);
 	}
+	public static void blacklistVPlan(Context context) {
+		Log.d("vplan", "blacklistvplan");
+		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
+				Context.MODE_PRIVATE, null);
+		Cursor vplan = myDB.query(Functions.DB_VPLAN_TABLE, new String[] { Functions.DB_ROWID,
+				Functions.DB_RAW_FACH }, null, null, null, null, null);
+		vplan.moveToFirst();
+		ContentValues vals = new ContentValues();
+		vals.put(Functions.DB_DISABLED, 2);
+		myDB.update(Functions.DB_VPLAN_TABLE, vals, null, null);
+		if(vplan.getCount() > 0)
+		do {
+				Cursor exclude = myDB
+						.query(Functions.DB_EXCLUDE_TABLE,
+								new String[] { Functions.DB_ROWID },
+								Functions.DB_RAW_FACH + "=? AND "
+										+ Functions.DB_TYPE + "=?",
+								new String[] {
+										vplan.getString(vplan
+												.getColumnIndex(Functions.DB_RAW_FACH)),
+										"oldstyle" }, null, null, null);
+				if (exclude.getCount() > 0) {
+					myDB.execSQL(
+							"UPDATE " + Functions.DB_VPLAN_TABLE + " SET "
+									+ Functions.DB_DISABLED + "=? WHERE "
+									+ Functions.DB_ROWID + "=?",
+							new String[] {
+									"1",
+									vplan.getString(vplan
+											.getColumnIndex(Functions.DB_ROWID)) });
+			}
+			exclude.close();
+		} while (vplan.moveToNext());
+		vplan.close();
+		myDB.close();
+	}
 	private static ServiceHandler hand;
 	@TargetApi(11)
 	public void updateVP() {
 		refreshing = true;
 		final View actionView;
+		View v;
 		if (Functions.getSDK() >= 11) {
-			actionView = refresh.getActionView();
-			refresh.setActionView(new ProgressBar(this));
+			try {
+				v = refresh.getActionView();
+				refresh.setActionView(new ProgressBar(this));
+			} catch (NullPointerException e) {
+				loading = ProgressDialog.show(this, null, "Lade...");
+				v = null;
+			}
+			actionView = v;
 		} else {
 			actionView = null;
 			loading = ProgressDialog.show(this, null,
@@ -758,7 +806,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				if (Functions.getSDK() >= 11)
+				if (Functions.getSDK() >= 11 && actionView != null)
 					refresh.setActionView(actionView);
 				else
 					loading.cancel();

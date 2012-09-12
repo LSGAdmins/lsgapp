@@ -140,7 +140,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 			Bundle data = getArguments();
 			String type = data.getString("list");
 			if (type.equals("blacklist")) {
-				table = new String(Functions.EXCLUDE_TABLE);
+				table = new String(Functions.DB_EXCLUDE_TABLE);
 			} else {
 				table = new String(Functions.INCLUDE_TABLE);
 			}
@@ -167,7 +167,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 			// info if listview empty
 			TextView textv = (TextView) getActivity().findViewById(
 					R.id.list_view_empty);
-			if (table.equals(Functions.EXCLUDE_TABLE))
+			if (table.equals(Functions.DB_EXCLUDE_TABLE))
 				textv.setText(R.string.exclude_empty);
 			else
 				textv.setText(R.string.include_empty);

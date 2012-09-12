@@ -35,7 +35,7 @@ public class BlackWhiteList extends ListActivity {
 		String type = data.getString(Functions.BLACKWHITELIST);
 		if(type.equals(Functions.BLACKLIST)) {
 			setTitle(getString(R.string.blacklist));
-			table = new String(Functions.EXCLUDE_TABLE);
+			table = new String(Functions.DB_EXCLUDE_TABLE);
 		}
 		else {
 			setTitle(getString(R.string.whitelist));
@@ -54,7 +54,7 @@ public class BlackWhiteList extends ListActivity {
 		//info if listview empty
         getListView().setEmptyView(findViewById(R.id.list_view_empty));
         TextView textv = (TextView) findViewById(R.id.list_view_empty);
-        if(table.equals(Functions.EXCLUDE_TABLE))
+        if(table.equals(Functions.DB_EXCLUDE_TABLE))
         	textv.setText(R.string.exclude_empty);
         else
         	textv.setText(R.string.include_empty);

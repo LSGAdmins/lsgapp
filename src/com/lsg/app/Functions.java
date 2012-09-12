@@ -113,7 +113,7 @@ public class Functions {
 	public static final String DB_TITLE = "title";
 	public static final String DB_VENUE = "venue";
 	// exclude & include
-	public static final String EXCLUDE_TABLE = "exclude";
+	public static final String DB_EXCLUDE_TABLE = "exclude";
 	public static final String INCLUDE_TABLE = "include";
 	public static final String DB_NEEDS_SYNC = "needssync";
 	// subjects
@@ -368,7 +368,7 @@ public class Functions {
     	    	    + Functions.DB_LENGTH             + " INTEGER"
     				+");");
     		//blacklist
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.EXCLUDE_TABLE + " ("
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EXCLUDE_TABLE + " ("
     				+ Functions.DB_ROWID + " INTEGER primary key autoincrement,"
     				+ Functions.DB_FACH + " TEXT,"
     				+ Functions.DB_NEEDS_SYNC + " TEXT"
@@ -434,8 +434,8 @@ public class Functions {
     			myDB.setVersion(1);
     		}
     		if(myDB.getVersion() == 1) {
-    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
+    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
     			Log.d(Functions.INCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
     			myDB.execSQL("ALTER TABLE " + Functions.INCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
     			myDB.setVersion(2);
@@ -475,12 +475,12 @@ public class Functions {
     			myDB.setVersion(8);
     		}
     		if(myDB.getVersion() == 8) {
-    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_TEACHER);
-    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_TEACHER + " TEXT");
-    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_HOUR);
-    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_HOUR + " TEXT");
-    			Log.d(Functions.EXCLUDE_TABLE, "adding column " + Functions.DB_DAY);
-    			myDB.execSQL("ALTER TABLE " + Functions.EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_DAY + " TEXT");
+    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_TEACHER);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_TEACHER + " TEXT");
+    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_HOUR);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_HOUR + " TEXT");
+    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_DAY);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_DAY + " TEXT");
     			myDB.setVersion(9);
     		}
     		if(myDB.getVersion() == 9) {
@@ -494,6 +494,16 @@ public class Functions {
     			Log.d(Functions.DB_TIME_TABLE_TEACHERS, "adding column " + Functions.DB_VERTRETUNG);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE_TEACHERS + " ADD COLUMN " + Functions.DB_VERTRETUNG + " TEXT");
     			myDB.setVersion(11);
+    		}
+    		if(myDB.getVersion() == 11) {
+    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_TYPE);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_TYPE + " TEXT");
+    			myDB.setVersion(12);
+    		}
+    		if(myDB.getVersion() == 12) {
+    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_DISABLED);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_DISABLED + " INTEGER");
+    			myDB.setVersion(13);
     		}
     		myDB.close();
         } catch (Exception e) {
@@ -546,7 +556,7 @@ public class Functions {
 				conmenu = 1;
 				}
 		
-		Cursor exclude = myDB.query(Functions.EXCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_RAW_FACH + " LIKE ?",
+		Cursor exclude = myDB.query(Functions.DB_EXCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_RAW_FACH + " LIKE ?",
 				new String[] {rawfach}, null, null, null);
 		if(exclude.getCount() > 0)
 			conmenu = 2;
@@ -578,7 +588,7 @@ public class Functions {
 	 * @param table the table
 	 * @return always true
 	 */
-	public static boolean contextMenuSelect(MenuItem item, Context context, final SQLlist list, String table) {
+	public static boolean contextMenuSelect(MenuItem item, final Context context, final SQLlist list, String table) {
 		final SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 		  
@@ -603,7 +613,7 @@ public class Functions {
 		  int menuItemIndex = item.getItemId();
 		  if(menuItemIndex == 0) {
 			  prompt = context.getString(R.string.really_exclude);
-			  listtable  = Functions.EXCLUDE_TABLE;
+			  listtable  = Functions.DB_EXCLUDE_TABLE;
 		  }
 		  else if(menuItemIndex == 1) {
 			  prompt = context.getString(R.string.really_include);
@@ -624,7 +634,10 @@ public class Functions {
 				        	vals.put(Functions.DB_FACH, fach);
 				        	vals.put(Functions.DB_RAW_FACH, rawfach);
 				        	vals.put(Functions.DB_NEEDS_SYNC, "true");
+				        	vals.put(Functions.DB_TYPE, "oldstyle");
 				        	myDB.insert(listtable, null, vals);
+//				        	VPlan.blacklistVPlan(context);
+//				        	TimeTable.blacklistTimeTable(context);
 				        	list.updateList();
 				            break;
 				        }
@@ -636,7 +649,7 @@ public class Functions {
 				.setNegativeButton(context.getString(R.string.no), dialogClickListener).show();
 		  }
 		  if(menuItemIndex == 2) {
-			  myDB.delete(Functions.EXCLUDE_TABLE, Functions.DB_RAW_FACH + " = ?", new String[] {rawfach});
+			  myDB.delete(Functions.DB_EXCLUDE_TABLE, Functions.DB_RAW_FACH + " = ?", new String[] {rawfach});
 			  list.updateList();
 		  }
 		  if(menuItemIndex == 3) {
@@ -693,23 +706,6 @@ public class Functions {
 			e.printStackTrace();
 		}
 	}
-	/*
-	public static void registerAC2DM(Context context) {
-		Log.d("ac2dm", "registration for ac2dm");
-		Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
-		registrationIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
-		registrationIntent.putExtra("sender", Functions.EMAIL);
-		context.startService(registrationIntent);
-	}
-	/**
-	 * unregister from ac2dm, if setting is disabled
-	 * @param context the app context
-	 
-	public static void unregisterAC2DM(Context context) {
-		Intent unregIntent = new Intent("com.google.android.c2dm.intent.UNREGISTER");
-		unregIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
-		context.startService(unregIntent);
-	}*/
 	/**
 	 * a little helper function to convert dp units to pixel on the specific device
 	 * @param dp the value in dp
@@ -719,13 +715,7 @@ public class Functions {
 	public static int dpToPx(int dp, Context ctx) {
 	    Resources r = ctx.getResources();
 	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-	}/*
-	public static int percentToPx(double percent, Activity context) {
-		Display display = context.getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		return (int) (size.x * percent);
-	}*/
+	}
 	//source: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
 	public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
 		int childCount = viewGroup.getChildCount();

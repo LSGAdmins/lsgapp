@@ -499,7 +499,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 							values.put(Functions.DB_RAW_LEHRER,
 									jObject.getString("rawteacher"));
 							Cursor c = myDB
-									.query(Functions.EXCLUDE_TABLE,
+									.query(Functions.DB_EXCLUDE_TABLE,
 											new String[] { Functions.DB_ROWID },
 											Functions.DB_TEACHER + "=? AND "
 													+ Functions.DB_RAW_FACH
@@ -632,21 +632,40 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		if(allSubjects.getCount() > 0)
 		do {
 			Cursor exclude = myDB.query(
-					Functions.EXCLUDE_TABLE,
+					Functions.DB_EXCLUDE_TABLE,
 					new String[] { Functions.DB_ROWID },
 					Functions.DB_TEACHER + "=? AND " + Functions.DB_RAW_FACH
-							+ "=? AND " + Functions.DB_HOUR + "=? AND "
-							+ Functions.DB_DAY + "=?",
-					new String[] { allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_RAW_LEHRER)),
-							allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_RAW_FACH)),
-							allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_HOUR)),
-							allSubjects.getString(allSubjects.getColumnIndex(Functions.DB_DAY)) }, null, null,
-					null);
-			if (exclude.getCount() > 0) {
-				myDB.execSQL("UPDATE " + Functions.DB_TIME_TABLE + " SET "
-						+ Functions.DB_DISABLED + "=? WHERE " + Functions.DB_ROWID + "=?",
-						new String[] { "1", allSubjects.getString(allSubjects
-								.getColumnIndex(Functions.DB_ROWID)) });
+ + "=? AND "
+										+ Functions.DB_HOUR + "=? AND "
+										+ Functions.DB_DAY + "=?",
+								new String[] {
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_RAW_LEHRER)),
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_RAW_FACH)),
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_HOUR)),
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_DAY)) },
+								null, null, null);
+				Cursor exclude_oldstyle = myDB
+						.query(Functions.DB_EXCLUDE_TABLE,
+								new String[] { Functions.DB_ROWID },
+								Functions.DB_RAW_FACH + "=? AND "
+										+ Functions.DB_TYPE + "=?",
+								new String[] {
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_RAW_FACH)),
+										"oldstyle" }, null, null, null);
+				if (exclude.getCount() > 0 || exclude_oldstyle.getCount() > 0) {
+					myDB.execSQL(
+							"UPDATE " + Functions.DB_TIME_TABLE + " SET "
+									+ Functions.DB_DISABLED + "=? WHERE "
+									+ Functions.DB_ROWID + "=?",
+							new String[] {
+									"1",
+									allSubjects.getString(allSubjects
+											.getColumnIndex(Functions.DB_ROWID)) });
 			}
 			exclude.close();
 		} while (allSubjects.moveToNext());

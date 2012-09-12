@@ -19,20 +19,19 @@ import android.os.Messenger;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.lsg.app.VPlan.VPlanUpdater;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
@@ -214,12 +213,12 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		getListView().setEmptyView(getListView().findViewById(R.id.list_view_empty));
 		((TextView) findViewById(R.id.list_view_empty)).setText(R.string.events_empty);
 		
-
 		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_EVENTS_TABLE);
 		long count = num_rows.simpleQueryForLong();
 		if(count == 0)
 			updateEvents();
 		num_rows.close();
+		
 		slidemenu = new SlideMenu(this, Events.class);
 		slidemenu.checkEnabled();
 		titlebar.init(this);
@@ -260,9 +259,16 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	public void updateEvents() {
 		refreshing = true;
 		final View actionView;
+		View v;
 		if (Functions.getSDK() >= 11) {
-			actionView = refresh.getActionView();
-			refresh.setActionView(new ProgressBar(this));
+			try {
+				v = refresh.getActionView();
+				refresh.setActionView(new ProgressBar(this));
+			} catch (NullPointerException e) {
+				loading = ProgressDialog.show(this, null, "Lade...");
+				v = null;
+			}
+			actionView = v;
 		} else {
 			actionView = null;
 			loading = ProgressDialog.show(this, null,
@@ -277,10 +283,11 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				if (Functions.getSDK() >= 11)
+				if (Functions.getSDK() >= 11 && actionView != null)
 					refresh.setActionView(actionView);
 				else
 					loading.cancel();
+				updateList();
 				refreshing = false;
 			}
 		});

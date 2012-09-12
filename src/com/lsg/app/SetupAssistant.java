@@ -344,7 +344,7 @@ public class SetupAssistant extends Activity {
 						c.moveToFirst();
 						do {
 							stmt = myDB.compileStatement("INSERT INTO "
-									+ Functions.EXCLUDE_TABLE + " ("
+									+ Functions.DB_EXCLUDE_TABLE + " ("
 									+ Functions.DB_TEACHER + ", "
 									+ Functions.DB_RAW_FACH + ", "
 									+ Functions.DB_FACH + ", "
@@ -778,7 +778,7 @@ public class SetupAssistant extends Activity {
 					c.moveToFirst();
 					Log.d("count", Integer.valueOf(c.getCount()).toString());
 					SQLiteStatement stmt = myDB.compileStatement("DELETE FROM "
-							+ Functions.EXCLUDE_TABLE + " WHERE "
+							+ Functions.DB_EXCLUDE_TABLE + " WHERE "
 							+ Functions.DB_HOUR + "=? AND " + Functions.DB_DAY
 							+ "=? AND " + Functions.DB_RAW_FACH + "=? AND "
 							+ Functions.DB_TEACHER + "=?");
