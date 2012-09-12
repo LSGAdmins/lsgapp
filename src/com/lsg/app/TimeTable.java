@@ -788,9 +788,9 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		titlebar.init(this);
 		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
-		if ((prefs.getBoolean("teacher", false) || prefs.getBoolean("pupil",
+		if ((prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs.getBoolean(Functions.RIGHTS_PUPIL,
 				false))) {
-			titlebar.addSpinnerNavigation( this, R.array.timetable_actions);
+			titlebar.addSpinnerNavigation( this, (prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions : R.array.timetable_actions_teachers);
 		}
 	}
 	public void showMine() {

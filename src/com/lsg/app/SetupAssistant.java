@@ -342,6 +342,9 @@ public class SetupAssistant extends Activity {
 						 * null, null, null);
 						 */
 						c.moveToFirst();
+						stmt = myDB.compileStatement("DELETE FROM " + Functions.DB_EXCLUDE_TABLE + " WHERE " + Functions.DB_TYPE + "=?");
+						stmt.bindString(1, "newstyle");
+						stmt.execute();
 						do {
 							stmt = myDB.compileStatement("INSERT INTO "
 									+ Functions.DB_EXCLUDE_TABLE + " ("
@@ -349,8 +352,9 @@ public class SetupAssistant extends Activity {
 									+ Functions.DB_RAW_FACH + ", "
 									+ Functions.DB_FACH + ", "
 									+ Functions.DB_HOUR + ", "
-									+ Functions.DB_DAY
-									+ ") VALUES (?, ?, ?, ?, ?)");
+									+ Functions.DB_DAY + ", "
+									+ Functions.DB_TYPE
+									+ ") VALUES (?, ?, ?, ?, ?, ?)");
 							stmt.bindString(1, c.getString(c
 									.getColumnIndex(Functions.DB_RAW_LEHRER)));
 							stmt.bindString(2, c.getString(c
@@ -359,6 +363,7 @@ public class SetupAssistant extends Activity {
 									.getColumnIndex(Functions.DB_FACH)));
 							stmt.bindLong(4, hour);
 							stmt.bindLong(5, day);
+							stmt.bindString(6, "newstyle");
 							stmt.execute();
 							stmt.close();
 							Log.d("rawfach", c.getString(c

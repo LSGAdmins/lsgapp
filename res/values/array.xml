@@ -41,4 +41,8 @@
         <item>Schülerstundenpläne</item>
         <item>Lehrerstundenpläne</item>
     </string-array>
+    <string-array name="timetable_actions_teachers">
+        <item>Mein Stundenplan</item>
+        <item>Schülerstundenpläne</item>
+    </string-array>
 </resources>
