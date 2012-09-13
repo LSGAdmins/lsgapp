@@ -35,6 +35,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         addPreferencesFromResource(R.xml.login_settings);
         addPreferencesFromResource(R.xml.vplan_settings);
         addPreferencesFromResource(R.xml.list_settings);
+        addPreferencesFromResource(R.xml.setupassistantbutton);
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int i = 0;
@@ -65,6 +66,14 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	public boolean onPreferenceClick(Preference preference) {
         				Intent intent = new Intent(Settings.this, BlackWhiteList.class);
         				intent.putExtra(Functions.BLACKWHITELIST, Functions.WHITELIST);
+        				startActivity(intent);
+        				return true;
+        				}
+        	});
+        Preference setupassistant = (Preference) findPreference("setupassistantPref");
+        setupassistant.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        	public boolean onPreferenceClick(Preference preference) {
+        				Intent intent = new Intent(Settings.this, SetupAssistant.class);
         				startActivity(intent);
         				return true;
         				}

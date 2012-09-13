@@ -230,33 +230,19 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 						int position, long id) {
 					Cursor c = myDB
 							.query(Functions.DB_TIME_TABLE, new String[] {
-									Functions.DB_RAW_FACH, Functions.DB_HOUR,
-									Functions.DB_LEHRER }, Functions.DB_ROWID
+									Functions.DB_REMOTE_ID, Functions.DB_VERTRETUNG }, Functions.DB_ROWID
 									+ "=?", new String[] { Long.valueOf(id)
 									.toString() }, null, null, null);
 					c.moveToFirst();
-					String hour = Integer.valueOf(
-							c.getInt(c.getColumnIndex(Functions.DB_HOUR)) + 1)
-							.toString();
-					Cursor d = myDB.query(
-							Functions.DB_VPLAN_TABLE,
-							new String[] { Functions.DB_KLASSE,
-									Functions.DB_STUNDE,
-									Functions.DB_VERTRETUNGSTEXT,
-									Functions.DB_LEHRER, Functions.DB_FACH,
-									Functions.DB_TYPE },
-							Functions.DB_RAW_FACH + "=? AND "
-									+ Functions.DB_STUNDE + "=? AND "
-									+ Functions.DB_RAW_LEHRER + "=?",
-							new String[] {
-									c.getString(c
-											.getColumnIndex(Functions.DB_RAW_FACH)),
-									hour,
-									c.getString(c
-											.getColumnIndex(Functions.DB_LEHRER)) },
-							null, null, null);
-					d.moveToFirst();
-					if (d.getCount() > 0) {
+					if (c.getString(c.getColumnIndex(Functions.DB_VERTRETUNG))
+							.equals("true")) {
+						Cursor d = myDB.query(Functions.DB_TIME_TABLE,
+								new String[] { Functions.DB_VERTRETUNGSTEXT,
+										Functions.DB_KLASSE, Functions.DB_FACH,
+										Functions.DB_STUNDE, Functions.DB_TYPE,
+										Functions.DB_LEHRER },
+								Functions.DB_ROWID + "=?", new String[] {c.getString(c.getColumnIndex(Functions.DB_REMOTE_ID))},
+								null, null, null);
 						String vtext = (!(d.getString(d
 								.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)))
 								.equals("null")) ? d.getString(d
@@ -666,52 +652,16 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 									"1",
 									allSubjects.getString(allSubjects
 											.getColumnIndex(Functions.DB_ROWID)) });
-			}
-			exclude.close();
-		} while (allSubjects.moveToNext());
+				}
+				exclude.close();
+			} while (allSubjects.moveToNext());
 		allSubjects.close();
-		myDB.close();
+		try {
+			myDB.close();
+		} catch (Exception e) {
+
+		}
 	}
-//	public class TimeTableUpdateTask extends AsyncTask<Void, Void, Void> {
-//		protected void onPreExecute() {
-//			super.onPreExecute();
-//			Functions.lockRotation(TimeTable.this);
-//			loading = ProgressDialog.show(TimeTable.this, "",
-//					getString(R.string.loading_timetable));
-//		}
-//
-//		@Override
-//		protected Void doInBackground(Void... params) {
-//			TimeTableUpdater upd = new TimeTableUpdater(TimeTable.this);
-//			upd.updateTeachers();
-//			upd.updatePupils();
-//			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//			Log.d("teacher", new Boolean(prefs.getBoolean(Functions.RIGHTS_TEACHER, false)).toString());
-//			if(!prefs.getBoolean(Functions.RIGHTS_TEACHER, false))
-//				blacklistTimeTable(getApplicationContext());
-//			return null;
-//		}
-//
-//		protected void onPostExecute(Void res) {
-//			super.onPostExecute(res);
-//			Log.d("asdf", "postexecute");
-//			loading.cancel();
-//			/*if (!res[0].equals("success"))
-//				Toast.makeText(TimeTable.this, res[1], Toast.LENGTH_LONG)
-//						.show();
-//			if (res[0].equals("loginerror")) {
-//				Intent intent;
-//				if (Functions.getSDK() >= 11)
-//					intent = new Intent(TimeTable.this, SettingsAdvanced.class);
-//				else
-//					intent = new Intent(TimeTable.this, Settings.class);
-//				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-//				TimeTable.this.startActivity(intent);
-//			}*/
-//			viewpageradap.updateCursor();
-//			Functions.unlockRotation(TimeTable.this);
-//		}
-//	}
 
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;

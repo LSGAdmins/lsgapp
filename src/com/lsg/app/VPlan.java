@@ -488,7 +488,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 						values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
 						values.put(Functions.DB_DATE, jObject.getString("date"));
 						values.put(Functions.DB_LENGTH, jObject.getInt("length"));
-						myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
+						long last_id = myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
 						// Date vdate = new SimpleDateFormat("dd.MM.yyyy")
 						// .parse(jObject.getString("date"));
 						Calendar cal = new GregorianCalendar(
@@ -498,6 +498,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 										.split("\\.")[1]),
 								Integer.valueOf(jObject.getString("date")
 										.split("\\.")[0]));
+						vals.put(Functions.DB_REMOTE_ID, last_id);
 						myDB.update(
 								Functions.DB_TIME_TABLE,
 								vals,
@@ -608,41 +609,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				return new String[] {"success", " "};
 				}
 		}
-//	public class VPlanUpdateTask extends AsyncTask<Void, Void, String[]> {
-//		@TargetApi(11)
-//		protected void onPreExecute() {
-//			super.onPreExecute();
-//			loading = ProgressDialog.show(VPlan.this, "", getString(R.string.loading_vplan));
-//			Functions.lockRotation(VPlan.this);
-//		}
-//		@Override
-//		protected String[] doInBackground(Void... params) {
-//			VPlanUpdater vpup = new VPlanUpdater(VPlan.this);
-//			vpup.updateTeachers();
-//			return vpup.update();
-//		}
-//		protected void onPostExecute(String[] res) {
-//			loading.cancel();
-//			Log.d("ready", "finished");
-//			if(!res[0].equals("success"))
-//				Toast.makeText(VPlan.this, res[1], Toast.LENGTH_LONG).show();
-//			if(res[0].equals("loginerror")) {
-//				Intent intent;
-//				if(Functions.getSDK() >= 11)
-//					intent = new Intent(VPlan.this, SettingsAdvanced.class);
-//				else
-//					intent = new Intent(VPlan.this, Settings.class);
-//				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-//				VPlan.this.startActivity(intent);
-//			}
-//			else {
-//				try {
-//					adapter.updateCursor();
-//				} catch(Exception e) {}
-//			}
-//			Functions.unlockRotation(VPlan.this);
-//		}
-//	}
+	
 	private VPlanPagerAdapter adapter;
 	private ExtendedViewPager pager;
 	private SharedPreferences prefs;

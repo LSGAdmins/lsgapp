@@ -1,33 +1,35 @@
-<PreferenceScreen
-        xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
     <PreferenceCategory
-        android:title="@string/vplan"
-        android:key="@string/vplan" >
-        <CheckBoxPreference 
-            android:title="@string/showwithoutclass"
+        android:key="@string/vplan"
+        android:title="@string/vplan" >
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="showwithoutclass"
-            android:defaultValue="true" />
-        <CheckBoxPreference 
-            android:title="@string/showonlywhitelist"
+            android:title="@string/showwithoutclass" />
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="showonlywhitelist"
-            android:defaultValue="false" />
-        <CheckBoxPreference 
-            android:title="@string/useac2dm"
+            android:title="@string/showonlywhitelist" />
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="useac2dm"
-            android:defaultValue="false" />
-        <CheckBoxPreference 
-            android:title="@string/updatevplanonstart"
+            android:title="@string/useac2dm" />
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="updatevplanonstart"
-            android:defaultValue="false" />
-        <CheckBoxPreference 
-            android:title="@string/autopullvplan"
+            android:title="@string/updatevplanonstart" />
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="autopullvplan"
-            android:defaultValue="false" />
+            android:title="@string/autopullvplan" />
+
         <EditTextPreference
-            android:title="@string/autopull_intervall"
-            android:hint="@string/min"
             android:defaultValue="30"
+            android:hint="@string/min"
+            android:inputType="number"
             android:key="autopull_intervall"
-            android:inputType="number" />
+            android:title="@string/autopull_intervall" />
     </PreferenceCategory>
+
 </PreferenceScreen>

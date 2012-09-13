@@ -87,6 +87,7 @@ public class Functions {
 	
 	public static final String DB_ROWID           = "_id";
 	public static final String DB_NAME            = "lsgapp";
+	public static final String DB_REMOTE_ID           = "remote_id";
 	//VPlan
 	public static final String DB_VPLAN_TABLE     = "vertretungen";
 	public static final String DB_VPLAN_TEACHER   = "lehrervertretungen";
@@ -504,6 +505,11 @@ public class Functions {
     			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_DISABLED);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_DISABLED + " INTEGER");
     			myDB.setVersion(13);
+    		}
+    		if(myDB.getVersion() == 13) {
+    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_REMOTE_ID);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_REMOTE_ID + " INTEGER");
+    			myDB.setVersion(14);
     		}
     		myDB.close();
         } catch (Exception e) {
