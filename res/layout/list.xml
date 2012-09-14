@@ -5,7 +5,7 @@
     android:layout_height="fill_parent">
     <ListView
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:id="@+id/android:list" />
     <TextView 
         android:id="@+id/list_view_empty"

@@ -200,11 +200,11 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			if(prefs.getBoolean("showonlywhitelist", false))
 				include_cond = "AND (" + include_cond + " ) OR ( " + include_cond + " )";
 			else
-				include_cond = " OR ( " + include_cond + " )";
+				include_cond = " OR ( " + include_cond + " ) ";
 		}
 		public void updateCursor() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-			String klasse = prefs.getString("class", "");
+			String klasse = prefs.getString("full_class", "");
 			where_conds[0] =  "%" + klasse + "%";
 			String first = "( " + Functions.DB_KLASSE + " LIKE ? ";
 			String sec = "";
@@ -215,7 +215,9 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			String mine_cond = first + include_cond +  sec + exclude_cond;
 			String all_cond = first + sec;
 			Log.d("mine_cond", mine_cond);
-			Log.d("all_cond", all_cond);
+			for(int i = 0; i < where_conds.length; i++) {
+				Log.d("where", where_conds[i]);
+			}
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
 				cursor_mine = myDB.query(Functions.DB_VPLAN_TEACHER,
 						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
