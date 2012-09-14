@@ -3,7 +3,6 @@ package com.lsg.app;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Messenger;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;

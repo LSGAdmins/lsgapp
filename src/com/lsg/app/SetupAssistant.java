@@ -41,10 +41,8 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.lsg.app.TimeTable.TimeTableUpdater;
-import com.lsg.app.lib.Download;
 
 public class SetupAssistant extends Activity {
-	Download down;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor edit;
 
@@ -291,7 +289,7 @@ public class SetupAssistant extends Activity {
 						stmt.bindString(5, Functions.KATHOLISCH);
 					}
 					long count = stmt.simpleQueryForLong();
-					if (count > 1) {
+					if (count > 1 || usr_class.equals("Q11") || usr_class.equals("Q12")) {
 						String selectionArgs[] = new String[6];
 						selectionArgs[0] = Integer.valueOf(day).toString();
 						selectionArgs[1] = Integer.valueOf(hour).toString();
@@ -327,20 +325,6 @@ public class SetupAssistant extends Activity {
 										+ Functions.DB_RAW_FACH + "!=? AND "
 										+ Functions.DB_CLASS + " LIKE ?",
 								selectionArgs, null, null, null);
-
-						/*
-						 * Cursor c = myDB.query( Functions.DB_TIME_TABLE, new
-						 * String[] { Functions.DB_RAW_FACH, Functions.DB_FACH,
-						 * Functions.DB_RAW_LEHRER }, Functions.DB_HOUR +
-						 * "=? AND " + Functions.DB_DAY + "=? AND " +
-						 * Functions.DB_CLASS + " LIKE ?", new String[] {
-						 * Integer.valueOf(hour).toString(),
-						 * Integer.valueOf(day).toString(), "%" +
-						 * prefs.getString( Functions.FULL_CLASS,
-						 * "").substring(0, 2) + "%" + prefs.getString(
-						 * Functions.FULL_CLASS, "").substring(2, 3) + "%" },
-						 * null, null, null);
-						 */
 						c.moveToFirst();
 						stmt = myDB.compileStatement("DELETE FROM " + Functions.DB_EXCLUDE_TABLE + " WHERE " + Functions.DB_TYPE + "=?");
 						stmt.bindString(1, "newstyle");
@@ -370,17 +354,6 @@ public class SetupAssistant extends Activity {
 									.getColumnIndex(Functions.DB_RAW_FACH)));
 						} while (c.moveToNext());
 						conflicts.add(new Integer[] { day, hour });
-						/*
-						 * SQLiteStatement rmstmt = myDB
-						 * .compileStatement("UPDATE " + Functions.DB_TIME_TABLE
-						 * + " SET " + Functions.DB_DISABLED + "=? WHERE " +
-						 * Functions.DB_DAY + "=? AND " + Functions.DB_HOUR +
-						 * "=? AND " + Functions.DB_CLASS + "=?");
-						 * rmstmt.bindLong(1, 1); rmstmt.bindLong(2, day);
-						 * rmstmt.bindLong(3, hour); rmstmt.bindString(4,
-						 * prefs.getString(Functions.FULL_CLASS, ""));
-						 * rmstmt.execute();
-						 */
 					}
 				}
 			}
@@ -446,16 +419,6 @@ public class SetupAssistant extends Activity {
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-		/*
-		 * setContentView(R.layout.main_nav);
-		 * 
-		 * UpdateCheckTask upcheck = new UpdateCheckTask(); upcheck.execute();
-		 * 
-		 * prefs = PreferenceManager.getDefaultSharedPreferences(this); edit =
-		 * prefs.edit(); if(prefs.getBoolean("updatevplanonstart", false)) {
-		 * UpdateBroadcastReceiver.VPupdate upd = new
-		 * UpdateBroadcastReceiver.VPupdate(this); upd.start(); }
-		 */
 		Functions.setAlarm(this);
 		Intent testAC2DM = new Intent("com.google.android.c2dm.intent.REGISTER");
 		if (startService(testAC2DM) == null) {
@@ -463,10 +426,7 @@ public class SetupAssistant extends Activity {
 			edit.putBoolean("disableAC2DM", true);
 			edit.putBoolean("useac2dm", false);
 			edit.commit();
-		}/*
-		 * 
-		 * if(Functions.getSDK() >= 9) down = new Download(lsgapp.this);
-		 */
+		}
 	}
 
 	public void setup(int step, boolean force) {
@@ -694,7 +654,7 @@ public class SetupAssistant extends Activity {
 				c.moveToNext();
 				if (ii + 1 == c.getCount() && showNone) {
 					option = new RadioButton(this);
-					option.setText("Kein Unterricht für mich!");
+					option.setText("Freistunde!");
 					option.setId(0);
 					rg.addView(option);
 				}
@@ -875,11 +835,6 @@ public class SetupAssistant extends Activity {
 			Intent about = new Intent(this, HelpAbout.class);
 			about.putExtra(Functions.helpabout, Functions.about);
 			startActivity(about);
-			return true;
-		case R.id.refresh:
-			/*
-			 * CommonDataTask cdt = new CommonDataTask(); cdt.execute();
-			 */
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

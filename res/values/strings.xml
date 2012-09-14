@@ -107,7 +107,11 @@
     <string name="teachers_short">Lehrer</string>
     <string name="smvblog">SMVBlog</string>
     <string name="oops">Oops!</string>
-    <string name="update_available"><b>Update verfügbar!</b></string>
+    <string name="update_available"><b>Update verfügbar</b></string>
+    <string name="update_available_content">Neue Version der LSGäpp: </string>
+    <string name="update_version">LSGäpp Version: </string>
+    <string name="changelog">Changelog:</string>
+    <string name="cancel">Abbruch</string>
     <string name="update">Update!</string>
     <string name="no_update">Keine Lust</string>
     <string name="search">Suche&#8230;</string>

@@ -2,22 +2,51 @@
     xmlns:android="http://schemas.android.com/apk/res/android" 
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="5dp" >
+
     <TextView
-   	    android:id="@+id/updatecheck_yourversion"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="26sp"
-        android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp"
-        android:textColor="@color/fontblack" />
+        android:text="@string/update_available"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
     <TextView
-   	    android:id="@+id/updatecheck_actversion"
-        android:layout_width="fill_parent"
+        android:id="@+id/versionview"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="26sp"
-        android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp"
-        android:textColor="@color/fontblack" />
-    
+        android:text="@string/update_version"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/changelog"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/changelog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+        <LinearLayout
+	        android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:orientation="horizontal"
+        	android:layout_gravity="bottom" >
+        	<Button
+	            android:id="@+id/finish"
+            	android:layout_width="fill_parent"
+            	android:layout_height="wrap_content"
+            	android:layout_weight="1"
+            	android:text="@string/cancel" />
+        	<Button
+	            android:id="@+id/update"
+            	android:layout_width="fill_parent"
+            	android:layout_height="wrap_content"
+            	android:layout_weight="1"
+            	android:text="@string/update"
+            	android:onClick="update" />
+    	</LinearLayout>
+
 </LinearLayout>

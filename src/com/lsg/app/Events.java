@@ -283,10 +283,13 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				if (Functions.getSDK() >= 11 && actionView != null)
-					refresh.setActionView(actionView);
-				else
-					loading.cancel();
+				try {
+					if (Functions.getSDK() >= 11 && actionView != null)
+						refresh.setActionView(actionView);
+					else
+						loading.cancel();
+				} catch (Exception e) {
+				}
 				updateList();
 				refreshing = false;
 			}

@@ -19,6 +19,8 @@ public class SMVBlog extends Activity implements HomeCall, RefreshCall {
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if(Functions.webv == null)
+		  Functions.init(this);
 		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		//getWindow().requestFeature(Window.FEATURE_PROGRESS);

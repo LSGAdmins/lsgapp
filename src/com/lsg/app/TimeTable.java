@@ -36,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
@@ -662,7 +663,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 
 		}
 	}
-
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
@@ -733,7 +733,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		slidemenu.checkEnabled();
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		Functions.init(this);
 		footer = (TextView) findViewById(R.id.footer_text);
 		titlebar.init(this);
 		titlebar.addRefresh(this);
@@ -742,6 +741,10 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 				false))) {
 			titlebar.addSpinnerNavigation( this, (prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions : R.array.timetable_actions_teachers);
 		}
+		//let service check for update
+		Intent intent = new Intent(TimeTable.this, WorkerService.class);
+	    intent.putExtra(WorkerService.WHAT, 100);
+	    startService(intent);
 	}
 	public void showMine() {
 		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);

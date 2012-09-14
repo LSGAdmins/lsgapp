@@ -772,7 +772,7 @@ public class Functions {
 	public static void unlockRotation(Activity ctx) {
 		ctx.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 	}
-	public static WebView webv;
+	public static WebView webv = null;
 	public static Bundle webvSave;
 	@SuppressLint("SetJavaScriptEnabled")
 	public static void init(Activity act) {
