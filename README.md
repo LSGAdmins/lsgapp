@@ -1,4 +1,4 @@
-lsgapp
+LSGäpp
 ======
 
 Die LSGäpp für Schüler des Louise-Schroeder-Gymnasiums. Schnell, einfach und kontinentuierlich weiterentwickelt.
