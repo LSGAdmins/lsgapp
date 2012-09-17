@@ -237,7 +237,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 					c.moveToFirst();
 					if (c.getString(c.getColumnIndex(Functions.DB_VERTRETUNG))
 							.equals("true")) {
-						Cursor d = myDB.query(Functions.DB_TIME_TABLE,
+						Cursor d = myDB.query(Functions.DB_VPLAN_TABLE,
 								new String[] { Functions.DB_VERTRETUNGSTEXT,
 										Functions.DB_KLASSE, Functions.DB_FACH,
 										Functions.DB_STUNDE, Functions.DB_TYPE,

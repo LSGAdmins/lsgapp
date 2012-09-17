@@ -65,7 +65,7 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 		}
 		public void run() {
 			VPlan.VPlanUpdater vpup = new VPlan.VPlanUpdater(context);
-			String res[] = vpup.update();
+			String res[] = vpup.updatePupils();
 			Log.d(res[0], res[1]);
 			res = vpup.updateTeachers();
 			Log.d(res[0], res[1]);

@@ -455,7 +455,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		VPlanUpdater(Context c) {
 			context = c;
 		}
-		public String[] update() {
+		public String[] updatePupils() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 			String add = "";
 			try {
@@ -463,6 +463,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 						+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_time", ""), "UTF-8");
 				} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
 			String get = Functions.getData(Functions.VP_URL, context, true, add);
+			Log.d("get", get);
 			if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
 				try {
 					JSONArray jArray = new JSONArray(get);
@@ -507,22 +508,22 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 								Functions.DB_DAY + "=? AND "
 										+ Functions.DB_HOUR + "=? AND "
 										+ Functions.DB_RAW_LEHRER
-										+ " LIKE ? AND " + Functions.DB_FACH
+										+ " LIKE ? AND " + Functions.DB_RAW_FACH
 										+ "=?",
 								new String[] {
-										Integer.valueOf(
-												cal.get(Calendar.DAY_OF_WEEK)
-														- 3
-														- cal.getFirstDayOfWeek())
+										Integer.valueOf(-(cal.get(Calendar.DAY_OF_WEEK)
+												- 3
+												- cal.getFirstDayOfWeek()))
 												.toString(),
 										Integer.valueOf(
 												jObject.getInt("stunde") - 1)
 												.toString(),
 										"%" + jObject.getString("rawlehrer")
 												+ "%",
-										jObject.getString("fach") });
+										jObject.getString("rawfach") });
 						Log.d("day",
-								Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK))
+								Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)
+										- 1)
 										.toString());
 						Log.d("date", cal.toString());
 
@@ -809,11 +810,11 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		VPlanUpdater udp = new VPlanUpdater(c);
 		switch(what) {
 		case WorkerService.UPDATE_ALL:
-			udp.update();
+			udp.updatePupils();
 			udp.updateTeachers();
 			break;
 		case WorkerService.UPDATE_PUPILS:
-			udp.update();
+			udp.updatePupils();
 			break;
 		case WorkerService.UPDATE_TEACHERS:
 			udp.updateTeachers();
