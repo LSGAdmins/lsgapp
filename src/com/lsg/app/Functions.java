@@ -291,7 +291,6 @@ public class Functions {
 	 * @param context the app context to access the database
 	 */
 	public static void cleanVPlanTable(Context context) {
-		if(false) {
 		Calendar now  = Calendar.getInstance();
 		int year_now  = now.get(Calendar.YEAR);
 		int month_now = now.get(Calendar.MONTH)+1;
@@ -329,7 +328,6 @@ public class Functions {
 		}
 		result.close();
 		myDB.close();
-		}
 	}
 	/**
 	 * Set up database

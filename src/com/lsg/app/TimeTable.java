@@ -655,6 +655,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 											.getColumnIndex(Functions.DB_ROWID)) });
 				}
 				exclude.close();
+				exclude_oldstyle.close();
 			} while (allSubjects.moveToNext());
 		allSubjects.close();
 		try {
