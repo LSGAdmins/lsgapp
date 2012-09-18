@@ -254,9 +254,12 @@ public class SetupAssistant extends Activity {
 				upd.updateTeachers();
 			SQLiteDatabase myDB = context.openOrCreateDatabase(
 					Functions.DB_NAME, Context.MODE_PRIVATE, null);
+			SQLiteStatement stmt = myDB.compileStatement("DELETE FROM " + Functions.DB_EXCLUDE_TABLE + " WHERE " + Functions.DB_TYPE + "=?");
+			stmt.bindString(1, "newstyle");
+			stmt.execute();
 			for (int day = 0; day < 7; day++) {
 				for (int hour = 0; hour < 12; hour++) {
-					SQLiteStatement stmt = myDB
+					stmt = myDB
 							.compileStatement("SELECT COUNT(*) FROM "
 									+ Functions.DB_TIME_TABLE + " WHERE "
 									+ Functions.DB_DAY + "=? AND "
@@ -326,9 +329,6 @@ public class SetupAssistant extends Activity {
 										+ Functions.DB_CLASS + " LIKE ?",
 								selectionArgs, null, null, null);
 						c.moveToFirst();
-						stmt = myDB.compileStatement("DELETE FROM " + Functions.DB_EXCLUDE_TABLE + " WHERE " + Functions.DB_TYPE + "=?");
-						stmt.bindString(1, "newstyle");
-						stmt.execute();
 						do {
 							stmt = myDB.compileStatement("INSERT INTO "
 									+ Functions.DB_EXCLUDE_TABLE + " ("
@@ -349,6 +349,7 @@ public class SetupAssistant extends Activity {
 							stmt.bindLong(5, day);
 							stmt.bindString(6, "newstyle");
 							stmt.execute();
+							Log.d("stmt", stmt.toString());
 							stmt.close();
 							Log.d("rawfach", c.getString(c
 									.getColumnIndex(Functions.DB_RAW_FACH)));
@@ -546,7 +547,7 @@ public class SetupAssistant extends Activity {
 				rb[i] = new RadioButton(this);
 				rb[i].setText(classes[i]);
 				rb[i].setId(i);
-				if (classes[i].equals(usr_class))
+				if (classes[i].equals(usr_class) || classes.length == 1)
 					rb[i].toggle();
 			}
 			for (int i = 0; i < classes.length; i++)
@@ -652,7 +653,7 @@ public class SetupAssistant extends Activity {
 					option.setChecked(true);
 				rg.addView(option);
 				c.moveToNext();
-				if (ii + 1 == c.getCount() && showNone) {
+				if (ii + 1 == c.getCount() && (showNone || prefs.getString(Functions.FULL_CLASS, "").equals("Q12") || prefs.getString(Functions.FULL_CLASS, "").equals("Q11"))) {
 					option = new RadioButton(this);
 					option.setText("Freistunde!");
 					option.setId(0);
