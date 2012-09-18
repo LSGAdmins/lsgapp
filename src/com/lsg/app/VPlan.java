@@ -673,7 +673,16 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
             startActivity(subjects);
 	    	return true;
 	    case R.id.info:
-	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    	Intent intent = new Intent(this, InfoActivity.class);
+	    	intent.putExtra("type", "vplan");
+	    	intent.putExtra("vplan_num", Integer.valueOf(adapter.cursor_all.getCount()).toString());
+	    	intent.putExtra("mine_num", Integer.valueOf(adapter.cursor_mine.getCount()).toString());
+	    	intent.putExtra("date", prefs.getString("vplan_date", "") + " / " + prefs.getString("vplan_time", ""));
+	    	intent.putExtra("vplan_num_teachers", Integer.valueOf(adapter.cursor_teachers.getCount()).toString());
+	    	intent.putExtra("date_teachers", prefs.getString("vplan_teacher_date", "") + " / " + prefs.getString("vplan_teacher_time", ""));
+	    	intent.putExtra("teacher", (prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs.getBoolean(Functions.RIGHTS_ADMIN, false)));
+	    	startActivity(intent);
+	    	/*AlertDialog.Builder builder = new AlertDialog.Builder(this);
 	    	builder.setMessage(getString(R.string.number_all) + " " + Integer.valueOf(adapter.cursor_all.getCount()).toString() + "\n"
 	    			+ getString(R.string.number_mine) + " " + Integer.valueOf(adapter.cursor_mine.getCount()).toString() + "\n"
 	    			+ getString(R.string.actdate) + prefs.getString("vplan_date", "") + " / " + prefs.getString("vplan_time", ""))
@@ -684,7 +693,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    	           }
 	    	       });
 	    	AlertDialog alert = builder.create();
-	    	alert.show();
+	    	alert.show();*/
 	    	return true;
         case android.R.id.home:
             onHomePress();

@@ -292,7 +292,7 @@ public class SetupAssistant extends Activity {
 						stmt.bindString(5, Functions.KATHOLISCH);
 					}
 					long count = stmt.simpleQueryForLong();
-					if (count > 1 || usr_class.equals("Q11") || usr_class.equals("Q12")) {
+					if (count > 1 || prefs.getString(Functions.FULL_CLASS, "").equals("Q11") || prefs.getString(Functions.FULL_CLASS, "").equals("Q12")) {
 						String selectionArgs[] = new String[6];
 						selectionArgs[0] = Integer.valueOf(day).toString();
 						selectionArgs[1] = Integer.valueOf(hour).toString();
