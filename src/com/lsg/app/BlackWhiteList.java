@@ -79,7 +79,7 @@ public class BlackWhiteList extends ListActivity {
 		long _id          = info.id;
 		int menuItemIndex = item.getItemId();
 		if(menuItemIndex == 0) {
-			myDB.delete(table, Functions.DB_ROWID + " = ?", new String[] {new Long(_id).toString()});
+			myDB.delete(table, Functions.DB_ROWID + " = ?", new String[] {Long.valueOf(_id).toString()});
 			updateList();
 		}
 		return true;

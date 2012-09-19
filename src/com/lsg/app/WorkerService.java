@@ -1,19 +1,22 @@
 package com.lsg.app;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lsg.app.lib.JBNotification;
 
@@ -41,6 +44,7 @@ public class WorkerService extends IntentService {
 		Bundle extras = intent.getExtras();
 		if (extras.getInt(WHAT) == 100) {
 			checkUpdate();
+			loadNews();
 		} else {
 			ClassLoader loader = WorkerClass.class.getClassLoader();
 			try {
@@ -104,6 +108,38 @@ public class WorkerService extends IntentService {
 				else
 					JBNotification.makeJBUpdateNotification(this, jObject.getString("actversion"), jObject.getString("changelog"));
 			}
+		} catch (JSONException e) {
+			Log.d("json", e.getMessage());
+		}
+	}
+	public void loadNews() {
+		String get = Functions.getData(Functions.NEWS_URL,
+				getApplicationContext(), true, "");
+		try {
+			JSONArray contents = new JSONArray(get);
+			String allContents = "";
+			for(int i = 0; i < contents.length(); i++) {
+				allContents = allContents + ((i != 0) ? "\n" : "") + contents.getString(i);
+			}
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			SharedPreferences.Editor edit = prefs.edit();
+			edit.putString(Functions.NEWS_PUPILS, allContents);
+			edit.commit();
+		} catch (JSONException e) {
+			Log.d("json", e.getMessage());
+		}
+		get = Functions.getData(Functions.NEWS_URL + "?type=teachers",
+				getApplicationContext(), true, "");
+		try {
+			JSONArray contents = new JSONArray(get);
+			String allContents = "";
+			for(int i = 0; i < contents.length(); i++) {
+				allContents = allContents + ((i != 0) ? "\n" : "") + contents.getString(i);
+			}
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			SharedPreferences.Editor edit = prefs.edit();
+			edit.putString(Functions.NEWS_TEACHERS, allContents);
+			edit.commit();
 		} catch (JSONException e) {
 			Log.d("json", e.getMessage());
 		}

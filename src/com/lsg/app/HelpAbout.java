@@ -14,7 +14,7 @@ public class HelpAbout extends Activity {
 		Functions.setTheme(false, true, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		Bundle data = getIntent().getExtras();
-		String type = data.getString(Functions.helpabout);
+		String type = data.getString(Functions.HELPABOUT);
 		if(type.equals(Functions.help)) {
 			setContentView(R.layout.help);
 			setTitle(getString(R.string.help));
@@ -30,9 +30,7 @@ public class HelpAbout extends Activity {
 	    switch (item.getItemId()) {
         case android.R.id.home:
             // app icon in action bar clicked; change mode
-            Intent intent = new Intent(this, SetupAssistant.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            finish();
             return true;
 	    default:
 	        return super.onOptionsItemSelected(item);

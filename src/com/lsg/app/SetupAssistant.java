@@ -829,12 +829,12 @@ public class SetupAssistant extends Activity {
 		switch (item.getItemId()) {
 		case R.id.help:
 			Intent help = new Intent(this, HelpAbout.class);
-			help.putExtra(Functions.helpabout, Functions.help);
+			help.putExtra(Functions.HELPABOUT, Functions.help);
 			startActivity(help);
 			return true;
 		case R.id.about:
 			Intent about = new Intent(this, HelpAbout.class);
-			about.putExtra(Functions.helpabout, Functions.about);
+			about.putExtra(Functions.HELPABOUT, Functions.about);
 			startActivity(about);
 			return true;
 		default:

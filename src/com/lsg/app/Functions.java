@@ -76,14 +76,18 @@ public class Functions {
 	public static final String   LOGIN_TEST_URL       = "http://linux.lsg.musin.de/cp/setup.php?act=checklogin";
 	public static final String   PERSON_DATA_URL      = "http://linux.lsg.musin.de/cp/setup.php?act=getdata";
 	public static final String   PERSON_DATA_SEND_URL = "http://linux.lsg.musin.de/cp/setup.php?act=setdata";
+	public static final String   NEWS_URL = "http://linux.lsg.musin.de/cp/news_app.php";
 	public static final String   API_VERSION          = "3";
 	
 	public static final String   class_key  = "class";
 	public static final String[] exclude    = {"Q11", "Q12"};
 	
-	public static final String helpabout = "helpabout";
+	public static final String HELPABOUT = "helpabout";
 	public static final String help      = "help";
 	public static final String about     = "about";
+	
+	public static final String NEWS_PUPILS = "news_pupils";
+	public static final String NEWS_TEACHERS = "news_teachers";
 	
 	public static final String DB_ROWID           = "_id";
 	public static final String DB_NAME            = "lsgapp";

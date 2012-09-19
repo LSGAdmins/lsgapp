@@ -4,6 +4,7 @@ import com.lsg.app.Events;
 import com.lsg.app.ExtendedPagerTabStrip;
 import com.lsg.app.ExtendedViewPager;
 import com.lsg.app.Functions;
+import com.lsg.app.HelpAbout;
 import com.lsg.app.R;
 import com.lsg.app.SMVBlog;
 import com.lsg.app.Settings;
@@ -57,6 +58,7 @@ public class SlideMenu {
 			public String label;
 			public String title;
 			public Class<?extends Activity> action;
+			public Intent actIntent;
 		}
 		public SlideMenuAdapter(Activity act, SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
 			super(act, R.id.menu_label, items);
@@ -91,6 +93,7 @@ public class SlideMenu {
 			MenuItem holder = (MenuItem) rowView.getTag();
 			String s = items[position].label;
 			holder.label.setText(s);
+			//holder.label.setCompoundDrawables(act.getResources().getDrawable(items[position].icon), null, null, null);
 			holder.icon.setImageResource(items[position].icon);
 			
 			if(holder.title != null) {
@@ -187,16 +190,20 @@ public class SlideMenu {
     	ListView list = (ListView) act.findViewById(R.id.menu_listview);
     	list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if(!items[position].action.equals(curAct)) {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				if (items[position].action == null || !items[position].action.equals(curAct)) {
 					Log.d("pos", Long.valueOf(id).toString());
 					menuToHide = true;
-					Intent intent = new Intent(act, items[position].action);
-					intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-					act.startActivity(intent);
-					} else {
-						hide();
-					}
+					if (items[position].action != null) {
+						Intent intent = new Intent(act, items[position].action);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+						act.startActivity(intent);
+					} else
+						act.startActivity(items[position].actIntent);
+				} else {
+					hide();
+				}
 				}
 			});
     	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
@@ -251,8 +258,8 @@ public class SlideMenu {
 	public void fill() {
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
 		if (prefs.getBoolean(Functions.IS_LOGGED_IN, false)) {
-			items = new SlideMenuAdapter.MenuDesc[6];
-			for (int i = 0; i < 6; i++) {
+			items = new SlideMenuAdapter.MenuDesc[9];
+			for (int i = 0; i < 9; i++) {
 				items[i] = new SlideMenuAdapter.MenuDesc();
 			}
 			items[0].icon = R.drawable.ic_launcher;
@@ -271,10 +278,26 @@ public class SlideMenu {
 			items[4].label = "Einstellungen";
 			items[4].action = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
 					: Settings.class;
-			items[5].type = Functions.TYPE_INFO;
-			items[5].title = "Aktuell";
 			items[5].icon = R.drawable.ic_launcher;
-			items[5].label = "test";
+			items[5].label = "Hilfe";
+			items[5].action = null;
+			items[5].actIntent = new Intent(act, HelpAbout.class);
+			items[5].actIntent.putExtra(Functions.HELPABOUT, Functions.help);
+			items[6].icon = R.drawable.ic_launcher;
+			items[6].label = "Über";
+			items[6].action = null;
+			items[6].actIntent = new Intent(act, HelpAbout.class);
+			items[6].actIntent.putExtra(Functions.HELPABOUT, Functions.about);
+			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, ""); 
+			items[7].type = Functions.TYPE_INFO;
+			items[7].title = "Aktuell";
+			items[7].icon = R.drawable.ic_launcher;
+			items[7].label = news_pupils.substring(0, ((news_pupils.length() > 60) ? 60 : news_pupils.length())) + ((news_pupils.length() > 60) ? "..." : "");
+			String news_teachers = prefs.getString(Functions.NEWS_TEACHERS, ""); 
+			items[8].type = Functions.TYPE_INFO;
+			items[8].title = "Lehrerinfo";
+			items[8].icon = R.drawable.ic_launcher;
+			items[8].label = news_teachers.substring(0, ((news_teachers.length() > 60) ? 60 : news_teachers.length())) + ((news_teachers.length() > 60) ? "..." : "");
 		} else {
 
 			items = new SlideMenuAdapter.MenuDesc[3];
