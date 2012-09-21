@@ -30,7 +30,6 @@
         android:textColor="@color/lightblack"
         android:textSize="14sp"
         android:layout_margin="10dip"
-        android:maxLines="3"
-        android:ellipsize="end" />
+        android:gravity="center_horizontal" />
      </LinearLayout>
 </LinearLayout>

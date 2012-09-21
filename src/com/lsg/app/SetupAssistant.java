@@ -292,7 +292,7 @@ public class SetupAssistant extends Activity {
 						stmt.bindString(5, Functions.KATHOLISCH);
 					}
 					long count = stmt.simpleQueryForLong();
-					if (count > 1 || prefs.getString(Functions.FULL_CLASS, "").equals("Q11") || prefs.getString(Functions.FULL_CLASS, "").equals("Q12")) {
+					if (count > 1 || ((prefs.getString(Functions.FULL_CLASS, "").equals("Q11") || prefs.getString(Functions.FULL_CLASS, "").equals("Q12")) && count > 0)) {
 						String selectionArgs[] = new String[6];
 						selectionArgs[0] = Integer.valueOf(day).toString();
 						selectionArgs[1] = Integer.valueOf(hour).toString();
@@ -328,32 +328,37 @@ public class SetupAssistant extends Activity {
 										+ Functions.DB_RAW_FACH + "!=? AND "
 										+ Functions.DB_CLASS + " LIKE ?",
 								selectionArgs, null, null, null);
-						c.moveToFirst();
-						do {
-							stmt = myDB.compileStatement("INSERT INTO "
-									+ Functions.DB_EXCLUDE_TABLE + " ("
-									+ Functions.DB_TEACHER + ", "
-									+ Functions.DB_RAW_FACH + ", "
-									+ Functions.DB_FACH + ", "
-									+ Functions.DB_HOUR + ", "
-									+ Functions.DB_DAY + ", "
-									+ Functions.DB_TYPE
-									+ ") VALUES (?, ?, ?, ?, ?, ?)");
-							stmt.bindString(1, c.getString(c
-									.getColumnIndex(Functions.DB_RAW_LEHRER)));
-							stmt.bindString(2, c.getString(c
-									.getColumnIndex(Functions.DB_RAW_FACH)));
-							stmt.bindString(3, c.getString(c
-									.getColumnIndex(Functions.DB_FACH)));
-							stmt.bindLong(4, hour);
-							stmt.bindLong(5, day);
-							stmt.bindString(6, "newstyle");
-							stmt.execute();
-							Log.d("stmt", stmt.toString());
-							stmt.close();
-							Log.d("rawfach", c.getString(c
-									.getColumnIndex(Functions.DB_RAW_FACH)));
-						} while (c.moveToNext());
+						if (c.moveToFirst())
+							do {
+								Log.d("pos", Integer.valueOf(c.getPosition())
+										.toString());
+								stmt = myDB.compileStatement("INSERT INTO "
+										+ Functions.DB_EXCLUDE_TABLE + " ("
+										+ Functions.DB_TEACHER + ", "
+										+ Functions.DB_RAW_FACH + ", "
+										+ Functions.DB_FACH + ", "
+										+ Functions.DB_HOUR + ", "
+										+ Functions.DB_DAY + ", "
+										+ Functions.DB_TYPE
+										+ ") VALUES (?, ?, ?, ?, ?, ?)");
+								stmt.bindString(
+										1,
+										c.getString(c
+												.getColumnIndex(Functions.DB_RAW_LEHRER)));
+								stmt.bindString(2, c.getString(c
+										.getColumnIndex(Functions.DB_RAW_FACH)));
+								stmt.bindString(3, c.getString(c
+										.getColumnIndex(Functions.DB_FACH)));
+								stmt.bindLong(4, hour);
+								stmt.bindLong(5, day);
+								stmt.bindString(6, "newstyle");
+								stmt.execute();
+								Log.d("stmt", stmt.toString());
+								stmt.close();
+								Log.d("rawfach", c.getString(c
+										.getColumnIndex(Functions.DB_RAW_FACH)));
+							} while (c.moveToNext());
+						c.close();
 						conflicts.add(new Integer[] { day, hour });
 					}
 				}
