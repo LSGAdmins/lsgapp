@@ -256,7 +256,8 @@ public class SlideMenu {
     	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
     		@Override
     		public void onClick(View v) {
-    			SlideMenu.this.hide();
+    			//SlideMenu.this.hide();
+    			//need this to get onTouch, don't know why
     		}
     	});
     	
@@ -268,6 +269,9 @@ public class SlideMenu {
 				case MotionEvent.ACTION_DOWN:
 					xPos = event.getX();
 					Log.d("xpos", Float.valueOf(xPos).toString());
+					content_lays = (FrameLayout.LayoutParams) content.getLayoutParams();
+					menu_lays = (FrameLayout.LayoutParams) menu.getLayoutParams();
+			    	content.bringToFront();
 					break;
 				case MotionEvent.ACTION_MOVE:
 					int diff = Float.valueOf(xPos - event.getX()).intValue();
@@ -275,26 +279,24 @@ public class SlideMenu {
 					lastX = event.getX();
 					if(diff < 0)
 						diff = 0;
-					if(lastDiff == diff)
+					if(lastDiff == diff || lastDiff -1 == diff)
 						break;
 					lastDiff = diff;
 					if(lastDiff < maxDiff)
 						maxDiff = lastDiff;
 
-			    	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
-			    	parm.setMargins(menuSize - diff, 0, -menuSize + diff, 0);
-			    	content.setLayoutParams(parm);
-			    	content.bringToFront();
-			    	FrameLayout.LayoutParams parms = (FrameLayout.LayoutParams) menu.getLayoutParams();
-			    	parms.setMargins(-diff / 2, statusHeight, diff / 2, 0);
-			    	menu.setLayoutParams(parms);
+			    	content_lays.setMargins(menuSize - diff, 0, -menuSize + diff, 0);
+			    	content.setLayoutParams(content_lays);
+			    	
+			    	menu_lays.setMargins(-diff / 2, statusHeight, diff / 2, 0);
+			    	menu.setLayoutParams(menu_lays);
 					break;
 				case MotionEvent.ACTION_UP:
 					Log.d("xPos", Float.valueOf(xPos).toString());
 					Log.d("lastX", Float.valueOf(lastX).toString());
 					Log.d("prevX", Float.valueOf(prevX).toString());
 					Log.d("pos", Float.valueOf(event.getX()).toString());
-					if(prevX < event.getX()) {
+					if(prevX < event.getX() && lastDiff > Functions.dpToPx(5, act)) {
 						menu.bringToFront();
 						show(true, lastDiff);
 					} else
@@ -305,6 +307,8 @@ public class SlideMenu {
 			}
 		});
 	}
+	private FrameLayout.LayoutParams content_lays;
+	private FrameLayout.LayoutParams menu_lays;
 	private float xPos;
 	private float lastX;
 	private float prevX;

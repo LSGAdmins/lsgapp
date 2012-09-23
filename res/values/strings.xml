@@ -12,7 +12,6 @@
     <string name="showonlywhitelist_on">Nur Vertretungen aus Whitelist angezeigt</string>
     <string name="on">An</string>
     <string name="off">Aus</string>
-    <string name="enable_AC2DM">Aktiviere Push-Nachrichten, um den Vertretungsplan immer auf dem aktuellen Stand zu halten!</string>
     <string name="useac2dm">Vertretungsplan pushen</string>
     <string name="useac2dm_on">Vertretungsplan wird auf dein Gerät gepusht</string>
     <string name="useac2dm_off">Vertretungsplan wird nicht gepusht</string>
@@ -20,9 +19,6 @@
     <string name="ok">OK</string>
     <string name="select_class">Klasse auswählen:</string>
     <string name="select_teacher">Lehrer auswählen:</string>
-    <string name="number_all">Anzahl der Vertretungen:</string>
-    <string name="number_mine">Vertretungen, die mich betreffen:</string>
-    <string name="actdate">Aktualisierungsdatum:</string>
     <string name="vplan">Vertretungsplan</string>
     <string name="vplan_short">Vertretungen</string>
     <string name="autopullvplan">Vertretungsplan im Hintergrund aktualisieren</string>
@@ -40,9 +36,6 @@
     <string name="protestant">Evangelisch</string>
     <string name="ethics">Ethik</string>
     <string name="timetable">Stundenplan</string>
-    <string name="choose_religion">Wähle deinen Religionsunterricht</string>
-    <string name="your_gender">Dein Geschlecht</string>
-    <string name="your_class">Deine Klasse</string>
     <string name="gender">Geschlecht</string>
     <string name="male">Männlich</string>
     <string name="female">Weiblich</string>
@@ -61,7 +54,6 @@
     <string name="list_remove">Von Liste entfernen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="noact">Keine Aktualisierung der Vertretungen notwendig</string>
-    <string name="noact_subjects">Keine Aktualisierung der Fächerliste notwendig</string>
     <string name="login">Zugangsdaten</string>
     <string name="login_summary">Benutzername &amp; Passwort für den Vertretungsplan</string>
     <string name="password">Passwort</string>
@@ -113,17 +105,15 @@
     <string name="changelog">Changelog:</string>
     <string name="cancel">Abbruch</string>
     <string name="update">Update!</string>
-    <string name="no_update">Keine Lust</string>
     <string name="search">Suche&#8230;</string>
     <string name="info">Info zum Tag</string>
     <string name="about">Über</string>
-    <string name="updatecheck">Update-Check</string>
     <string name="abouttext">Dies ist die Android-App für Schüler des LSG. \n
         Sie wurde von Maximilian Mühlbauer (scirocco101@gmail.com) und Paul Thiele (thielepaul@gmail.com) programmiert. \n
         Die Icons stammen von Dominik Philp (philp.dominik@gmail.com). \n
-        Der Sourcecode ist auf Launchpad zu finden: http://launchpad.net/lsgapp \n
-        Der Bugtracker ist auch auf Launchpad: http://bugs.launchpad.net/lsgapp \n
-        Wer keinen Launchpad-Account hat, kann Wünsche, Kritik und Fehler an lsgadmins@googlegroups.com mailen.</string>
+        Der Sourcecode ist auf GitHub zu finden: http://github.com/LSGAdmins/lsgapp \n
+        Der Bugtracker ist auch auf GitHub: http://github.com/LSGAdmins/lsgapp/issues \n
+        Wer keinen GitHub-Account hat, kann Wünsche, Kritik und Fehler an lsgadmins@googlegroups.com mailen.</string>
     <string name="help">Hilfe</string>
     <string name="help_vplan_head">Vertretungsplan</string>
     <string name="help_vplan_content">Beim ersten Aufruf des Vertretungsplans öffnen sich automatisch die Einstellungen, wo ihr euch mit euren normalen Schulaccounts
