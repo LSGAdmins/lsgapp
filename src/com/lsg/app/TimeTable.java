@@ -32,10 +32,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -834,7 +832,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		if(refreshing && Functions.getSDK() >= 11)
 				refresh.setActionView(new ProgressBar(this));
 		else if(refreshing)
-			loading = ProgressDialog.show(this, null, "Lade...");
+			loading = ProgressDialog.show(this, null, getString(R.string.loading_timetable));
 		return true;
 	}
 

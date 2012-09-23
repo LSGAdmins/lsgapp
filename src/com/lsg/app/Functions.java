@@ -39,9 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -49,7 +47,6 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.lsg.app.interfaces.SQLlist;
@@ -749,6 +746,7 @@ public class Functions {
 	 * lock the rotation for asynctask
 	 * @param ctx the app context
 	 */
+	@SuppressWarnings("deprecation")
 	public static void lockRotation(Activity ctx) {
 		WindowManager wm =  (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
 	    Display dp = wm.getDefaultDisplay();

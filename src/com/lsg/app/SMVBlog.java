@@ -1,18 +1,17 @@
 package com.lsg.app;
 
-import com.lsg.app.lib.SlideMenu;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
-
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
 
 public class SMVBlog extends Activity implements HomeCall, RefreshCall {
 	private SlideMenu slidemenu;

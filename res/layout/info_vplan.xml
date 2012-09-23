@@ -16,7 +16,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Meine Vertretungen:"
+                android:text="@string/vplan_mine"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:paddingRight="5dp" />
 
@@ -25,7 +25,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="Small Text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
 
@@ -38,7 +37,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Schüler"
+                android:text="@string/pupils"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
@@ -49,14 +48,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vertretungsanzahl:"
+                    android:text="@string/vplan_num"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:id="@+id/vplan_num"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Small Text"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
             </LinearLayout>
 
@@ -68,14 +66,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Datum:"
+                    android:text="@string/date"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:id="@+id/date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Small Text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="10dp" />
             </LinearLayout>
@@ -89,7 +86,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lehrer"
+                    android:text="@string/teacher"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <LinearLayout
@@ -100,14 +97,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Vertretungsanzahl:"
+                        android:text="@string/vplan_num"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <TextView
                         android:id="@+id/vplan_num_teachers"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Small Text"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
                 </LinearLayout>
 
@@ -119,14 +115,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Datum:"
+                        android:text="@string/date"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <TextView
                         android:id="@+id/date_teachers"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Small Text"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
                 </LinearLayout>
             </LinearLayout>

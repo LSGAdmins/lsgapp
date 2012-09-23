@@ -1,18 +1,17 @@
 package com.lsg.app;
 
-import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.interfaces.SelectedCallback;
-
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import android.widget.SpinnerAdapter;
+
+import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.interfaces.SelectedCallback;
 
 @TargetApi(11)
 public class Advanced implements SearchView.OnQueryTextListener {

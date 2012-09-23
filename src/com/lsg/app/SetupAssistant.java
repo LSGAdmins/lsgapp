@@ -24,9 +24,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -103,7 +100,7 @@ public class SetupAssistant extends Activity {
 
 		protected void onPreExecute() {
 			super.onPreExecute();
-			loading = ProgressDialog.show(context, null, "Lade Daten...");
+			loading = ProgressDialog.show(context, null, getString(R.string.loading_data));
 		}
 
 		@Override
@@ -176,7 +173,7 @@ public class SetupAssistant extends Activity {
 
 		protected void onPreExecute() {
 			super.onPreExecute();
-			loading = ProgressDialog.show(context, null, "Lade Daten...");
+			loading = ProgressDialog.show(context, null, getString(R.string.loading_data));
 		}
 
 		@Override
@@ -239,7 +236,7 @@ public class SetupAssistant extends Activity {
 
 		protected void onPreExecute() {
 			super.onPreExecute();
-			loading = ProgressDialog.show(context, null, "Lade Daten...");
+			loading = ProgressDialog.show(context, null, getString(R.string.loading_data));
 		}
 
 		@Override
@@ -387,7 +384,6 @@ public class SetupAssistant extends Activity {
 	private static String[] classes;
 	private static String usr_class;
 	private static String teacher_short;
-	private static ArrayList<Integer[]> timetable_conflicts;
 	private static ArrayList<RadioGroup> timetable_conflicts_rg;
 
 	@Override
@@ -587,7 +583,6 @@ public class SetupAssistant extends Activity {
 
 	public void setupTimeTableConflicts(ArrayList<Integer[]> conflicts) {
 		Integer[] conflict = new Integer[2];
-		timetable_conflicts = conflicts;
 		timetable_conflicts_rg = new ArrayList<RadioGroup>();
 		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME,
 				Context.MODE_PRIVATE, null);
@@ -820,115 +815,5 @@ public class SetupAssistant extends Activity {
 				settings = new Intent(this, Settings.class);
 			startActivity(settings);
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		// inflater.inflate(R.menu.lsgapp, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.help:
-			Intent help = new Intent(this, HelpAbout.class);
-			help.putExtra(Functions.HELPABOUT, Functions.help);
-			startActivity(help);
-			return true;
-		case R.id.about:
-			Intent about = new Intent(this, HelpAbout.class);
-			about.putExtra(Functions.HELPABOUT, Functions.about);
-			startActivity(about);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		/*
-		 * if(Functions.getSDK() >= 9)
-		 * unregisterReceiver(down.downloadReceiver);
-		 */
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();/*
-						 * if(Functions.getSDK() >= 9) { IntentFilter
-						 * intentFilter = new
-						 * IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE
-						 * ); registerReceiver(down.downloadReceiver,
-						 * intentFilter); }
-						 * 
-						 * if(!prefs.getString("username", "").equals("")) {
-						 * if(!prefs.getBoolean("disableAC2DM", false) &&
-						 * !prefs.getBoolean("ac2dm_chosen", false)) {
-						 * AlertDialog.Builder builder = new
-						 * AlertDialog.Builder(lsgapp.this);
-						 * builder.setMessage(getString(R.string.enable_AC2DM))
-						 * .setCancelable(false)
-						 * .setPositiveButton(getString(R.string.ok), new
-						 * DialogInterface.OnClickListener() { public void
-						 * onClick(DialogInterface dialog, int id) {
-						 * edit.putBoolean("useac2dm", true);
-						 * edit.putBoolean("ac2dm_chosen", true); edit.commit();
-						 * Functions.registerAC2DM(lsgapp.this);
-						 * dialog.cancel(); } })
-						 * .setNegativeButton(getString(R.string.no), new
-						 * DialogInterface.OnClickListener() { public void
-						 * onClick(DialogInterface dialog, int id) {
-						 * edit.putBoolean("useac2dm", false);
-						 * edit.putBoolean("ac2dm_chosen", true); edit.commit();
-						 * dialog.cancel(); } }); AlertDialog alert =
-						 * builder.create(); builder.setCancelable(false);
-						 * alert.show(); }
-						 * if(prefs.getString(Functions.RELIGION,
-						 * "-1").equals("-1")) { final CharSequence[] items =
-						 * getResources().getStringArray(R.array.religion);
-						 * AlertDialog.Builder builder = new
-						 * AlertDialog.Builder(this);
-						 * builder.setTitle(R.string.choose_religion);
-						 * builder.setItems(items, new
-						 * DialogInterface.OnClickListener() { public void
-						 * onClick(DialogInterface dialog, int item) {
-						 * switch(item) { case 0:
-						 * edit.putString(Functions.RELIGION,
-						 * Functions.KATHOLISCH); break; case 1:
-						 * edit.putString(Functions.RELIGION,
-						 * Functions.EVANGELISCH); break; default:
-						 * edit.putString(Functions.RELIGION, Functions.ETHIK);
-						 * break; } edit.commit(); dialog.cancel(); } });
-						 * AlertDialog alert = builder.create();
-						 * builder.setCancelable(false); alert.show(); }
-						 * if(prefs.getString(Functions.GENDER,
-						 * "-1").equals("-1")) { final CharSequence[] items =
-						 * getResources().getStringArray(R.array.gender);
-						 * AlertDialog.Builder builder = new
-						 * AlertDialog.Builder(this);
-						 * builder.setTitle(R.string.your_gender);
-						 * builder.setItems(items, new
-						 * DialogInterface.OnClickListener() { public void
-						 * onClick(DialogInterface dialog, int item) {
-						 * switch(item) { case 0:
-						 * edit.putString(Functions.GENDER, "m"); break; case 1:
-						 * edit.putString(Functions.GENDER, "w"); break;
-						 * default: edit.putString(Functions.GENDER, "-1");
-						 * break; } edit.commit(); dialog.cancel(); } });
-						 * builder.setCancelable(false); AlertDialog alert =
-						 * builder.create(); builder.setCancelable(false);
-						 * alert.show(); } } SQLiteDatabase myDB =
-						 * openOrCreateDatabase(Functions.DB_NAME,
-						 * Context.MODE_PRIVATE, null); SQLiteStatement num_rows
-						 * = myDB.compileStatement("SELECT COUNT(*) FROM " +
-						 * Functions.DB_CLASS_TABLE); long count =
-						 * num_rows.simpleQueryForLong(); if(count == 0) {
-						 * CommonDataTask cdt = new CommonDataTask();
-						 * cdt.execute(); } myDB.close(); num_rows.close();
-						 */
 	}
 }

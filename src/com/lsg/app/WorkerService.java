@@ -16,7 +16,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.lsg.app.lib.JBNotification;
 
@@ -48,7 +47,7 @@ public class WorkerService extends IntentService {
 		} else {
 			ClassLoader loader = WorkerClass.class.getClassLoader();
 			try {
-				Class class_ = loader.loadClass(extras.getString(WORKER_CLASS));
+				Class<?> class_ = loader.loadClass(extras.getString(WORKER_CLASS));
 				WorkerClass object = (WorkerClass) class_.newInstance();
 				object.update(extras.getInt(WHAT), getApplicationContext());
 			} catch (Exception e) {

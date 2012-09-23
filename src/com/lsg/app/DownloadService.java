@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 @TargetApi(11)
 public class DownloadService extends Service {
@@ -23,8 +24,12 @@ public class DownloadService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if(intent.getExtras().getString("started").equals("notification"))
-			((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(NOTIFICATION_ID);
+		Toast.makeText(getApplicationContext(),
+				getString(R.string.downloading_update), Toast.LENGTH_LONG)
+				.show();
+		if (intent.getExtras().getString("started").equals("notification"))
+			((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
+					.cancel(NOTIFICATION_ID);
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		final DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);

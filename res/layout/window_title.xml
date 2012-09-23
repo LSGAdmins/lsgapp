@@ -10,7 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dip"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@string/homebutton" />
 
     <Spinner
         android:id="@+id/titlebar_spinner"
@@ -36,7 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:src="@android:drawable/ic_menu_rotate" />
+            android:src="@android:drawable/ic_menu_rotate"
+            android:contentDescription="@string/searchbutton" />
     </LinearLayout>
 
 </LinearLayout>

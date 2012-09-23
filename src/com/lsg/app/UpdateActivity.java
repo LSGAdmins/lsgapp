@@ -28,7 +28,6 @@ public class UpdateActivity extends Activity {
 	public void update(View v) {
 		finish();
 		if(Functions.getSDK() < 11) {
-			String url = "http://www.example.com";
 			Intent i = new Intent(Intent.ACTION_VIEW);
 			i.setData(Uri.parse(Functions.UPDATE_URL));
 			startActivity(i);

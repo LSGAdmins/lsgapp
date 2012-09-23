@@ -1,8 +1,6 @@
 package com.lsg.app.lib;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -28,11 +26,9 @@ public class TitleCompat {
 	}
 
 	private Activity activity;
-	private boolean homeasup;
 
 	public TitleCompat(Activity act, boolean homeasup) {
 		activity = act;
-		this.homeasup = homeasup;
 		if (Functions.getSDK() < 11) {
 			act.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 			act.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,

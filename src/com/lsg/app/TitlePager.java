@@ -36,6 +36,7 @@ public class TitlePager {
 		//titlecontainer rendered -> position titles
 		container.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@SuppressWarnings("deprecation")
 					@Override
 					public void onGlobalLayout() {
 						container.getViewTreeObserver().removeGlobalOnLayoutListener(this);

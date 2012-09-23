@@ -1,10 +1,5 @@
 package com.lsg.app;
 
-import com.lsg.app.lib.SlideMenu;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -18,12 +13,15 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+
 //code for old devices -> deprecated
-@SuppressLint("deprecated")
+@SuppressWarnings("deprecation")
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener, HomeCall {
 	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		titlebar = new TitleCompat(this, true);

@@ -1,13 +1,12 @@
 package com.lsg.app;
 
-import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.interfaces.SelectedCallback;
-
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.view.Menu;
 import android.webkit.WebView;
+
+import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.interfaces.SelectedCallback;
 
 public class AdvancedWrapper {
 	public void dropDownNav(Activity context, int actionArrayRes, SelectedCallback navlistener, int selPosition) {

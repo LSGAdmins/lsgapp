@@ -141,7 +141,6 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	    }
 	    else
 	    	menu.removeItem(R.id.search);
-	    menu.removeItem(R.id.settings);
 	    return true;
 	}
 	@Override

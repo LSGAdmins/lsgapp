@@ -25,10 +25,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -265,7 +263,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 				v = refresh.getActionView();
 				refresh.setActionView(new ProgressBar(this));
 			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(this, null, "Lade...");
+				loading = ProgressDialog.show(this, null, getString(R.string.loading_events));
 				v = null;
 			}
 			actionView = v;

@@ -4,7 +4,6 @@
     <string name="hello">Hello World, lsgapp!</string>
     <string name="versionname">beta1</string>
     <string name="app_name">LSGäpp</string>
-    <string name="act_version">Aktuelle Version</string>
     <string name="dark_actionbar">Dunkle ActionBar</string>
     <string name="showwithoutclass_off">Vertretungen ohne Klassen nicht angezeigt</string>
     <string name="showwithoutclass_on">Vertretungen ohne Klassen angezeigt</string>
@@ -67,12 +66,9 @@
     <string name="loginerror">Login-Fehler\nBitte korrigieren Sie Benutzernamen und Passwort</string>
     <string name="loading_vplan">Lade Vertretungen&#8230;</string>
     <string name="loading_events">Lade Termine&#8230;</string>
-    <string name="loading_class">Lade Klasse&#8230;</string>
-    <string name="loading_subjects">Lade Fächerliste&#8230;</string>
     <string name="loading_timetable">Lade Stundenplan&#8230;</string>
-    <string name="loading_common_data">Lade Daten&#8230;</string>
-    <string name="downloading">Lade Update herunter</string>
-    <string name="please_install">Öffne Downloads \n Bitte installieren Sie das Update.</string>
+    <string name="loading_data">Lade Daten&#8230;</string>
+    <string name="downloading_update">Lade Update herunter</string>
     <string name="no_class"></string>
     <string name="showwithoutclass">Vertretungen ohne Klassenbezeichnung anzeigen</string>
     <string name="showonlywhitelist">Nur Vertretungen aus Whitelist anzeigen</string>
@@ -91,14 +87,10 @@
     <string name="login_setup">Login</string>
     <string name="classes">Klassen</string>
     <string name="no_classes">Ohne Klassenbezeichnung</string>
-    <string name="all">Alle Vertretungen</string>
-    <string name="mine">Meine Vertretungen</string>
-    <string name="teachers">Lehrervertretungen</string>
-    <string name="all_short">Alle</string>
-    <string name="mine_short">Meine</string>
-    <string name="teachers_short">Lehrer</string>
+    <string name="vplan_mine">Meine Vertretungen</string>
+    <string name="vplan_pupils">Schülervertretungen</string>
+    <string name="vplan_teachers">Lehrervertretungen</string>
     <string name="smvblog">SMVBlog</string>
-    <string name="oops">Oops!</string>
     <string name="update_available"><b>Update verfügbar</b></string>
     <string name="update_available_content">Neue Version der LSGäpp: </string>
     <string name="update_version">LSGäpp Version: </string>
@@ -137,8 +129,14 @@
     <string name="subjectlist_info">Lange drücken und halten, um Vertretungen bestimmter Fächer immer anzuzeigen / immer zu verbergen.</string>
     <string name="permissions">Berechtigungen</string>
     <string name="pupil">Schüler</string>
+    <string name="pupils">Schüler</string>
     <string name="teacher">Lehrer</string>
     <string name="admin">Admin</string>
     <string name="teacher_short">Kürzel</string>
     <string name="select_short">Kürzel auswählen</string>
+    <string name="vplan_num">Vertretungsanzahl:</string>
+    <string name="date">Datum:</string>
+    <string name="homebutton">Home-Button</string>
+    <string name="searchbutton">Button zum Suchen</string>
+    <string name="icon">Icon</string>
 </resources>

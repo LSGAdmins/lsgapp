@@ -11,11 +11,9 @@ import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -84,9 +82,9 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			where_conds_events[3] = "%";
 			where_conds_events[4] = "%";
 			where_conds_events[5] = "%";
-			titles[0] = "Meine Vertretungen";
-			titles[1] = "Schülervertretungen";
-			titles[2] = "Lehrervertretungen";
+			titles[0] = getString(R.string.vplan_mine);
+			titles[1] = getString(R.string.vplan_pupils);
+			titles[2] = getString(R.string.vplan_teachers);
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
 			exclude_subjects[1] = (prefs.getString(Functions.GENDER, "").equals("m")) ? "Sw" : "Sm";
 			if(prefs.getString(Functions.RELIGION, "").equals(Functions.KATHOLISCH)) {
@@ -327,9 +325,9 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			LayoutInflater inflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View rowView;
 			if(teacher)
-				rowView = inflater.inflate(R.layout.standard, null, true);
+				rowView = inflater.inflate(R.layout.vplan_listitem, null, true);
 			else
-				rowView = inflater.inflate(R.layout.standard, null, true);
+				rowView = inflater.inflate(R.layout.vplan_listitem, null, true);
 			Standard holder = new Standard();
 			holder.standard = (LinearLayout) rowView.findViewById(R.id.standard_rellayout);
 			holder.date = (TextView) rowView.findViewById(R.id.vertretung_date);
@@ -656,14 +654,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
 	    switch (item.getItemId()) {
-	    case R.id.settings:
-	    	Intent settings;
-	    	if(Functions.getSDK() >= 11)
-	    		settings = new Intent(this, SettingsAdvanced.class);
-	    	else
-	    		settings = new Intent(this, Settings.class);
-	    	startActivity(settings);
-	        return true;
 	    case R.id.refresh:
 	    	onRefreshPress();
 	    	return true;
@@ -767,7 +757,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				v = refresh.getActionView();
 				refresh.setActionView(new ProgressBar(this));
 			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(this, null, "Lade...");
+				loading = ProgressDialog.show(this, null, getString(R.string.loading_vplan));
 				v = null;
 			}
 			actionView = v;
