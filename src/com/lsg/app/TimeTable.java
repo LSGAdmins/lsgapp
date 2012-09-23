@@ -20,7 +20,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
@@ -33,10 +32,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
@@ -230,66 +230,77 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 				public void onItemClick(AdapterView<?> parent, View view,
 						int position, long id) {
 					Cursor c = myDB
-							.query(Functions.DB_TIME_TABLE, new String[] {
-									Functions.DB_REMOTE_ID, Functions.DB_VERTRETUNG }, Functions.DB_ROWID
-									+ "=?", new String[] { Long.valueOf(id)
-									.toString() }, null, null, null);
-					c.moveToFirst();
-					if (c.getString(c.getColumnIndex(Functions.DB_VERTRETUNG))
-							.equals("true")) {
-						Cursor d = myDB.query(Functions.DB_VPLAN_TABLE,
-								new String[] { Functions.DB_VERTRETUNGSTEXT,
-										Functions.DB_KLASSE, Functions.DB_FACH,
-										Functions.DB_STUNDE, Functions.DB_TYPE,
-										Functions.DB_LEHRER },
-								Functions.DB_ROWID + "=?", new String[] {c.getString(c.getColumnIndex(Functions.DB_REMOTE_ID))},
-								null, null, null);
-						String vtext = (!(d.getString(d
-								.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)))
-								.equals("null")) ? d.getString(d
-								.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))
-								+ "\n" : "";
-						AlertDialog.Builder builder = new AlertDialog.Builder(
-								context);
-						builder.setTitle(
-								d.getString(d
-										.getColumnIndex(Functions.DB_KLASSE)))
-								.setMessage(
-										d.getString(d
-												.getColumnIndex(Functions.DB_FACH))
-												+ " / "
-												+ d.getString(d
-														.getColumnIndex(Functions.DB_STUNDE))
-												+ ". "
-												+ context
-														.getString(R.string.hour)
-												+ "\n"
-												+ vtext
-												+ d.getString(d
-														.getColumnIndex(Functions.DB_TYPE))
-												+ " "
-												+ context
-														.getString(R.string.at)
-												+ " "
-												+ d.getString(d
-														.getColumnIndex(Functions.DB_LEHRER)))
-								.setCancelable(true)
-								.setNeutralButton(
-										context.getString(R.string.ok),
-										new DialogInterface.OnClickListener() {
-											public void onClick(
-													DialogInterface dialog,
-													int id) {
-												dialog.cancel();
-											}
-										});
-						AlertDialog alert = builder.create();
-						alert.show();
-					}
+							.query(Functions.DB_TIME_TABLE,
+									new String[] { Functions.DB_REMOTE_ID,
+											Functions.DB_VERTRETUNG },
+									Functions.DB_ROWID + "=?",
+									new String[] { Long.valueOf(id).toString() },
+									null, null, null);
+					if (c.moveToFirst())
+						if (c.getString(c.getColumnIndex(Functions.DB_VERTRETUNG)) != null && c.getString(
+								c.getColumnIndex(Functions.DB_VERTRETUNG))
+								.equals("true")) {
+							Cursor d = myDB.query(
+									Functions.DB_VPLAN_TABLE,
+									new String[] {
+											Functions.DB_VERTRETUNGSTEXT,
+											Functions.DB_KLASSE,
+											Functions.DB_FACH,
+											Functions.DB_STUNDE,
+											Functions.DB_TYPE,
+											Functions.DB_LEHRER },
+									Functions.DB_ROWID + "=?",
+									new String[] { c.getString(c
+											.getColumnIndex(Functions.DB_REMOTE_ID)) },
+									null, null, null);
+							String vtext = (!(d.getString(d
+									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)))
+									.equals("null")) ? d.getString(d
+									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))
+									+ "\n"
+									: "";
+							AlertDialog.Builder builder = new AlertDialog.Builder(
+									context);
+							builder.setTitle(
+									d.getString(d
+											.getColumnIndex(Functions.DB_KLASSE)))
+									.setMessage(
+											d.getString(d
+													.getColumnIndex(Functions.DB_FACH))
+													+ " / "
+													+ d.getString(d
+															.getColumnIndex(Functions.DB_STUNDE))
+													+ ". "
+													+ context
+															.getString(R.string.hour)
+													+ "\n"
+													+ vtext
+													+ d.getString(d
+															.getColumnIndex(Functions.DB_TYPE))
+													+ " "
+													+ context
+															.getString(R.string.at)
+													+ " "
+													+ d.getString(d
+															.getColumnIndex(Functions.DB_LEHRER)))
+									.setCancelable(true)
+									.setNeutralButton(
+											context.getString(R.string.ok),
+											new DialogInterface.OnClickListener() {
+												public void onClick(
+														DialogInterface dialog,
+														int id) {
+													dialog.cancel();
+												}
+											});
+							AlertDialog alert = builder.create();
+							alert.show();
+						}
 				}
 			});
 			lv.setEmptyView(lay.findViewById(R.id.list_view_empty));
-			((TextView) lay.findViewById(R.id.list_view_empty)).setText(R.string.timetable_empty);
+			((TextView) lay.findViewById(R.id.list_view_empty))
+					.setText(R.string.timetable_empty);
 			((ViewPager) pager).addView(lay, 0);
 			return lay;
 		}

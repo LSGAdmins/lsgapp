@@ -1,21 +1,5 @@
 package com.lsg.app.lib;
 
-import com.lsg.app.Events;
-import com.lsg.app.ExtendedPagerTabStrip;
-import com.lsg.app.ExtendedViewPager;
-import com.lsg.app.Functions;
-import com.lsg.app.HelpAbout;
-import com.lsg.app.R;
-import com.lsg.app.SMVBlog;
-import com.lsg.app.Settings;
-import com.lsg.app.SettingsAdvanced;
-import com.lsg.app.SetupAssistant;
-import com.lsg.app.TimeTable;
-import com.lsg.app.VPlan;
-import com.lsg.app.R.drawable;
-import com.lsg.app.R.id;
-import com.lsg.app.R.layout;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +8,7 @@ import android.graphics.Rect;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -43,6 +28,20 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lsg.app.Events;
+import com.lsg.app.ExtendedPagerTabStrip;
+import com.lsg.app.ExtendedViewPager;
+import com.lsg.app.Functions;
+import com.lsg.app.HelpAbout;
+import com.lsg.app.InfoActivity;
+import com.lsg.app.R;
+import com.lsg.app.SMVBlog;
+import com.lsg.app.Settings;
+import com.lsg.app.SettingsAdvanced;
+import com.lsg.app.SetupAssistant;
+import com.lsg.app.TimeTable;
+import com.lsg.app.VPlan;
+
 public class SlideMenu {
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
 		Activity act;
@@ -53,6 +52,7 @@ public class SlideMenu {
 			public ImageView icon;
 		}
 		static class MenuDesc {
+			public boolean useSlideMenu = true;
 			public int type = Functions.TYPE_PAGE;
 			public int icon;
 			public String label;
@@ -72,7 +72,11 @@ public class SlideMenu {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View rowView = convertView;
-			if (rowView == null) {
+			if (rowView == null
+					|| (items[position].type == Functions.TYPE_INFO && rowView
+							.findViewById(R.id.title) == null)
+					|| (items[position].type == Functions.TYPE_PAGE && rowView
+							.findViewById(R.id.title) != null)) {
 				LayoutInflater inflater = act.getLayoutInflater();
 				MenuItem viewHolder = new MenuItem();
 				switch(getItemViewType(position)) {
@@ -93,7 +97,6 @@ public class SlideMenu {
 			MenuItem holder = (MenuItem) rowView.getTag();
 			String s = items[position].label;
 			holder.label.setText(s);
-			//holder.label.setCompoundDrawables(act.getResources().getDrawable(items[position].icon), null, null, null);
 			holder.icon.setImageResource(items[position].icon);
 			
 			if(holder.title != null) {
@@ -126,6 +129,30 @@ public class SlideMenu {
 		prefs = PreferenceManager.getDefaultSharedPreferences(act);
 	}
 	public void checkEnabled() {
+    	content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
+		content.setBackgroundResource(R.layout.background);
+		
+		parent = (FrameLayout) content.getParent();
+    	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	menu = inflater.inflate(R.layout.menu, null);
+    	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
+    	lays.setMargins(20000, 20000, 0, 0);
+    	menu.setLayoutParams(lays);
+    	content.bringToFront();
+    	parent.addView(menu);
+    	
+    	menu.getViewTreeObserver().addOnGlobalLayoutListener(
+				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						menu.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+						if(menuToHide) {
+							hide();
+							menuToHide = false;
+						}
+						}
+					});
+    	fill();
 		if(menuShown)
 			this.show(false);
 	}
@@ -136,23 +163,23 @@ public class SlideMenu {
 			window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
 			statusHeight = rectgle.top;
 			}
-		this.show(true);
+		this.show(true, 0);
 	}
+
 	public void show(boolean animate) {
+		show(animate, 0);
+	}
+	ViewGroup _content;
+	public void show(boolean animate, int offset) {
     	menuSize = Functions.dpToPx(250, act);
-    	content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
+    	if(offset == 0)
+    		offset = menuSize;
     	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
     	parm.setMargins(menuSize, 0, -menuSize, 0);
     	content.setLayoutParams(parm);
-    	
-    	
-    	/*FrameLayout _content = (FrameLayout) act.findViewById(android.R.id.content);
-    	LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) _content.getLayoutParams();
-    	parms.setMargins(menuSize, 0, -menuSize, 0);
-    	_content.setLayoutParams(parms);
-    	LinearLayout title = (LinearLayout) act.findViewById(R.id.title).getParent();
-    	title.setLayoutParams(parm);*/
-    	ViewGroup _content;
+    	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
+    	lays.setMargins(0,statusHeight, 0, 0);
+    	menu.setLayoutParams(lays);
     	try {
 			_content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
 		}
@@ -168,25 +195,6 @@ public class SlideMenu {
 		parms.setMargins(menuSize, 0, -menuSize, 0);
 		content.setLayoutParams(parms);
     	
-    	
-    	parent = (FrameLayout) content.getParent();
-    	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	menu = inflater.inflate(R.layout.menu, null);
-    	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
-    	lays.setMargins(0,statusHeight, 0, 0);
-    	menu.setLayoutParams(lays);
-    	parent.addView(menu);
-    	menu.getViewTreeObserver().addOnGlobalLayoutListener(
-				new ViewTreeObserver.OnGlobalLayoutListener() {
-					@Override
-					public void onGlobalLayout() {
-						menu.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-						if(menuToHide) {
-							hide();
-							menuToHide = false;
-						}
-						}
-					});
     	ListView list = (ListView) act.findViewById(R.id.menu_listview);
     	list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -194,7 +202,8 @@ public class SlideMenu {
 					int position, long id) {
 				if (items[position].action == null || !items[position].action.equals(curAct)) {
 					Log.d("pos", Long.valueOf(id).toString());
-					menuToHide = true;
+					if (items[position].useSlideMenu)
+						menuToHide = true;
 					if (items[position].action != null) {
 						Intent intent = new Intent(act, items[position].action);
 						intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -206,12 +215,6 @@ public class SlideMenu {
 				}
 				}
 			});
-    	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
-    		@Override
-    		public void onClick(View v) {
-    			SlideMenu.this.hide();
-    		}
-    	});
     	
     	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
     	try {    		
@@ -221,18 +224,17 @@ public class SlideMenu {
 		} catch (Exception e) {
 			// no viewpager to disable :)
 		}
-
-		TranslateAnimation slideoutanim = new TranslateAnimation(-menuSize, 0,
-				0, 0);
-		slideoutanim.setDuration(500);
 		if (animate) {
+			TranslateAnimation slideoutanim = new TranslateAnimation(-offset, 0,
+					0, 0);
+			slideoutanim.setDuration(Math.abs(offset) * 500 / menuSize);
+			
 			TranslateAnimation slideinanim = new TranslateAnimation(
-					-(menuSize / 2), 0, 0, 0);
-			slideinanim.setDuration(500);
+					-(offset / 2), 0, 0, 0);
+			slideinanim.setDuration(Math.abs(offset) * 500 / menuSize);
 			menu.startAnimation(slideinanim);
 			content.startAnimation(slideoutanim);
 
-			content.setBackgroundResource(R.layout.background);
 			content.bringToFront();
 			slideinanim.setAnimationListener(new AnimationListener() {
 				@Override
@@ -240,12 +242,10 @@ public class SlideMenu {
 					// to enable view that is clicked for slide-back
 					menu.bringToFront();
 				}
-
 				@Override
 				public void onAnimationRepeat(Animation animation) {
 					// not needed here
 				}
-
 				@Override
 				public void onAnimationStart(Animation animation) {
 					// not needed here
@@ -253,7 +253,118 @@ public class SlideMenu {
 			});
 		}
 		menuShown = true;
-		this.fill();
+    	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
+    		@Override
+    		public void onClick(View v) {
+    			SlideMenu.this.hide();
+    		}
+    	});
+    	
+		((FrameLayout) menu.findViewById(R.id.overlay)).setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				
+				switch(event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					xPos = event.getX();
+					Log.d("xpos", Float.valueOf(xPos).toString());
+					break;
+				case MotionEvent.ACTION_MOVE:
+					int diff = Float.valueOf(xPos - event.getX()).intValue();
+			    	prevX = lastX;
+					lastX = event.getX();
+					if(diff < 0)
+						diff = 0;
+					if(lastDiff == diff)
+						break;
+					lastDiff = diff;
+					if(lastDiff < maxDiff)
+						maxDiff = lastDiff;
+
+			    	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
+			    	parm.setMargins(menuSize - diff, 0, -menuSize + diff, 0);
+			    	content.setLayoutParams(parm);
+			    	content.bringToFront();
+			    	FrameLayout.LayoutParams parms = (FrameLayout.LayoutParams) menu.getLayoutParams();
+			    	parms.setMargins(-diff / 2, statusHeight, diff / 2, 0);
+			    	menu.setLayoutParams(parms);
+					break;
+				case MotionEvent.ACTION_UP:
+					Log.d("xPos", Float.valueOf(xPos).toString());
+					Log.d("lastX", Float.valueOf(lastX).toString());
+					Log.d("prevX", Float.valueOf(prevX).toString());
+					Log.d("pos", Float.valueOf(event.getX()).toString());
+					if(prevX < event.getX()) {
+						menu.bringToFront();
+						show(true, lastDiff);
+					} else
+						hide(lastDiff);
+					break;
+				}
+				return false;
+			}
+		});
+	}
+	private float xPos;
+	private float lastX;
+	private float prevX;
+	private int maxDiff = 0;
+	private int lastDiff;
+	public void hide() {
+		hide(0);
+	}
+	public void hide(int offset) {
+		AnimationSet menuAnimations = new AnimationSet(true);
+		menuAnimations.setDuration(500);
+		/*AlphaAnimation menuFadeOut = new AlphaAnimation(1.0F, 0.0F);
+		menuFadeOut.setDuration(500);*/
+		TranslateAnimation menuSlideOut = new TranslateAnimation(0, -((menuSize - offset) / 3), 0, 0);
+		menuSlideOut.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
+		//menuAnimations.addAnimation(menuFadeOut);
+		menuAnimations.addAnimation(menuSlideOut);
+		menu.startAnimation(menuSlideOut);
+		
+		TranslateAnimation content_in = new TranslateAnimation(menuSize - offset, 0, 0, 0);
+		content_in.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
+		content.startAnimation(content_in);
+		//((LinearLayout) act.findViewById(android.R.id.content).getParent()).bringToFront();
+		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
+    	parm.setMargins(0, 0, 0, 0);
+    	content.setLayoutParams(parm);
+    	
+    	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
+    	try {
+    		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
+    		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(true);
+    	} catch(Exception e) {
+    		//no viewpager :)
+    	}
+    	menuShown = false;
+		content.bringToFront();
+		_content.bringToFront();
+		parent.invalidate();
+		menu.invalidate();
+		content.invalidate();
+		menuSlideOut.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+
+				FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) menu.getLayoutParams();
+				params.setMargins(20000, 20000, 0, 0);
+				menu.setLayoutParams(params);
+			}
+		});
 	}
 	public void fill() {
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
@@ -283,21 +394,40 @@ public class SlideMenu {
 			items[5].action = null;
 			items[5].actIntent = new Intent(act, HelpAbout.class);
 			items[5].actIntent.putExtra(Functions.HELPABOUT, Functions.help);
+			items[5].useSlideMenu = false;
 			items[6].icon = R.drawable.ic_launcher;
 			items[6].label = "Über";
 			items[6].action = null;
 			items[6].actIntent = new Intent(act, HelpAbout.class);
 			items[6].actIntent.putExtra(Functions.HELPABOUT, Functions.about);
-			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, ""); 
+			items[6].useSlideMenu = false;
+			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, "");
 			items[7].type = Functions.TYPE_INFO;
 			items[7].title = "Aktuell";
 			items[7].icon = R.drawable.ic_launcher;
-			items[7].label = news_pupils.substring(0, ((news_pupils.length() > 60) ? 60 : news_pupils.length())) + ((news_pupils.length() > 60) ? "..." : "");
-			String news_teachers = prefs.getString(Functions.NEWS_TEACHERS, ""); 
-			items[8].type = Functions.TYPE_INFO;
-			items[8].title = "Lehrerinfo";
-			items[8].icon = R.drawable.ic_launcher;
-			items[8].label = news_teachers.substring(0, ((news_teachers.length() > 60) ? 60 : news_teachers.length())) + ((news_teachers.length() > 60) ? "..." : "");
+			items[7].label = news_pupils.substring(0,
+					((news_pupils.length() > 60) ? 60 : news_pupils.length()))
+					+ ((news_pupils.length() > 60) ? "..." : "");
+			items[7].action = null;
+			items[7].actIntent = new Intent(act, InfoActivity.class);
+			items[7].actIntent.putExtra("type", "info");
+			items[7].actIntent.putExtra("info_type", "pupils");
+			items[7].useSlideMenu = false;
+			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
+					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) {
+				String news_teachers = prefs.getString(Functions.NEWS_TEACHERS,
+						"");
+				items[8].type = Functions.TYPE_INFO;
+				items[8].title = "Lehrerinfo";
+				items[8].icon = R.drawable.ic_launcher;
+				items[8].label = news_teachers.substring(0, ((news_teachers
+						.length() > 60) ? 60 : news_teachers.length()))
+						+ ((news_teachers.length() > 60) ? "..." : "");
+				items[8].actIntent = new Intent(act, InfoActivity.class);
+				items[8].actIntent.putExtra("type", "info");
+				items[8].actIntent.putExtra("info_type", "teachers");
+				items[8].useSlideMenu = false;
+			}
 		} else {
 
 			items = new SlideMenuAdapter.MenuDesc[3];
@@ -316,35 +446,5 @@ public class SlideMenu {
 		}
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
-	}
-	public void hide() {
-    	//contentToFront(null, false);
-		AnimationSet menuAnimations = new AnimationSet(true);
-		menuAnimations.setDuration(500);
-		AlphaAnimation menuFadeOut = new AlphaAnimation(1.0F, 0.0F);
-		menuFadeOut.setDuration(500);
-		TranslateAnimation menuSlideOut = new TranslateAnimation(0, -(menuSize / 3), 0, 0);
-		menuSlideOut.setDuration(500);
-		menuAnimations.addAnimation(menuFadeOut);
-		menuAnimations.addAnimation(menuSlideOut);
-		menu.startAnimation(menuAnimations);
-		parent.removeView(menu);
-		
-		TranslateAnimation content_in = new TranslateAnimation(menuSize, 0, 0, 0);
-		content_in.setDuration(500);
-		content.startAnimation(content_in);
-		//((LinearLayout) act.findViewById(android.R.id.content).getParent()).bringToFront();
-		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
-    	parm.setMargins(0, 0, 0, 0);
-    	content.setLayoutParams(parm);
-    	
-    	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
-    	try {
-    		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
-    		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(true);
-    	} catch(Exception e) {
-    		//no viewpager :)
-    	}
-    	menuShown = false;
 	}
 }

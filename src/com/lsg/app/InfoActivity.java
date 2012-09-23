@@ -1,9 +1,12 @@
 package com.lsg.app;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 
 public class InfoActivity extends Activity {
@@ -22,6 +25,16 @@ public class InfoActivity extends Activity {
 			((TextView) findViewById(R.id.date_teachers)).setText(extras.getString("date_teachers"));
 			if(!extras.getBoolean("teacher"))
 				(findViewById(R.id.teachers_container)).setVisibility(View.GONE);
+		} else if(extras.getString("type").equals("info")) {
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			setContentView(R.layout.news);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			String text;
+			if(extras.getString("info_type").equals("pupils"))
+				text = prefs.getString(Functions.NEWS_PUPILS, "");
+			else
+				text = prefs.getString(Functions.NEWS_TEACHERS, "");
+			((TextView) findViewById(R.id.news_content)).setText(text);
 		}
 	}
 }
