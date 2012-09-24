@@ -251,6 +251,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 									new String[] { c.getString(c
 											.getColumnIndex(Functions.DB_REMOTE_ID)) },
 									null, null, null);
+							d.moveToFirst();
 							String vtext = (!(d.getString(d
 									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)))
 									.equals("null")) ? d.getString(d

@@ -224,7 +224,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 								Functions.DB_VERTRETUNGSTEXT,
 								Functions.DB_VERTRETER, Functions.DB_ROOM,
 								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
-								Functions.DB_LENGTH },
+								Functions.DB_LENGTH, "'teachers' AS type" },
 						Functions.DB_RAW_VERTRETER + "=? OR "
 								+ Functions.DB_RAW_LEHRER + "=?", new String[] {
 								prefs.getString(Functions.TEACHER_SHORT, ""),
@@ -238,16 +238,31 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 								Functions.DB_VERTRETUNGSTEXT,
 								Functions.DB_VERTRETER, Functions.DB_ROOM,
 								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
-								Functions.DB_LENGTH }, mine_cond, where_conds,
+								Functions.DB_LENGTH, "'pupils' AS type" }, mine_cond, where_conds,
 						null, null, null);
 			}
 			where_conds[0] = "%";
-			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
-					Functions.DB_CLASS_LEVEL, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);
-			cursor_teachers = myDB.query(Functions.DB_VPLAN_TEACHER, new String [] {Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE, Functions.DB_STUNDE,
-					Functions.DB_LEHRER, Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT, Functions.DB_VERTRETER, Functions.DB_ROOM,
-					Functions.DB_CLASS_LEVEL, Functions.DB_DATE, Functions.DB_LENGTH}, all_cond, where_conds, null, null, null);;
+			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {
+					Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE,
+					Functions.DB_STUNDE, Functions.DB_LEHRER,
+					Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT,
+					Functions.DB_VERTRETER, Functions.DB_ROOM,
+					Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
+					Functions.DB_LENGTH, "'pupils' AS type" }, all_cond, where_conds, null, null,
+					null);
+			cursor_teachers = myDB.query(Functions.DB_VPLAN_TEACHER,
+					new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
+							Functions.DB_TYPE, Functions.DB_STUNDE,
+							Functions.DB_LEHRER, Functions.DB_FACH,
+							Functions.DB_VERTRETUNGSTEXT,
+							Functions.DB_VERTRETER, Functions.DB_ROOM,
+							Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
+							Functions.DB_LENGTH, "'teachers' AS type" }, all_cond, where_conds, null,
+					null, Functions.DB_DATE + ", CASE "
+							+ Functions.DB_VERTRETER
+							+ " WHEN 'null' THEN 0 ELSE 1 END, "
+							+ Functions.DB_VERTRETER + ", "
+							+ Functions.DB_STUNDE);
 			vadapter_mine.changeCursor(cursor_mine);
 			vadapter_all.changeCursor(cursor_all);
 			vadapter_teachers.changeCursor(cursor_teachers);
@@ -349,11 +364,13 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			
 			String olddate  = "";
 			String oldclass = "";
+			String oldvertreter = "";
 			int position = cursor.getPosition();
 			if(position > 0) {
 				cursor.moveToPosition(position-1);
 				olddate  = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
 				oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_CLASS_LEVEL));
+				oldvertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
 				cursor.moveToPosition(position);
 				}
 			
@@ -376,14 +393,20 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				holder.type.setVisibility(View.VISIBLE);
 				holder.when.setVisibility(View.VISIBLE);
 				holder.bottom.setVisibility(View.VISIBLE);
-				
-				if(klassenstufe.equals(oldclass))
+
+				if (klassenstufe.equals(oldclass)
+						&& (cursor.getString(cursor.getColumnIndex("type"))
+								.equals("teachers") && cursor.getString(
+								cursor.getColumnIndex(Functions.DB_VERTRETER))
+								.equals(oldvertreter)))
 					holder.klasse.setVisibility(View.GONE);
 				else {
 					holder.klasse.setVisibility(View.VISIBLE);
 					}
 				if(Integer.valueOf(klassenstufe) < 14)
 					holder.klasse.setText(klassenstufe + ". " + context.getString(R.string.classes));
+				else if(cursor.getString(cursor.getColumnIndex("type")).equals("teachers"))
+					holder.klasse.setText(getString(R.string.vplan_of) + " " + cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER)));
 				else
 					holder.klasse.setText(context.getString(R.string.no_classes));
 				if(klasse.equals("null")) {
@@ -510,7 +533,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 										+ "=?",
 								new String[] {
 										Integer.valueOf(-(cal.get(Calendar.DAY_OF_WEEK)
-												- 3
+												- 2
 												- cal.getFirstDayOfWeek()))
 												.toString(),
 										Integer.valueOf(
@@ -520,10 +543,10 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 												+ "%",
 										jObject.getString("rawfach") });
 						Log.d("day",
-								Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)
-										- 1)
+								Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK) - 1 - cal.getFirstDayOfWeek())
 										.toString());
-						Log.d("date", cal.toString());
+						//Log.d("date", cal.toString());
+						Log.d("firstdayofweek", Integer.valueOf(cal.getFirstDayOfWeek()).toString());
 
 						i++;
 					}
@@ -672,18 +695,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    	intent.putExtra("date_teachers", prefs.getString("vplan_teacher_date", "") + " / " + prefs.getString("vplan_teacher_time", ""));
 	    	intent.putExtra("teacher", (prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs.getBoolean(Functions.RIGHTS_ADMIN, false)));
 	    	startActivity(intent);
-	    	/*AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    	builder.setMessage(getString(R.string.number_all) + " " + Integer.valueOf(adapter.cursor_all.getCount()).toString() + "\n"
-	    			+ getString(R.string.number_mine) + " " + Integer.valueOf(adapter.cursor_mine.getCount()).toString() + "\n"
-	    			+ getString(R.string.actdate) + prefs.getString("vplan_date", "") + " / " + prefs.getString("vplan_time", ""))
-	    	       .setCancelable(true)
-	    	       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-	    	           public void onClick(DialogInterface dialog, int id) {
-	    	                dialog.cancel();
-	    	           }
-	    	       });
-	    	AlertDialog alert = builder.create();
-	    	alert.show();*/
 	    	return true;
         case android.R.id.home:
             onHomePress();

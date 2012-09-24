@@ -139,4 +139,5 @@
     <string name="homebutton">Home-Button</string>
     <string name="searchbutton">Button zum Suchen</string>
     <string name="icon">Icon</string>
+    <string name="vplan_of">Vertretungen von</string>
 </resources>
