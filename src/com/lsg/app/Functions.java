@@ -105,7 +105,8 @@ public class Functions {
 	public static final String DB_FACH            = "fach";
 	public static final String DB_RAW_FACH        = "rawfach";
 	public static final String DB_DATE            = "date";
-	public static final String DB_LENGTH = "length";
+	public static final String DB_LENGTH          = "length";
+	public static final String DB_DAY_OF_WEEK     = "dayofweek";
 	// Termine
 	public static final String DB_EVENTS_TABLE = "events";
 	public static final String DB_DATES = "dates";
@@ -509,6 +510,11 @@ public class Functions {
     			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_REMOTE_ID);
     			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_REMOTE_ID + " INTEGER");
     			myDB.setVersion(14);
+    		}
+    		if(myDB.getVersion() == 14) {
+    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_DAY_OF_WEEK);
+    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_DAY_OF_WEEK + " INTEGER");
+    			myDB.setVersion(15);
     		}
     		myDB.close();
         } catch (Exception e) {

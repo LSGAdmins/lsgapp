@@ -511,30 +511,24 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 						values.put(Functions.DB_FACH, jObject.getString("fach"));
 						values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
 						values.put(Functions.DB_DATE, jObject.getString("date"));
-						values.put(Functions.DB_LENGTH, jObject.getInt("length"));
-						long last_id = myDB.insert(Functions.DB_VPLAN_TABLE, null, values);
-						// Date vdate = new SimpleDateFormat("dd.MM.yyyy")
-						// .parse(jObject.getString("date"));
-						Calendar cal = new GregorianCalendar(
-								Integer.valueOf(jObject.getString("date")
-										.split("\\.")[2]),
-								Integer.valueOf(jObject.getString("date")
-										.split("\\.")[1]),
-								Integer.valueOf(jObject.getString("date")
-										.split("\\.")[0]));
+						values.put(Functions.DB_LENGTH,
+								jObject.getInt("length"));
+						values.put(Functions.DB_DAY_OF_WEEK,
+								jObject.getInt("dayofweek"));
+						long last_id = myDB.insert(Functions.DB_VPLAN_TABLE,
+								null, values);
 						vals.put(Functions.DB_REMOTE_ID, last_id);
-						myDB.update(
+						long num_rows = myDB.update(
 								Functions.DB_TIME_TABLE,
 								vals,
 								Functions.DB_DAY + "=? AND "
 										+ Functions.DB_HOUR + "=? AND "
 										+ Functions.DB_RAW_LEHRER
-										+ " LIKE ? AND " + Functions.DB_RAW_FACH
-										+ "=?",
+										+ " LIKE ? AND "
+										+ Functions.DB_RAW_FACH + "=?",
 								new String[] {
-										Integer.valueOf(-(cal.get(Calendar.DAY_OF_WEEK)
-												- 2
-												- cal.getFirstDayOfWeek()))
+										Integer.valueOf(
+												jObject.getInt("dayofweek"))
 												.toString(),
 										Integer.valueOf(
 												jObject.getInt("stunde") - 1)
@@ -542,18 +536,35 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 										"%" + jObject.getString("rawlehrer")
 												+ "%",
 										jObject.getString("rawfach") });
-						Log.d("day",
-								Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK) - 1 - cal.getFirstDayOfWeek())
-										.toString());
-						//Log.d("date", cal.toString());
-						Log.d("firstdayofweek", Integer.valueOf(cal.getFirstDayOfWeek()).toString());
-
+						int ii = 1;
+						while(num_rows == 0 && jObject.getInt("stunde") - ii >= 0) {
+							num_rows = myDB.update(
+									Functions.DB_TIME_TABLE,
+									vals,
+									Functions.DB_DAY + "=? AND "
+											+ Functions.DB_HOUR + "=? AND "
+											+ Functions.DB_RAW_LEHRER
+											+ " LIKE ? AND "
+											+ Functions.DB_RAW_FACH + "=? AND "
+											+ Functions.DB_LENGTH + "=?",
+									new String[] {
+											Integer.valueOf(
+													jObject.getInt("dayofweek"))
+													.toString(),
+											Integer.valueOf(
+													jObject.getInt("stunde") - 1 - ii)
+													.toString(),
+											"%" + jObject.getString("rawlehrer")
+													+ "%",
+											jObject.getString("rawfach"),  Integer.valueOf(1 + ii).toString()});
+							ii++;
+						}
 						i++;
 					}
 					myDB.close();
-					JSONObject jObject            = jArray.getJSONObject(i);
-					String date                   = jObject.getString("date");
-					String time                   = jObject.getString("time");
+					JSONObject jObject = jArray.getJSONObject(i);
+					String date = jObject.getString("date");
+					String time = jObject.getString("time");
 					SharedPreferences.Editor edit = prefs.edit();
 					edit.putString("vplan_date", date);
 					edit.putString("vplan_time", time);
