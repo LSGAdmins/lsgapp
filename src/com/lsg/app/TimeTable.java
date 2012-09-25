@@ -28,11 +28,13 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,6 +46,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.interfaces.SelectedCallback;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
@@ -162,7 +165,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	}
 
 	public class TimeTableViewPagerAdapter extends PagerAdapter implements
-			PagerTitles {
+			PagerTitles, SQLlist {
 		private String[] exclude_subjects = new String[6];
 		private final SQLiteDatabase myDB;
 		private Cursor[] timetable_cursors = new Cursor[5];
@@ -298,6 +301,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 				}
 			});
 			lv.setEmptyView(lay.findViewById(R.id.list_view_empty));
+			TimeTable.this.registerForContextMenu(lv);
 			((TextView) lay.findViewById(R.id.list_view_empty))
 					.setText(R.string.timetable_empty);
 			((ViewPager) pager).addView(lay, 0);
@@ -412,6 +416,16 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 
 		@Override
 		public void startUpdate(View view) {
+		}
+
+		@Override
+		public void updateWhereCond(String searchText) {
+			//don't need this
+		}
+
+		@Override
+		public void updateList() {
+			updateCursor();
 		}
 	}
 
@@ -985,6 +999,16 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	@Override
 	public void onRefreshPress() {
 		updateTimeTable();
+	}
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		Log.d("create", "contextmenu");
+		super.onCreateContextMenu(menu, v, menuInfo);
+		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_TIME_TABLE);
+	}
+	@Override
+	public boolean onContextItemSelected(final MenuItem item) {
+		return Functions.contextMenuSelect(item, this, viewpageradap, Functions.DB_TIME_TABLE);
 	}
 	public void update(int what, Context c) {
 		TimeTableUpdater udp = new TimeTableUpdater(c);

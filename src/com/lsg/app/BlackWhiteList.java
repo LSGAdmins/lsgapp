@@ -33,9 +33,12 @@ public class BlackWhiteList extends ListActivity {
 		
 		Bundle data = getIntent().getExtras();
 		String type = data.getString(Functions.BLACKWHITELIST);
+		
+		String wherecond = "";
 		if(type.equals(Functions.BLACKLIST)) {
 			setTitle(getString(R.string.blacklist));
 			table = new String(Functions.DB_EXCLUDE_TABLE);
+			wherecond = Functions.DB_TYPE + "='oldstyle'";
 		}
 		else {
 			setTitle(getString(R.string.whitelist));
@@ -43,7 +46,7 @@ public class BlackWhiteList extends ListActivity {
 		}
 		
 		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
-				null, null, null, null, null);
+				wherecond, null, null, null, null);
 		
 		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
 				new int[] {R.id.main_textview}, 0);

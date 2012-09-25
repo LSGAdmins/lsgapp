@@ -2,8 +2,6 @@ package com.lsg.app;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -18,6 +18,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -141,12 +142,13 @@ public class SettingsAdvanced extends PreferenceActivity {
 			String type = data.getString("list");
 			if (type.equals("blacklist")) {
 				table = new String(Functions.DB_EXCLUDE_TABLE);
+				wherecond = Functions.DB_TYPE + "='oldstyle'";
 			} else {
 				table = new String(Functions.INCLUDE_TABLE);
 			}
 
 			c = myDB.query(table, new String[] { Functions.DB_ROWID,
-					Functions.DB_FACH }, null, null, null, null, null);
+					Functions.DB_FACH }, wherecond, null, null, null, null);
 
 			adap = new SimpleCursorAdapter(getActivity(),
 					R.layout.main_listitem, c,
@@ -160,7 +162,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 				Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.list, container, false);
 		}
-
+		String wherecond = "";
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -183,7 +185,8 @@ public class SettingsAdvanced extends PreferenceActivity {
 
 		public void updateList() {
 			c = myDB.query(table, new String[] { Functions.DB_ROWID,
-					Functions.DB_FACH }, null, null, null, null, null);
+					Functions.DB_FACH }, wherecond, null, null, null, null);
+			Log.d("where", wherecond);
 			adap.changeCursor(c);
 		}
 

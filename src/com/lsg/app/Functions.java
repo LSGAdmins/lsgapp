@@ -556,6 +556,25 @@ public class Functions {
 				}
 			if(klasse.equals("null"))
 				conmenu = 1;
+			} else if(table.equals(Functions.DB_TIME_TABLE)) {
+				Log.d("create", "context4timetable");
+				Cursor cur = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_CLASS, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
+						new String[] {Long.valueOf(info.id).toString()}, null, null, null);
+				cur.moveToFirst();
+				
+				klasse  = cur.getString(cur.getColumnIndex(Functions.DB_CLASS));
+				rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
+				fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+				cur.close();
+				
+				int i = 0;
+				while(i < Functions.exclude.length) {
+					if(klasse.contains(Functions.exclude[i]))
+						conmenu = 1;
+					i++;
+					}
+				if(klasse.equals("null"))
+					conmenu = 1;
 			} else if(table.equals(Functions.DB_SUBJECT_TABLE)) {
 				Cursor cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
 						new String[] {Long.valueOf(info.id).toString()}, null, null, null);
@@ -606,6 +625,9 @@ public class Functions {
 		  Cursor cur;
 		  if(table.equals(Functions.DB_VPLAN_TABLE)) {
 			  cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
+					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
+		  } else if(table.equals(Functions.DB_TIME_TABLE)) {
+			  cur = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
 					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
 		  } else { //table.equals(Functions.DB_SUBJECT_TABLE)
 			  cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
