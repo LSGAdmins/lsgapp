@@ -241,62 +241,66 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 						if (c.getString(c.getColumnIndex(Functions.DB_VERTRETUNG)) != null && c.getString(
 								c.getColumnIndex(Functions.DB_VERTRETUNG))
 								.equals("true")) {
-							Cursor d = myDB.query(
-									Functions.DB_VPLAN_TABLE,
-									new String[] {
-											Functions.DB_VERTRETUNGSTEXT,
-											Functions.DB_KLASSE,
-											Functions.DB_FACH,
-											Functions.DB_STUNDE,
-											Functions.DB_TYPE,
-											Functions.DB_LEHRER },
-									Functions.DB_ROWID + "=?",
-									new String[] { c.getString(c
-											.getColumnIndex(Functions.DB_REMOTE_ID)) },
-									null, null, null);
-							d.moveToFirst();
-							String vtext = (!(d.getString(d
-									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)))
-									.equals("null")) ? d.getString(d
-									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))
-									+ "\n"
-									: "";
-							AlertDialog.Builder builder = new AlertDialog.Builder(
-									context);
-							builder.setTitle(
-									d.getString(d
-											.getColumnIndex(Functions.DB_KLASSE)))
-									.setMessage(
-											d.getString(d
-													.getColumnIndex(Functions.DB_FACH))
-													+ " / "
-													+ d.getString(d
-															.getColumnIndex(Functions.DB_STUNDE))
-													+ ". "
-													+ context
-															.getString(R.string.hour)
-													+ "\n"
-													+ vtext
-													+ d.getString(d
-															.getColumnIndex(Functions.DB_TYPE))
-													+ " "
-													+ context
-															.getString(R.string.at)
-													+ " "
-													+ d.getString(d
-															.getColumnIndex(Functions.DB_LEHRER)))
-									.setCancelable(true)
-									.setNeutralButton(
-											context.getString(R.string.ok),
-											new DialogInterface.OnClickListener() {
-												public void onClick(
-														DialogInterface dialog,
-														int id) {
-													dialog.cancel();
-												}
-											});
-							AlertDialog alert = builder.create();
-							alert.show();
+							Intent intent = new Intent(TimeTable.this, InfoActivity.class);
+							intent.putExtra("type", "timetable_popup");
+							intent.putExtra("id", c.getString(c.getColumnIndex(Functions.DB_REMOTE_ID)));
+							startActivity(intent);
+//							Cursor d = myDB.query(
+//									Functions.DB_VPLAN_TABLE,
+//									new String[] {
+//											Functions.DB_VERTRETUNGSTEXT,
+//											Functions.DB_KLASSE,
+//											Functions.DB_FACH,
+//											Functions.DB_STUNDE,
+//											Functions.DB_TYPE,
+//											Functions.DB_LEHRER },
+//									Functions.DB_ROWID + "=?",
+//									new String[] { c.getString(c
+//											.getColumnIndex(Functions.DB_REMOTE_ID)) },
+//									null, null, null);
+//							d.moveToFirst();
+//							String vtext = (!(d.getString(d
+//									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT)))
+//									.equals("null")) ? d.getString(d
+//									.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))
+//									+ "\n"
+//									: "";
+//							AlertDialog.Builder builder = new AlertDialog.Builder(
+//									context);
+//							builder.setTitle(
+//									d.getString(d
+//											.getColumnIndex(Functions.DB_KLASSE)))
+//									.setMessage(
+//											d.getString(d
+//													.getColumnIndex(Functions.DB_FACH))
+//													+ " / "
+//													+ d.getString(d
+//															.getColumnIndex(Functions.DB_STUNDE))
+//													+ ". "
+//													+ context
+//															.getString(R.string.hour)
+//													+ "\n"
+//													+ vtext
+//													+ d.getString(d
+//															.getColumnIndex(Functions.DB_TYPE))
+//													+ " "
+//													+ context
+//															.getString(R.string.at)
+//													+ " "
+//													+ d.getString(d
+//															.getColumnIndex(Functions.DB_LEHRER)))
+//									.setCancelable(true)
+//									.setNeutralButton(
+//											context.getString(R.string.ok),
+//											new DialogInterface.OnClickListener() {
+//												public void onClick(
+//														DialogInterface dialog,
+//														int id) {
+//													dialog.cancel();
+//												}
+//											});
+//							AlertDialog alert = builder.create();
+//							alert.show();
 						}
 				}
 			});
