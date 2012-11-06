@@ -377,29 +377,29 @@ public class SlideMenu {
 			for (int i = 0; i < 9; i++) {
 				items[i] = new SlideMenuAdapter.MenuDesc();
 			}
-			items[0].icon = R.drawable.ic_launcher;
+			items[0].icon = R.drawable.ic_timetable;
 			items[0].label = "Stundenplan";
 			items[0].action = TimeTable.class;
-			items[1].icon = R.drawable.ic_launcher;
+			items[1].icon = R.drawable.ic_vplan;
 			items[1].label = "Vertretungsplan";
 			items[1].action = VPlan.class;
-			items[2].icon = R.drawable.ic_launcher;
+			items[2].icon = R.drawable.ic_events;
 			items[2].label = "Termine";
 			items[2].action = Events.class;
-			items[3].icon = R.drawable.ic_launcher;
+			items[3].icon = R.drawable.ic_smv;
 			items[3].label = "SMVBlog";
 			items[3].action = SMVBlog.class;
-			items[4].icon = R.drawable.ic_launcher;
+			items[4].icon = R.drawable.ic_settings;
 			items[4].label = "Einstellungen";
 			items[4].action = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
 					: Settings.class;
-			items[5].icon = R.drawable.ic_launcher;
+			items[5].icon = R.drawable.ic_help;
 			items[5].label = "Hilfe";
 			items[5].action = null;
 			items[5].actIntent = new Intent(act, HelpAbout.class);
 			items[5].actIntent.putExtra(Functions.HELPABOUT, Functions.help);
 			items[5].useSlideMenu = false;
-			items[6].icon = R.drawable.ic_launcher;
+			items[6].icon = R.drawable.ic_about;
 			items[6].label = "Über";
 			items[6].action = null;
 			items[6].actIntent = new Intent(act, HelpAbout.class);
