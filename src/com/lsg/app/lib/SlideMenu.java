@@ -380,7 +380,7 @@ public class SlideMenu {
 			items[0].icon = R.drawable.ic_timetable;
 			items[0].label = "Stundenplan";
 			items[0].action = TimeTable.class;
-			items[1].icon = R.drawable.ic_vplan;
+			items[1].icon = R.drawable.ic_vplan_green;
 			items[1].label = "Vertretungsplan";
 			items[1].action = VPlan.class;
 			items[2].icon = R.drawable.ic_events;
