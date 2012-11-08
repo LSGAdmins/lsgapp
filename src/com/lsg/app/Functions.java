@@ -292,14 +292,15 @@ public class Functions {
 	 * Clean database of vplan - used when the vplan is one day old, but there's no new version
 	 * @param context the app context to access the database
 	 */
-	public static void cleanVPlanTable(Context context) {
+	public static void cleanVPlanTable(Context context, String table) {
 		Calendar now  = Calendar.getInstance();
 		int year_now  = now.get(Calendar.YEAR);
 		int month_now = now.get(Calendar.MONTH)+1;
 		int day_now   = now.get(Calendar.DAY_OF_MONTH);
 		SQLiteDatabase myDB;
 		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
-		Cursor result = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_DATE}, null, null, null, null, null);
+		
+		Cursor result = myDB.query(table, new String[] {Functions.DB_DATE}, null, null, null, null, null);
 		result.moveToFirst();
 		int i = 0;
 		while(i < result.getCount()) {
@@ -521,7 +522,8 @@ public class Functions {
         	myDB.close();
         	Log.d("db", e.getMessage());
         	}
-    	Functions.cleanVPlanTable(context);
+    	Functions.cleanVPlanTable(context, DB_VPLAN_TABLE);
+    	Functions.cleanVPlanTable(context, DB_VPLAN_TEACHER);
 	}
 	/**
 	 * add items to blacklist / remove items from blacklist

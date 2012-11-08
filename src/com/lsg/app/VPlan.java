@@ -45,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -655,12 +656,18 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    pager = (ExtendedViewPager)findViewById(R.id.viewpager);
 	    //pager.setOnPageChangeListener(this);
 	    pager.setAdapter(adapter);
+		pager.setPageMargin(Functions.dpToPx(40, this));
+		pager.setPageMarginDrawable(R.layout.viewpager_margin);
+		
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    slidemenu = new SlideMenu(this, VPlan.class);
 	    slidemenu.checkEnabled();
 	    titlebar.init(this);
 	    titlebar.addRefresh(this);
 	    titlebar.setTitle(getTitle());
+	    Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+	    /*String st = null;
+	    st.toCharArray();*/
 	    }
 	
 	private MenuItem refresh;
