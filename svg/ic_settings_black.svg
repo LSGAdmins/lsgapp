@@ -58,7 +58,7 @@
      transform="translate(-195,-499.46218)">
     <text
        xml:space="preserve"
-       style="font-size:100px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
+       style="font-size:100px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0000;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
        x="183"
        y="574.86218"
        id="text3776"
@@ -67,7 +67,7 @@
          id="tspan3778"
          x="183"
          y="574.86218">?</tspan></text>
-<!--    <text
+    <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        x="133.5"
@@ -77,7 +77,7 @@
          sodipodi:role="line"
          id="tspan3782"
          x="133.5"
-         y="648.36218" /></text>-->
+         y="648.36218" /></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:10.43099976000000062;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3830"
@@ -88,7 +88,7 @@
        transform="translate(195,499.46218)" />
     <text
        xml:space="preserve"
-       style="font-size:76.30728912px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
+       style="font-size:76.30728912px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0000;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
        x="201.56073"
        y="573.94171"
        id="text3822"

@@ -22,7 +22,7 @@
      transform="translate(-195,-499.46218)">
     <text
        xml:space="preserve"
-       style="font-size:100px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
+       style="font-size:100px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0000;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
        x="183"
        y="574.86218"
        id="text3776"
@@ -30,6 +30,7 @@
          sodipodi:role="line"
          id="tspan3778"
          x="183"
-         y="574.86218">?</tspan></text>
+         y="574.86218">B</tspan></text>
   </g>
 </svg>
+

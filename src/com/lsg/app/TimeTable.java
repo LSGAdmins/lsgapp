@@ -29,12 +29,12 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -100,14 +100,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			TimetableItem holder = (TimetableItem) view.getTag();
-			/*
-			 * int position = cursor.getPosition(); if(position == 0) {
-			 * holder.timetable_day.setVisibility(View.VISIBLE);
-			 * holder.timetable_day
-			 * .setText(context.getResources().getStringArray
-			 * (R.array.days)[cursor
-			 * .getInt(cursor.getColumnIndex(Functions.DB_DAY))]); } else
-			 */
 			holder.timetable_day.setVisibility(View.GONE);
 			int hour = cursor.getInt(cursor.getColumnIndex(Functions.DB_HOUR)) + 1;
 			String when = Integer.valueOf(hour).toString();
@@ -774,6 +766,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		Intent intent = new Intent(TimeTable.this, WorkerService.class);
 	    intent.putExtra(WorkerService.WHAT, 100);
 	    startService(intent);
+	    //Log.d("encrypted", LSGappAuth.encrypt("passwort", "aaaa"));
 	}
 	public void showMine() {
 		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);

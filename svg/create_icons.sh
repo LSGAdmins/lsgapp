@@ -1,29 +1,9 @@
 #!/bin/bash
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_about.svg -geometry 92x92 res/drawable-xhdpi/ic_about.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_about.svg -geometry 72x72 res/drawable-hdpi/ic_about.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_about.svg -geometry 48x48 res/drawable-mdpi/ic_about.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_about.svg -geometry 36x36 res/drawable-ldpi/ic_about.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_help.svg -geometry 92x92 res/drawable-xhdpi/ic_help.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_help.svg -geometry 72x72 res/drawable-hdpi/ic_help.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_help.svg -geometry 48x48 res/drawable-mdpi/ic_help.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_help.svg -geometry 36x36 res/drawable-ldpi/ic_help.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_settings.svg -geometry 92x92 res/drawable-xhdpi/ic_settings.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_settings.svg -geometry 72x72 res/drawable-hdpi/ic_settings.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_settings.svg -geometry 48x48 res/drawable-mdpi/ic_settings.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_settings.svg -geometry 36x36 res/drawable-ldpi/ic_settings.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_vplan.svg -geometry 92x92 res/drawable-xhdpi/ic_vplan_green.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_vplan.svg -geometry 72x72 res/drawable-hdpi/ic_vplan_green.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_vplan.svg -geometry 48x48 res/drawable-mdpi/ic_vplan_green.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_vplan.svg -geometry 36x36 res/drawable-ldpi/ic_vplan_green.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_smv.svg -geometry 92x92 res/drawable-xhdpi/ic_smv.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_smv.svg -geometry 72x72 res/drawable-hdpi/ic_smv.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_smv.svg -geometry 48x48 res/drawable-mdpi/ic_smv.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_smv.svg -geometry 36x36 res/drawable-ldpi/ic_smv.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_events.svg -geometry 92x92 res/drawable-xhdpi/ic_events.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_events.svg -geometry 72x72 res/drawable-hdpi/ic_events.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_events.svg -geometry 48x48 res/drawable-mdpi/ic_events.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_events.svg -geometry 36x36 res/drawable-ldpi/ic_events.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_timetable.svg -geometry 92x92 res/drawable-xhdpi/ic_timetable.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_timetable.svg -geometry 72x72 res/drawable-hdpi/ic_timetable.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_timetable.svg -geometry 48x48 res/drawable-mdpi/ic_timetable.png
-convert +transparent "#00ff00" -fuzz 50% -background '#0000' svg/ic_timetable.svg -geometry 36x36 res/drawable-ldpi/ic_timetable.png
+for file in *.svg
+do
+  echo $file
+  convert -transparent white -fuzz 50% -background none $file -geometry 36x36 ../res/drawable-ldpi/${file%.*}.png
+  convert -transparent white -fuzz 50% -background none $file -geometry 48x48 ../res/drawable-mdpi/${file%.*}.png
+  convert -transparent white -fuzz 50% -background none $file -geometry 72x72 ../res/drawable-hdpi/${file%.*}.png
+  convert -transparent white -fuzz 50% -background none $file -geometry 92x92 ../res/drawable-xhdpi/${file%.*}.png
+done

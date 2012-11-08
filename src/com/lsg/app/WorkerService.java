@@ -133,7 +133,7 @@ public class WorkerService extends IntentService {
 			JSONArray contents = new JSONArray(get);
 			String allContents = "";
 			for(int i = 0; i < contents.length(); i++) {
-				allContents = allContents + ((i != 0) ? "\n" : "") + contents.getString(i);
+				allContents = allContents + ((i != 0) ? "\n\n" : "") + contents.getString(i);
 			}
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			SharedPreferences.Editor edit = prefs.edit();

@@ -1,7 +1,13 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/news_content"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    android:padding="10dp" />
+    android:layout_height="fill_parent" >
+
+    <TextView
+        android:id="@+id/news_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:padding="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</ScrollView>

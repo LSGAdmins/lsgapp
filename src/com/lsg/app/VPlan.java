@@ -210,10 +210,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
 			String mine_cond = first + include_cond +  sec + exclude_cond;
 			String all_cond = first + sec;
-			Log.d("mine_cond", mine_cond);
-			for(int i = 0; i < where_conds.length; i++) {
-				Log.d("where", where_conds[i]);
-			}
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
 				cursor_mine = myDB.query(Functions.DB_VPLAN_TEACHER,
 						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
@@ -238,6 +234,8 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
 								Functions.DB_LENGTH, "'pupils' AS type" }, mine_cond, where_conds,
 						null, null, null);
+				Log.d("mine_cond", mine_cond);
+				Log.d("klasse", where_conds[0]);
 			}
 			where_conds[0] = "%";
 			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {
@@ -480,9 +478,8 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			try {
 				add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_date", ""), "UTF-8")
 						+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_time", ""), "UTF-8");
-				} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+				} catch(UnsupportedEncodingException e) { Log.w("encoding", e.getMessage()); }
 			String get = Functions.getData(Functions.VP_URL, context, true, add);
-			Log.d("get", get);
 			if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact")) {
 				try {
 					JSONArray jArray = new JSONArray(get);
@@ -568,7 +565,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					edit.putString("vplan_time", time);
 					edit.commit();
 					} catch(JSONException e) {
-						Log.d("jsonerror", e.getMessage());
+						Log.w("jsonerror", e.getMessage());
 						return new String[] {"json", context.getString(R.string.jsonerror)};
 					}
 				}
@@ -589,9 +586,8 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					add = "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_teacher_date", ""), "UTF-8")
 							+ "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("vplan_teacher_time", ""), "UTF-8")
 							+ "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode("teachers", "UTF-8");
-					} catch(UnsupportedEncodingException e) { Log.d("encoding", e.getMessage()); }
+					} catch(UnsupportedEncodingException e) { Log.w("encoding", e.getMessage()); }
 				String get = Functions.getData(Functions.VP_URL, context, true, add);
-				Log.d("get", get);
 				if(!get.equals("networkerror") && !get.equals("loginerror") && !get.equals("noact") && !get.equals("rights")) {
 					try {
 						JSONArray jArray = new JSONArray(get);
@@ -627,7 +623,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 						edit.putString("vplan_teacher_time", time);
 						edit.commit();
 						} catch(JSONException e) {
-							Log.d("jsonerror", e.getMessage());
+							Log.w("jsonerror", e.getMessage());
 							return new String[] {"json", context.getString(R.string.jsonerror)};
 						}
 					}
@@ -731,7 +727,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		return Functions.contextMenuSelect(item, this, adapter, Functions.DB_VPLAN_TABLE);
 	}
 	public static void blacklistVPlan(Context context) {
-		Log.d("vplan", "blacklistvplan");
 		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
 				Context.MODE_PRIVATE, null);
 		Cursor vplan = myDB.query(Functions.DB_VPLAN_TABLE, new String[] { Functions.DB_ROWID,
@@ -794,7 +789,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 
 			@Override
 			public void onFinishedService() {
-				Log.d("service", "finished without error");
 				if (Functions.getSDK() >= 11 && actionView != null)
 					refresh.setActionView(actionView);
 				else
