@@ -73,7 +73,8 @@ public class Functions {
 	public static final String   LOGIN_TEST_URL       = "http://linux.lsg.musin.de/cp/setup.php?act=checklogin";
 	public static final String   PERSON_DATA_URL      = "http://linux.lsg.musin.de/cp/setup.php?act=getdata";
 	public static final String   PERSON_DATA_SEND_URL = "http://linux.lsg.musin.de/cp/setup.php?act=setdata";
-	public static final String   NEWS_URL = "http://linux.lsg.musin.de/cp/news_app.php";
+	public static final String   NEWS_URL             = "http://linux.lsg.musin.de/cp/news_app.php";
+	public static final String   ERROR_URL            = "http://linux.lsg.musin.de/cp/error.php";
 	public static final String   API_VERSION          = "3";
 	
 	public static final String   class_key  = "class";
@@ -261,10 +262,20 @@ public class Functions {
 	public static String getData(String urlString, Context context, boolean login, String add) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		try {
-			String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("username", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(prefs.getString("password", ""), "UTF-8")
-					+ "&" + URLEncoder.encode("api", "UTF-8") + "=" + URLEncoder.encode(Functions.API_VERSION, "UTF-8") + add;
-        	URL url = new URL(urlString);
+			String data = "";
+			if (login)
+				data = URLEncoder.encode("username", "UTF-8")
+						+ "="
+						+ URLEncoder.encode(prefs.getString("username", ""),
+								"UTF-8")
+						+ "&"
+						+ URLEncoder.encode("password", "UTF-8")
+						+ "="
+						+ URLEncoder.encode(prefs.getString("password", ""),
+								"UTF-8");
+			data = data + "&" + URLEncoder.encode("api", "UTF-8") + "="
+					+ URLEncoder.encode(Functions.API_VERSION, "UTF-8") + add;
+			URL url = new URL(urlString);
         	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         	// If you invoke the method setDoOutput(true) on the URLConnection, it will always use the POST method.
         	conn.setDoOutput(true);

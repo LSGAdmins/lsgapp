@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="@string/general"
+        android:title="@string/general" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="sendcrashes"
+            android:title="@string/sendcrashes" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

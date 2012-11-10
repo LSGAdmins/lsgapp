@@ -31,6 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -190,6 +191,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		titlebar = new TitleCompat(this, true);
 		myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);

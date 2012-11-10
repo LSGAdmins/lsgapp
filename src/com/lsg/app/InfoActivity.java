@@ -1,5 +1,7 @@
 package com.lsg.app;
 
+import com.lsg.app.lib.ExceptionHandler;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 public class InfoActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Bundle extras = getIntent().getExtras();
 		Log.d("type", extras.getString("type"));

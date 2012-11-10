@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import java.util.List;
 
+import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 
 import android.annotation.TargetApi;
@@ -37,6 +38,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Functions.homeUp(this);
 		slidemenu = new SlideMenu(this, SettingsAdvanced.class);
@@ -45,7 +47,6 @@ public class SettingsAdvanced extends PreferenceActivity {
 
 	@Override
 	public void onBuildHeaders(List<Header> target) {
-		// Functions.setTheme(false, true, this);
 		loadHeadersFromResource(R.xml.setting_headers, target);
 	}
 
@@ -125,6 +126,14 @@ public class SettingsAdvanced extends PreferenceActivity {
 		}
 	}
 
+	public static class GeneralFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.general_settings);
+		}
+	}
+
 	public static class BlackWhiteListFragment extends ListFragment {
 		private SQLiteDatabase myDB;
 		private String table;
@@ -162,7 +171,9 @@ public class SettingsAdvanced extends PreferenceActivity {
 				Bundle savedInstanceState) {
 			return inflater.inflate(R.layout.list, container, false);
 		}
+
 		String wherecond = "";
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -241,6 +252,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			slidemenu.show();
+			Log.d("menu", "home");
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

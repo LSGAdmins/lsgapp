@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -18,6 +19,7 @@ public class SMVBlog extends Activity implements HomeCall, RefreshCall {
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		if(Functions.webv == null)
 		  Functions.init(this);
 		titlebar = new TitleCompat(this, true);

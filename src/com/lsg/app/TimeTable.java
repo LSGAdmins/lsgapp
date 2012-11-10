@@ -48,6 +48,7 @@ import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.interfaces.SelectedCallback;
+import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -693,6 +694,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		titlebar = new TitleCompat(this, true);
 		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);

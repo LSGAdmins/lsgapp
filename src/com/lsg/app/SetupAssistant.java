@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.lsg.app.TimeTable.TimeTableUpdater;
+import com.lsg.app.lib.ExceptionHandler;
 
 public class SetupAssistant extends Activity {
 	private SharedPreferences prefs;
@@ -388,6 +389,7 @@ public class SetupAssistant extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Functions.init(this);
 		Functions.setTheme(false, false, this);

@@ -1,7 +1,7 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
-
+    
     <header
-        android:icon="@drawable/ic_settings_black"
+        android:icon="@drawable/ic_login"
         android:title="@string/change_user"
         android:summary="@string/change_user_summary" >
         <intent
@@ -23,6 +23,11 @@
         android:icon="@drawable/ic_vplan_black"
         android:summary="@string/vplan_summary"
         android:title="@string/vplan" />
+    <header
+        android:fragment="com.lsg.app.SettingsAdvanced$GeneralFragment"
+        android:icon="@drawable/ic_settings_black"
+        android:summary="@string/general_summary"
+        android:title="@string/general_settings" />
     <header
         android:fragment="com.lsg.app.SettingsAdvanced$BlackWhiteListFragment"
         android:icon="@drawable/ic_blacklist"

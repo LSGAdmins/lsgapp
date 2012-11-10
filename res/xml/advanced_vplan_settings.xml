@@ -19,10 +19,6 @@
             android:switchTextOff="@string/off"
             android:switchTextOn="@string/on"
             android:defaultValue="false" />
-        <CheckBoxPreference
-            android:title="@string/dark_actionbar"
-            android:key="dark_actionbar"
-            android:defaultValue="false" />
         <SwitchPreference 
             android:title="@string/useac2dm"
             android:key="useac2dm"

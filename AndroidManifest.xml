@@ -106,12 +106,7 @@
         <service android:name=".GCMIntentService" />
         <service
             android:name=".ExceptionSender"
-            android:exported="false"
-            android:process=":remote" >
-            <intent-filter>
-                <action android:name="com.lsg.app.Exception" />
-            </intent-filter>
-        </service>
+            android:exported="false" />
         <service
             android:name=".WorkerService"
             android:exported="false" />

@@ -13,6 +13,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
+import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -24,6 +25,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		
@@ -32,6 +34,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		
         addPreferencesFromResource(R.xml.login_settings);
         addPreferencesFromResource(R.xml.vplan_settings);
+        addPreferencesFromResource(R.xml.general_settings);
         addPreferencesFromResource(R.xml.list_settings);
         addPreferencesFromResource(R.xml.setupassistantbutton);
         

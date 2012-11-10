@@ -1,5 +1,7 @@
 package com.lsg.app;
 
+import com.lsg.app.lib.ExceptionHandler;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.view.View;
 public class HelpAbout extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);

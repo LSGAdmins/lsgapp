@@ -1,5 +1,7 @@
 package com.lsg.app;
 
+import java.net.URLEncoder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
@@ -23,6 +26,7 @@ public class WorkerService extends IntentService {
 	public interface WorkerClass {
 		public void update(int what, Context c);
 	}
+
 	public static int RESULT_OK = 0;
 	public static int RESULT_ERROR = 1;
 	public static final int UPDATE_ALL = 0;
@@ -30,7 +34,7 @@ public class WorkerService extends IntentService {
 	public static final int UPDATE_TEACHERS = 2;
 	public static String WHAT = "what";
 	public static String WORKER_CLASS = "workerclass";
-	public static String ACTION    = "action";
+	public static String ACTION = "action";
 	public static String MESSENGER = "messenger";
 	public static String TIMETABLE = "timetable";
 
@@ -44,10 +48,31 @@ public class WorkerService extends IntentService {
 		if (extras.getInt(WHAT) == 100) {
 			checkUpdate();
 			loadNews();
+		} else if (extras.getInt(WHAT) == 200) {
+			try {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			
+			PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+
+				String add = "&exception="
+						+ URLEncoder.encode(prefs.getString("exception", ""),
+								"UTF-8") + "&appversion="
+						+ URLEncoder.encode(pInfo.versionName, "UTF-8")
+						+ "&appcode="
+						+ URLEncoder.encode(Integer.valueOf(pInfo.versionCode).toString(), "UTF-8");
+			String data = Functions.getData(Functions.ERROR_URL, this, false, add);
+			if(data.equals("success")) {
+				SharedPreferences.Editor edit = prefs.edit();
+				edit.remove("exception");
+				edit.commit();
+			}
+			} catch(Exception e) {
+			}
 		} else {
 			ClassLoader loader = WorkerClass.class.getClassLoader();
 			try {
-				Class<?> class_ = loader.loadClass(extras.getString(WORKER_CLASS));
+				Class<?> class_ = loader.loadClass(extras
+						.getString(WORKER_CLASS));
 				WorkerClass object = (WorkerClass) class_.newInstance();
 				object.update(extras.getInt(WHAT), getApplicationContext());
 			} catch (Exception e) {
@@ -103,24 +128,28 @@ public class WorkerService extends IntentService {
 					final int NOTIFICATION_ID = 1;
 
 					mNotificationManager.notify(NOTIFICATION_ID, notification);
-				}
-				else
-					JBNotification.makeJBUpdateNotification(this, jObject.getString("actversion"), jObject.getString("changelog"));
+				} else
+					JBNotification.makeJBUpdateNotification(this,
+							jObject.getString("actversion"),
+							jObject.getString("changelog"));
 			}
 		} catch (JSONException e) {
 			Log.d("json", e.getMessage());
 		}
 	}
+
 	public void loadNews() {
 		String get = Functions.getData(Functions.NEWS_URL,
 				getApplicationContext(), true, "");
 		try {
 			JSONArray contents = new JSONArray(get);
 			String allContents = "";
-			for(int i = 0; i < contents.length(); i++) {
-				allContents = allContents + ((i != 0) ? "\n" : "") + contents.getString(i);
+			for (int i = 0; i < contents.length(); i++) {
+				allContents = allContents + ((i != 0) ? "\n" : "")
+						+ contents.getString(i);
 			}
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext());
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putString(Functions.NEWS_PUPILS, allContents);
 			edit.commit();
@@ -132,10 +161,12 @@ public class WorkerService extends IntentService {
 		try {
 			JSONArray contents = new JSONArray(get);
 			String allContents = "";
-			for(int i = 0; i < contents.length(); i++) {
-				allContents = allContents + ((i != 0) ? "\n\n" : "") + contents.getString(i);
+			for (int i = 0; i < contents.length(); i++) {
+				allContents = allContents + ((i != 0) ? "\n\n" : "")
+						+ contents.getString(i);
 			}
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext());
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putString(Functions.NEWS_TEACHERS, allContents);
 			edit.commit();

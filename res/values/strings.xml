@@ -144,4 +144,8 @@
     <string name="change_user_summary">Benutzernamen &amp; Passwort anpassen</string>
     <string name="change_time_table">Stundenplan</string>
     <string name="change_time_table_summary">Meinen Stundenplan anpassen</string>
+    <string name="general">Allgemein</string>
+    <string name="sendcrashes">Abstürze melden</string>
+    <string name="general_settings">Allgemeine Einstellungen</string>
+    <string name="general_summary">Allgemeine Einstellungen anpassen</string>
 </resources>
