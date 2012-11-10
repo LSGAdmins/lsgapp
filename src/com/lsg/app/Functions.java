@@ -336,7 +336,7 @@ public class Functions {
 					}
 				}
 			if(!isvalid) {
-				myDB.execSQL("DELETE FROM " + Functions.DB_VPLAN_TABLE + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
+				myDB.execSQL("DELETE FROM " + table + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
 				}
 			i++;
 		}

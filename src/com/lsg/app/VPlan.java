@@ -106,7 +106,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			long count = num_rows.simpleQueryForLong();
 			SQLiteStatement num_rows_2 = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TEACHER);
 			long count2 = num_rows_2.simpleQueryForLong();
-			if(count == 0 || count2 == 0)
+			if(count == 0 && count2 == 0)
 				act.updateVP();
 			num_rows.close();
 			vadapter_mine = new VPlan.VertretungAdapter(context, cursor_mine,
@@ -255,7 +255,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 							Functions.DB_VERTRETER, Functions.DB_ROOM,
 							Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
 							Functions.DB_LENGTH, "'teachers' AS type" }, all_cond, where_conds, null,
-					null, Functions.DB_DATE + ", CASE "
+					null, Functions.DB_ROWID + ", CASE "
 							+ Functions.DB_VERTRETER
 							+ " WHEN 'null' THEN 0 ELSE 1 END, "
 							+ Functions.DB_VERTRETER + ", "
