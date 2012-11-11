@@ -620,8 +620,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    titlebar.init(this);
 	    titlebar.addRefresh(this);
 	    titlebar.setTitle(getTitle());
-	    String s = null;
-	    s.toCharArray();
 	    }
 	
 	private MenuItem refresh;
