@@ -487,10 +487,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					int i = 0;
 					SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 					myDB.delete(Functions.DB_VPLAN_TABLE, null, null); //clear vertretungen
-					ContentValues vals = new ContentValues();
-					vals.put(Functions.DB_VERTRETUNG, "false");
-					myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
-					vals.put(Functions.DB_VERTRETUNG, "true");
 					while(i < jArray.length() - 1) {
 						JSONObject jObject = jArray.getJSONObject(i);
 						ContentValues values = new ContentValues();
@@ -511,50 +507,8 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 								jObject.getInt("length"));
 						values.put(Functions.DB_DAY_OF_WEEK,
 								jObject.getInt("dayofweek"));
-						long last_id = myDB.insert(Functions.DB_VPLAN_TABLE,
+						myDB.insert(Functions.DB_VPLAN_TABLE,
 								null, values);
-						vals.put(Functions.DB_REMOTE_ID, last_id);
-						long num_rows = myDB.update(
-								Functions.DB_TIME_TABLE,
-								vals,
-								Functions.DB_DAY + "=? AND "
-										+ Functions.DB_HOUR + "=? AND "
-										+ Functions.DB_RAW_LEHRER
-										+ " LIKE ? AND "
-										+ Functions.DB_RAW_FACH + "=?",
-								new String[] {
-										Integer.valueOf(
-												jObject.getInt("dayofweek"))
-												.toString(),
-										Integer.valueOf(
-												jObject.getInt("stunde") - 1)
-												.toString(),
-										"%" + jObject.getString("rawlehrer")
-												+ "%",
-										jObject.getString("rawfach") });
-						int ii = 1;
-						while(num_rows == 0 && jObject.getInt("stunde") - ii >= 0) {
-							num_rows = myDB.update(
-									Functions.DB_TIME_TABLE,
-									vals,
-									Functions.DB_DAY + "=? AND "
-											+ Functions.DB_HOUR + "=? AND "
-											+ Functions.DB_RAW_LEHRER
-											+ " LIKE ? AND "
-											+ Functions.DB_RAW_FACH + "=? AND "
-											+ Functions.DB_LENGTH + "=?",
-									new String[] {
-											Integer.valueOf(
-													jObject.getInt("dayofweek"))
-													.toString(),
-											Integer.valueOf(
-													jObject.getInt("stunde") - 1 - ii)
-													.toString(),
-											"%" + jObject.getString("rawlehrer")
-													+ "%",
-											jObject.getString("rawfach"),  Integer.valueOf(1 + ii).toString()});
-							ii++;
-						}
 						i++;
 					}
 					myDB.close();
@@ -565,6 +519,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					edit.putString("vplan_date", date);
 					edit.putString("vplan_time", time);
 					edit.commit();
+					Functions.cleanVPlanTable(context, Functions.DB_VPLAN_TABLE);
 					} catch(JSONException e) {
 						Log.w("jsonerror", e.getMessage());
 						return new String[] {"json", context.getString(R.string.jsonerror)};
@@ -725,11 +680,13 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_VPLAN_TABLE);
+		String table = (pager.getCurrentItem() != 2) ? Functions.DB_VPLAN_TABLE : Functions.DB_VPLAN_TEACHER;
+		Functions.createContextMenu(menu, v, menuInfo, this, table);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, this, adapter, Functions.DB_VPLAN_TABLE);
+		String table = (pager.getCurrentItem() != 2) ? Functions.DB_VPLAN_TABLE : Functions.DB_VPLAN_TEACHER;
+		return Functions.contextMenuSelect(item, this, adapter, table);
 	}
 	public static void blacklistVPlan(Context context) {
 		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,

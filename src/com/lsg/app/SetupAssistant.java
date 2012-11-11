@@ -54,7 +54,7 @@ public class SetupAssistant extends Activity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			loading = ProgressDialog
-					.show(context, null, "Teste Login-Daten...");
+					.show(context, null, getString(R.string.check_login)); 
 		}
 
 		@Override
@@ -77,9 +77,9 @@ public class SetupAssistant extends Activity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						SetupAssistant.this);
 				builder.setMessage(
-						"Internet-Verbindung ist zum Setup erforderlich.")
+						getString(R.string.network_conn_req))
 						.setCancelable(true)
-						.setNeutralButton("Ok",
+						.setNeutralButton(getString(R.string.ok),
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int id) {
@@ -125,7 +125,7 @@ public class SetupAssistant extends Activity {
 				try {
 				teacher_short = jarr.getString("short");
 				} catch(JSONException e) {
-					Log.v(SetupAssistant.class.getName(), "seems like no teacher :)");
+					Log.v(SetupAssistant.class.getName(), "seems like you're not a teacher :)");
 					e.printStackTrace();
 				}
 				JSONArray json_cls = jarr.getJSONArray("classes");
@@ -207,8 +207,6 @@ public class SetupAssistant extends Activity {
 												"UTF-8") + "&" + URLEncoder.encode("short", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.TEACHER_SHORT, ""), "UTF-8"));
 			} catch (Exception e) {
 			}
-			Log.d("res", res);
-			Log.d("res", usr_class);
 			return res.equals("success");
 		}
 
@@ -402,9 +400,9 @@ public class SetupAssistant extends Activity {
 		else {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(
-					"Wollen sie den Setup-Assistenten wirklich noch einmal ausführen?")
+					getString(R.string.rerun_setup_assistant))
 					.setCancelable(false)
-					.setPositiveButton("Ja",
+					.setPositiveButton(getString(R.string.yes),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -412,7 +410,7 @@ public class SetupAssistant extends Activity {
 									setup(step, false);
 								}
 							})
-					.setNegativeButton("Nein",
+					.setNegativeButton(getString(R.string.no),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {

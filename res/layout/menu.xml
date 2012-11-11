@@ -11,7 +11,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:divider="@color/dividerblack"
-            android:dividerHeight="2dip"  />
+            android:dividerHeight="2dip"
+            android:cacheColorHint="@color/darkblack"  />
     </LinearLayout>
     <FrameLayout
         android:id="@+id/overlay"

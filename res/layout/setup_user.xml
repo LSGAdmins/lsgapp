@@ -3,7 +3,7 @@
         android:layout_height="fill_parent"
     	android:layout_marginLeft="10dp"
     	android:layout_marginRight="10dp"
-        android:orientation="vertical" >
+        android:orientation="vertical" >                         
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -12,7 +12,7 @@
         <EditText
             android:id="@+id/username"
             android:singleLine="true"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:ems="15"
             android:hint="@string/username" >
@@ -20,7 +20,7 @@
         </EditText>
         <EditText
             android:id="@+id/password"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:ems="15"
             android:inputType="textPassword"

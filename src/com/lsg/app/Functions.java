@@ -167,17 +167,6 @@ public class Functions {
 	 * @param act the calling activity
 	 */
 	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
-		/*
-		 * int theme = android.R.style.Theme_Light; if(Functions.getSDK() >= 11)
-		 * { SharedPreferences prefs =
-		 * PreferenceManager.getDefaultSharedPreferences(act);
-		 * if(Functions.getSDK() >= 14 && prefs.getBoolean("dark_actionbar",
-		 * false)) theme = android.R.style.Theme_Holo_Light_DarkActionBar; else
-		 * theme = android.R.style.Theme_Holo_Light; if(dialog) theme =
-		 * android.R.style.Theme_Holo_Light_Dialog; } else { if(dialog) { theme
-		 * = android.R.style.Theme_Dialog; } } act.setTheme(theme);
-		 */
-
 		if(homeasup && Functions.getSDK() >= 11) {
 			homeUp(act);
 		}
@@ -336,11 +325,80 @@ public class Functions {
 					}
 				}
 			if(!isvalid) {
-				myDB.execSQL("DELETE FROM " + table + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
+				//myDB.execSQL("DELETE FROM " + table + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
 				}
 			i++;
 		}
 		result.close();
+		myDB.close();
+		matchVPlanTimeTable(context);
+	}
+	public static void matchVPlanTimeTable(Context context) {
+		SQLiteDatabase myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+		ContentValues vals = new ContentValues();
+		vals.put(Functions.DB_VERTRETUNG, "false");
+		myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
+		vals.put(Functions.DB_VERTRETUNG, "true");
+		
+		Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_ROWID, Functions.DB_DAY_OF_WEEK, Functions.DB_STUNDE, Functions.DB_RAW_LEHRER, Functions.DB_RAW_FACH}, null, null, null, null, null);
+		c.moveToFirst();
+		do {
+		vals.put(Functions.DB_REMOTE_ID, c.getString(c.getColumnIndex(Functions.DB_ROWID)));
+		Log.d("remoteid", vals.getAsString(Functions.DB_REMOTE_ID));
+		Log.d("opts", 
+				c.getString(c
+						.getColumnIndex(Functions.DB_DAY_OF_WEEK))+
+				c.getString(c
+						.getColumnIndex(Functions.DB_STUNDE))+
+				"%"
+						+ c.getString(c
+								.getColumnIndex(Functions.DB_RAW_LEHRER))
+						+ "%"+
+				c.getString(c
+						.getColumnIndex(Functions.DB_RAW_FACH)));
+		long num_rows = myDB.update(
+				Functions.DB_TIME_TABLE,
+							vals,
+							Functions.DB_DAY + "=? AND " + Functions.DB_HOUR
+									+ "=? AND " + Functions.DB_RAW_LEHRER
+									+ " LIKE ? AND " + Functions.DB_RAW_FACH
+									+ "=?",
+							new String[] {
+									c.getString(c
+											.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
+											Integer.valueOf(
+													c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - 1)
+													.toString(),
+									"%"
+											+ c.getString(c
+													.getColumnIndex(Functions.DB_RAW_LEHRER))
+											+ "%",
+									c.getString(c
+											.getColumnIndex(Functions.DB_RAW_FACH)) });
+		Log.d("num_rows", Long.valueOf(num_rows).toString());
+			int ii = 1;
+
+			while (num_rows == 0 && c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - ii >= 0) {
+			num_rows = myDB.update(
+					Functions.DB_TIME_TABLE,
+					vals,
+					Functions.DB_DAY + "=? AND "
+							+ Functions.DB_HOUR + "=? AND "
+							+ Functions.DB_RAW_LEHRER
+							+ " LIKE ? AND "
+							+ Functions.DB_RAW_FACH + "=? AND "
+							+ Functions.DB_LENGTH + "=?",
+					new String[] {
+							c.getString(c.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
+							Integer.valueOf(
+									c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - 1 - ii)
+									.toString(),
+							"%" + c.getString(c.getColumnIndex(Functions.DB_RAW_LEHRER))
+									+ "%",
+							c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)),  Integer.valueOf(1 + ii).toString()});
+			ii++;
+		}
+		} while(c.moveToNext());
 		myDB.close();
 	}
 	/**
