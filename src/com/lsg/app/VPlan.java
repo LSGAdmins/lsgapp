@@ -602,7 +602,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
@@ -621,6 +620,8 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    titlebar.init(this);
 	    titlebar.addRefresh(this);
 	    titlebar.setTitle(getTitle());
+	    String s = null;
+	    s.toCharArray();
 	    }
 	
 	private MenuItem refresh;

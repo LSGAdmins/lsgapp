@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
@@ -49,6 +50,7 @@ public class WorkerService extends IntentService {
 			checkUpdate();
 			loadNews();
 		} else if (extras.getInt(WHAT) == 200) {
+			Log.d("except", "sending exception");
 			try {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			
@@ -59,14 +61,23 @@ public class WorkerService extends IntentService {
 								"UTF-8") + "&appversion="
 						+ URLEncoder.encode(pInfo.versionName, "UTF-8")
 						+ "&appcode="
-						+ URLEncoder.encode(Integer.valueOf(pInfo.versionCode).toString(), "UTF-8");
+						+ URLEncoder.encode(Integer.valueOf(pInfo.versionCode)
+								.toString(), "UTF-8") + "&brand="
+						+ URLEncoder.encode(Build.BRAND, "UTF-8") + "&device="
+						+ URLEncoder.encode(Build.DEVICE, "UTF-8") + "&model"
+						+ URLEncoder.encode(Build.MODEL, "UTF-8") + "&product="
+						+ URLEncoder.encode(Build.PRODUCT, "UTF-8")
+						+ "&manufacturer="
+						+ URLEncoder.encode(Build.MANUFACTURER, "UTF-8");
 			String data = Functions.getData(Functions.ERROR_URL, this, false, add);
+			Log.d("data", data);
 			if(data.equals("success")) {
 				SharedPreferences.Editor edit = prefs.edit();
 				edit.remove("exception");
 				edit.commit();
 			}
 			} catch(Exception e) {
+				e.printStackTrace();
 			}
 		} else {
 			ClassLoader loader = WorkerClass.class.getClassLoader();

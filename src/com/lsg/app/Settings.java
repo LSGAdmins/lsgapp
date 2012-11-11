@@ -25,7 +25,6 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		

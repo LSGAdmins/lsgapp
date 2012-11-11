@@ -191,7 +191,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		titlebar = new TitleCompat(this, true);
 		myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);

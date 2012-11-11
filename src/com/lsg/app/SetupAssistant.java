@@ -387,7 +387,6 @@ public class SetupAssistant extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Functions.init(this);
 		Functions.setTheme(false, false, this);

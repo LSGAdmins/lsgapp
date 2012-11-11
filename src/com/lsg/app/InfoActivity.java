@@ -16,7 +16,6 @@ import android.widget.TextView;
 public class InfoActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Bundle extras = getIntent().getExtras();
 		Log.d("type", extras.getString("type"));

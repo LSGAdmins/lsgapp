@@ -12,7 +12,6 @@ import android.view.View;
 public class HelpAbout extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);

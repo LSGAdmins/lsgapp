@@ -694,7 +694,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    ExceptionHandler.init(this);
 		titlebar = new TitleCompat(this, true);
 		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);
