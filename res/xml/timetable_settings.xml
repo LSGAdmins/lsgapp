@@ -1,0 +1,10 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="@string/timetable">
+            <Preference
+        android:key="timetableSettings"
+        android:title="@string/change_time_table"
+        android:summary="@string/change_time_table_summary" />
+    </PreferenceCategory>
+</PreferenceScreen>

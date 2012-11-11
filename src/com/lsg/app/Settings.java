@@ -33,10 +33,10 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
         addPreferencesFromResource(R.xml.login_settings);
+        addPreferencesFromResource(R.xml.timetable_settings);
         addPreferencesFromResource(R.xml.vplan_settings);
         addPreferencesFromResource(R.xml.general_settings);
         addPreferencesFromResource(R.xml.list_settings);
-        addPreferencesFromResource(R.xml.setupassistantbutton);
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int i = 0;
@@ -71,10 +71,20 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         				return true;
         				}
         	});
-        Preference setupassistant = (Preference) findPreference("setupassistantPref");
-        setupassistant.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        Preference loginsettings = (Preference) findPreference("loginSettings");
+        loginsettings.setOnPreferenceClickListener(new OnPreferenceClickListener() {
         	public boolean onPreferenceClick(Preference preference) {
         				Intent intent = new Intent(Settings.this, SetupAssistant.class);
+        				intent.setAction("changeUser");
+        				startActivity(intent);
+        				return true;
+        				}
+        	});
+        Preference ttsettings = (Preference) findPreference("timetableSettings");
+        ttsettings.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        	public boolean onPreferenceClick(Preference preference) {
+        				Intent intent = new Intent(Settings.this, SetupAssistant.class);
+        				intent.setAction("changeTimeTable");
         				startActivity(intent);
         				return true;
         				}

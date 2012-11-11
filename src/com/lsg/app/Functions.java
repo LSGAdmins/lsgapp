@@ -325,7 +325,7 @@ public class Functions {
 					}
 				}
 			if(!isvalid) {
-				//myDB.execSQL("DELETE FROM " + table + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
+				myDB.execSQL("DELETE FROM " + table + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
 				}
 			i++;
 		}
@@ -342,63 +342,74 @@ public class Functions {
 		
 		Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_ROWID, Functions.DB_DAY_OF_WEEK, Functions.DB_STUNDE, Functions.DB_RAW_LEHRER, Functions.DB_RAW_FACH}, null, null, null, null, null);
 		c.moveToFirst();
-		do {
-		vals.put(Functions.DB_REMOTE_ID, c.getString(c.getColumnIndex(Functions.DB_ROWID)));
-		Log.d("remoteid", vals.getAsString(Functions.DB_REMOTE_ID));
-		Log.d("opts", 
-				c.getString(c
-						.getColumnIndex(Functions.DB_DAY_OF_WEEK))+
-				c.getString(c
-						.getColumnIndex(Functions.DB_STUNDE))+
-				"%"
-						+ c.getString(c
-								.getColumnIndex(Functions.DB_RAW_LEHRER))
-						+ "%"+
-				c.getString(c
-						.getColumnIndex(Functions.DB_RAW_FACH)));
-		long num_rows = myDB.update(
-				Functions.DB_TIME_TABLE,
-							vals,
-							Functions.DB_DAY + "=? AND " + Functions.DB_HOUR
-									+ "=? AND " + Functions.DB_RAW_LEHRER
-									+ " LIKE ? AND " + Functions.DB_RAW_FACH
-									+ "=?",
-							new String[] {
-									c.getString(c
-											.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
-											Integer.valueOf(
-													c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - 1)
-													.toString(),
-									"%"
-											+ c.getString(c
-													.getColumnIndex(Functions.DB_RAW_LEHRER))
-											+ "%",
-									c.getString(c
-											.getColumnIndex(Functions.DB_RAW_FACH)) });
-		Log.d("num_rows", Long.valueOf(num_rows).toString());
-			int ii = 1;
+		if (c.getCount() > 0)
+			do {
+				vals.put(Functions.DB_REMOTE_ID,
+						c.getString(c.getColumnIndex(Functions.DB_ROWID)));
+				Log.d("remoteid", vals.getAsString(Functions.DB_REMOTE_ID));
+				Log.d("opts",
+						c.getString(c.getColumnIndex(Functions.DB_DAY_OF_WEEK))
+								+ c.getString(c
+										.getColumnIndex(Functions.DB_STUNDE))
+								+ "%"
+								+ c.getString(c
+										.getColumnIndex(Functions.DB_RAW_LEHRER))
+								+ "%"
+								+ c.getString(c
+										.getColumnIndex(Functions.DB_RAW_FACH)));
+				long num_rows = myDB
+						.update(Functions.DB_TIME_TABLE,
+								vals,
+								Functions.DB_DAY + "=? AND "
+										+ Functions.DB_HOUR + "=? AND "
+										+ Functions.DB_RAW_LEHRER
+										+ " LIKE ? AND "
+										+ Functions.DB_RAW_FACH + "=?",
+								new String[] {
+										c.getString(c
+												.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
+										Integer.valueOf(
+												c.getInt(c
+														.getColumnIndex(Functions.DB_STUNDE)) - 1)
+												.toString(),
+										"%"
+												+ c.getString(c
+														.getColumnIndex(Functions.DB_RAW_LEHRER))
+												+ "%",
+										c.getString(c
+												.getColumnIndex(Functions.DB_RAW_FACH)) });
+				Log.d("num_rows", Long.valueOf(num_rows).toString());
+				int ii = 1;
 
-			while (num_rows == 0 && c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - ii >= 0) {
-			num_rows = myDB.update(
-					Functions.DB_TIME_TABLE,
-					vals,
-					Functions.DB_DAY + "=? AND "
-							+ Functions.DB_HOUR + "=? AND "
-							+ Functions.DB_RAW_LEHRER
-							+ " LIKE ? AND "
-							+ Functions.DB_RAW_FACH + "=? AND "
-							+ Functions.DB_LENGTH + "=?",
-					new String[] {
-							c.getString(c.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
-							Integer.valueOf(
-									c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - 1 - ii)
-									.toString(),
-							"%" + c.getString(c.getColumnIndex(Functions.DB_RAW_LEHRER))
-									+ "%",
-							c.getString(c.getColumnIndex(Functions.DB_RAW_FACH)),  Integer.valueOf(1 + ii).toString()});
-			ii++;
-		}
-		} while(c.moveToNext());
+				while (num_rows == 0
+						&& c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - ii >= 0) {
+					num_rows = myDB
+							.update(Functions.DB_TIME_TABLE,
+									vals,
+									Functions.DB_DAY + "=? AND "
+											+ Functions.DB_HOUR + "=? AND "
+											+ Functions.DB_RAW_LEHRER
+											+ " LIKE ? AND "
+											+ Functions.DB_RAW_FACH + "=? AND "
+											+ Functions.DB_LENGTH + "=?",
+									new String[] {
+											c.getString(c
+													.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
+											Integer.valueOf(
+													c.getInt(c
+															.getColumnIndex(Functions.DB_STUNDE))
+															- 1 - ii)
+													.toString(),
+											"%"
+													+ c.getString(c
+															.getColumnIndex(Functions.DB_RAW_LEHRER))
+													+ "%",
+											c.getString(c
+													.getColumnIndex(Functions.DB_RAW_FACH)),
+											Integer.valueOf(1 + ii).toString() });
+					ii++;
+				}
+			} while (c.moveToNext());
 		myDB.close();
 	}
 	/**
