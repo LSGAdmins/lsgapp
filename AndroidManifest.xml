@@ -123,6 +123,7 @@
             android:name="InfoActivity"
             android:theme="@style/AppThemeDialog" >
         </activity>
+        <activity android:name="OverlayHelp" android:theme="@style/Theme.Transparent" android:excludeFromRecents="true"></activity>
     </application>
 
 </manifest>

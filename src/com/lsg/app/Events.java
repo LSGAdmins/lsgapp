@@ -150,35 +150,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			return new String[] {"success", ""};
 			}
 		}
-//	public class EventUpdateTask extends AsyncTask<Void, Void, String[]> {
-//		protected void onPreExecute() {
-//			super.onPreExecute();
-//			Functions.lockRotation(Events.this);
-//			loading = ProgressDialog.show(Events.this, "", getString(R.string.loading_events));
-//		}
-//		@Override
-//		protected String[] doInBackground(Void... params) {
-//			EventUpdate evup = new EventUpdate(Events.this);
-//			return evup.refreshEvents();
-//		}
-//		protected void onPostExecute(String[] res) {
-//			loading.cancel();
-//			if(!res[0].equals("success"))
-//				Toast.makeText(Events.this, res[1], Toast.LENGTH_LONG).show();
-//			if(res[0].equals("loginerror")) {
-//				Intent intent;
-//				if(Functions.getSDK() >= 11)
-//					intent = new Intent(Events.this, SettingsAdvanced.class);
-//				else
-//					intent = new Intent(Events.this, Settings.class);
-//				intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-//				Events.this.startActivity(intent);
-//			}
-//			else
-//				updateList();
-//			Functions.unlockRotation(Events.this);
-//		}
-//	}
 	private ProgressDialog loading;
 	private EventAdapter evadap;
 	private String where_cond = " " + Functions.DB_DATES + " LIKE ? OR " + Functions.DB_ENDDATES + " LIKE ? OR "
@@ -223,6 +194,8 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		titlebar.init(this);
 		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
+		
+		Functions.checkMessage(this, "homeasup");
 	}
 	private boolean refreshing = false;
 	private MenuItem refresh;

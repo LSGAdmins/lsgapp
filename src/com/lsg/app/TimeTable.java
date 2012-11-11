@@ -768,6 +768,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	    intent.putExtra(WorkerService.WHAT, 100);
 	    startService(intent);
 	    //Log.d("encrypted", LSGappAuth.encrypt("passwort", "aaaa"));
+		Functions.checkMessage(this, "homeasuphelp");
 	}
 	public void showMine() {
 		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);

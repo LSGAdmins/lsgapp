@@ -907,10 +907,19 @@ public class Functions {
 			AdvancedWrapper advWrapper = new AdvancedWrapper();
 			advWrapper.postUrl(webv, "http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
 			advWrapper = null;
-		}
-		else
+		} else
 			webv.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
-		if(prefs.getBoolean("useac2dm", false))
-		  Functions.registerGCM(act);
+		if (prefs.getBoolean("useac2dm", false))
+			Functions.registerGCM(act);
 	}
+	public static void checkMessage(Context context, String action) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.commit();
+		if(!prefs.getBoolean(action + "_shown", false)) {
+			Intent intent = new Intent(context, OverlayHelp.class);
+			intent.setAction(action);
+			context.startActivity(intent);
+		}
 	}
+}

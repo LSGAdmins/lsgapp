@@ -34,4 +34,5 @@
 <color name="inactivegrey">#AAA</color>
 <color name="fontgrey">#666</color>
 <color name="fontblack">#222</color>
+<color name="halfTransparent">#29000000</color>
 </resources>

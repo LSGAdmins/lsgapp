@@ -1,6 +1,9 @@
 <resources>
 
     <style name="AppTheme" parent="@style/ActionBarSupportTheme" />
+
     <style name="AppThemeDialog" parent="@android:style/Theme.Dialog" />
+    
+    <style name="Theme.Transparent" parent="@android:style/Theme.Translucent.NoTitleBar" />
 
 </resources>
