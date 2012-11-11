@@ -88,11 +88,14 @@ public class SMVBlog extends Activity implements HomeCall, RefreshCall {
 	public void onDestroy() {
 		super.onDestroy();
 		Log.d("dest", "ondestroy");
-		//Functions.webv.saveState(Functions.webvSave);
-		FrameLayout par = (FrameLayout) Functions.webv.getParent();
-		par.removeAllViewsInLayout();
-		LinearLayout parpar = (LinearLayout) par.getParent();
-		parpar.removeAllViews();
+		// Functions.webv.saveState(Functions.webvSave);
+		try {
+			FrameLayout par = (FrameLayout) Functions.webv.getParent();
+			par.removeAllViewsInLayout();
+			LinearLayout parpar = (LinearLayout) par.getParent();
+			parpar.removeAllViews();
+		} catch (Exception e) {
+		}
 	}
 	@Override
 	public void onHomePress() {

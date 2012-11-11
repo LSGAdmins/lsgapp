@@ -345,7 +345,7 @@ public class SlideMenu {
     	}
     	menuShown = false;
 		content.bringToFront();
-		_content.bringToFront();
+		//_content.bringToFront();
 		parent.invalidate();
 		menu.invalidate();
 		content.invalidate();
