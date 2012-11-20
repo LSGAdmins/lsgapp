@@ -27,6 +27,7 @@ import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -45,7 +46,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -392,10 +392,10 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				holder.bottom.setVisibility(View.VISIBLE);
 
 				if (klassenstufe.equals(oldclass)
-						&& (cursor.getString(cursor.getColumnIndex("type"))
+						&& (((cursor.getString(cursor.getColumnIndex("type"))
 								.equals("teachers") && cursor.getString(
-								cursor.getColumnIndex(Functions.DB_VERTRETER))
-								.equals(oldvertreter)))
+								cursor.getColumnIndex(Functions.DB_VERTRETER)).equals(oldvertreter)) || cursor.getString(cursor.getColumnIndex("type")).equals("pupils")))
+								)
 					holder.klasse.setVisibility(View.GONE);
 				else {
 					holder.klasse.setVisibility(View.VISIBLE);
@@ -406,14 +406,24 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 					holder.klasse.setText(getString(R.string.vplan_of) + " " + cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER)));
 				else
 					holder.klasse.setText(context.getString(R.string.no_classes));
-				if(klasse.equals("null")) {
-					klasse = context.getString(R.string.no_class);
-					}
-				
-				String fach = cursor.getString(cursor.getColumnIndex(Functions.DB_FACH));
-				holder.title.setText(klasse + " (" + fach + ")");
+
 				String type = cursor.getString(cursor.getColumnIndex(Functions.DB_TYPE));
 				holder.type.setText(type);
+
+				holder.type.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+				holder.title.setVisibility(View.VISIBLE);
+				String fach = cursor.getString(cursor.getColumnIndex(Functions.DB_FACH));
+				if(fach.equals("null") && klasse.equals("null")) {
+					holder.type.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+					holder.title.setVisibility(View.GONE);
+				}
+				else if (klasse.equals("null"))
+					holder.title.setText(fach);
+//				else if(fach.equals("null"))
+//					holder.title.setText(klasse);	//hypothetic
+				else
+					holder.title.setText(klasse + " (" + fach + ")");
+				
 				Integer lesson;
 				try {
 				lesson = Integer.valueOf(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));

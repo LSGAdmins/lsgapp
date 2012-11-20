@@ -41,6 +41,7 @@
             android:layout_column="1"
       	    android:layout_marginLeft="5sp"
       	    android:textColor="@color/fontgrey" />
+        <!-- Attention! Text size modified in VPlan.java -> Vertretungadapter -->
         <TextView
             android:id="@+id/vertretung_when"
             android:gravity="right"
