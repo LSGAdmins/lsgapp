@@ -169,7 +169,6 @@ public class SlideMenu {
 	public void show(boolean animate) {
 		show(animate, 0);
 	}
-	ViewGroup _content;
 	public void show(boolean animate, int offset) {
     	menuSize = Functions.dpToPx(250, act);
     	if(offset == 0)
@@ -180,17 +179,6 @@ public class SlideMenu {
     	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
     	lays.setMargins(0,statusHeight, 0, 0);
     	menu.setLayoutParams(lays);
-    	try {
-			_content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
-		}
-		catch(ClassCastException e) {
-			/*
-			 * When there is no title bar (android:theme="@android:style/Theme.NoTitleBar"),
-			 * the android.R.id.content FrameLayout is directly attached to the DecorView,
-			 * without the intermediate LinearLayout that holds the titlebar plus content.
-			 */
-			_content = (FrameLayout) act.findViewById(android.R.id.content);
-		}
 		FrameLayout.LayoutParams parms = new FrameLayout.LayoutParams(-1, -1, 3);
 		parms.setMargins(menuSize, 0, -menuSize, 0);
 		content.setLayoutParams(parms);
@@ -256,7 +244,6 @@ public class SlideMenu {
     	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
     		@Override
     		public void onClick(View v) {
-    			//SlideMenu.this.hide();
     			//need this to get onTouch, don't know why
     		}
     	});
@@ -345,7 +332,6 @@ public class SlideMenu {
     	}
     	menuShown = false;
 		content.bringToFront();
-		//_content.bringToFront();
 		parent.invalidate();
 		menu.invalidate();
 		content.invalidate();

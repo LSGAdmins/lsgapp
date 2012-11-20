@@ -226,18 +226,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 			}
 			return true;
 		}
-
-		@Override
-		public boolean onOptionsItemSelected(MenuItem item) {
-			// Handle item selection
-			switch (item.getItemId()) {
-			case android.R.id.home:
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-			}
-		}
-
+		
 		@Override
 		public void onDestroy() {
 			super.onDestroy();
@@ -251,6 +240,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			slidemenu.show();
+			findViewById(android.R.id.content).invalidate();
 			Log.d("menu", "home");
 			return true;
 		default:

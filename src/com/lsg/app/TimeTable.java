@@ -173,7 +173,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		public TimeTableViewPagerAdapter(TimeTable act) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
-				Log.d("teacher", prefs.getString(Functions.TEACHER_SHORT, ""));
 				setTeacher(prefs.getString(Functions.TEACHER_SHORT, ""));
 			}
 			else
@@ -591,7 +590,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 						edit.commit();
 						for(int ii = 1; ii < one_teacher.length(); ii++) {
 							JSONObject jObject = one_teacher.getJSONObject(ii);
-							//Log.d("json", jObject.toString());
 							ContentValues values = new ContentValues();
 							values.put(Functions.DB_SHORT, short_);
 							values.put(Functions.DB_BREAK_SURVEILLANCE,
@@ -627,7 +625,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	}
 
 	public static void blacklistTimeTable(Context context) {
-		Log.d("timetable", "blacklisttimetable");
 		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
 				Context.MODE_PRIVATE, null);
 		Cursor allSubjects = myDB.query(Functions.DB_TIME_TABLE, new String[] { Functions.DB_ROWID,
@@ -695,8 +692,8 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		titlebar = new TitleCompat(this, true);
-		Functions.setupDB(this);
 		super.onCreate(savedInstanceState);
+		Functions.setupDB(this);
 		if (!((SharedPreferences) PreferenceManager
 				.getDefaultSharedPreferences(this)).getBoolean(
 				Functions.IS_LOGGED_IN, false)) {
@@ -768,7 +765,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	    intent.putExtra(WorkerService.WHAT, 100);
 	    startService(intent);
 	    //Log.d("encrypted", LSGappAuth.encrypt("passwort", "aaaa"));
-		Functions.checkMessage(this, "homeasuphelp");
+		Functions.checkMessage(this, new String[] {Functions.OVERLAY_HOMEBUTTON, Functions.OVERLAY_SWIPE});
 	}
 	public void showMine() {
 		((TextView) findViewById(R.id.footer_text)).setVisibility(View.GONE);
@@ -903,7 +900,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	    intent.putExtra(WorkerService.WORKER_CLASS, TimeTable.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
 	    startService(intent);
-	    Log.d("class", TimeTableUpdater.class.getCanonicalName());
 	}
 	@Override
 	public void onDestroy() {
@@ -987,7 +983,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.setSelectedItem(savedInstanceState.getInt("navlistselected"), this);
 		}
-		Log.d("extras", savedInstanceState.toString());
 		//super.onRestoreInstanceState(savedInstanceState);
 		refreshing = savedInstanceState.getBoolean("refreshing");
 	}
@@ -1001,7 +996,6 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	}
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		Log.d("create", "contextmenu");
 		super.onCreateContextMenu(menu, v, menuInfo);
 		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_TIME_TABLE);
 	}

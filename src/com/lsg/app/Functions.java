@@ -160,6 +160,11 @@ public class Functions {
 	public static final String RIGHTS_TEACHER = "teacher";
 	public static final String RIGHTS_ADMIN = "admin";
 	
+	//overlay
+	public static final String SHOWN              = "_shown";
+	public static final String OVERLAY_HOMEBUTTON = "home";
+	public static final String OVERLAY_SWIPE      = "swipe";
+	
 	/**
 	 * set holo theme in android 4
 	 * @param dialog if it should be a dialog
@@ -346,17 +351,6 @@ public class Functions {
 			do {
 				vals.put(Functions.DB_REMOTE_ID,
 						c.getString(c.getColumnIndex(Functions.DB_ROWID)));
-				Log.d("remoteid", vals.getAsString(Functions.DB_REMOTE_ID));
-				Log.d("opts",
-						c.getString(c.getColumnIndex(Functions.DB_DAY_OF_WEEK))
-								+ c.getString(c
-										.getColumnIndex(Functions.DB_STUNDE))
-								+ "%"
-								+ c.getString(c
-										.getColumnIndex(Functions.DB_RAW_LEHRER))
-								+ "%"
-								+ c.getString(c
-										.getColumnIndex(Functions.DB_RAW_FACH)));
 				long num_rows = myDB
 						.update(Functions.DB_TIME_TABLE,
 								vals,
@@ -378,7 +372,6 @@ public class Functions {
 												+ "%",
 										c.getString(c
 												.getColumnIndex(Functions.DB_RAW_FACH)) });
-				Log.d("num_rows", Long.valueOf(num_rows).toString());
 				int ii = 1;
 
 				while (num_rows == 0
@@ -912,14 +905,32 @@ public class Functions {
 		if (prefs.getBoolean("useac2dm", false))
 			Functions.registerGCM(act);
 	}
-	public static void checkMessage(Context context, String action) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor edit = prefs.edit();
-		edit.commit();
-		if(!prefs.getBoolean(action + "_shown", false)) {
-			Intent intent = new Intent(context, OverlayHelp.class);
-			intent.setAction(action);
-			context.startActivity(intent);
+	public static void checkMessage(Context context, String[] action) {
+		if(action.length == 0)
+			return;
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		String[] addActions = new String[action.length - 1];
+		if (action.length > 1) {
+			int i = 0;
+			for (String item : action) {
+				if(i == 0){
+					i++;
+					continue;
+				}
+				addActions[i-1] = item;
+				i++;
+			}
+		}
+		for (int ii = 0; ii < action.length; ii++) {
+			if (!prefs.getBoolean(action[ii] + SHOWN, false)) {
+				Intent intent = new Intent(context, OverlayHelp.class);
+				intent.setAction(action[0]);
+				if (addActions != null)
+					intent.putExtra("other", addActions);
+				context.startActivity(intent);
+				return;
+			}
 		}
 	}
 }

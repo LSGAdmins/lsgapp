@@ -31,7 +31,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -195,7 +194,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
 		
-		Functions.checkMessage(this, "homeasup");
+		Functions.checkMessage(this, new String[] {Functions.OVERLAY_HOMEBUTTON});
 	}
 	private boolean refreshing = false;
 	private MenuItem refresh;

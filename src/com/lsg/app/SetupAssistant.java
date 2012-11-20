@@ -323,7 +323,7 @@ public class SetupAssistant extends Activity {
 										+ Functions.DB_RAW_FACH + "!=? AND "
 										+ Functions.DB_RAW_FACH + "!=? AND "
 										+ Functions.DB_CLASS + " LIKE ?",
-								selectionArgs, null, null, null);
+								selectionArgs, null, null, Functions.DB_FACH);
 						if (c.moveToFirst())
 							do {
 								Log.d("pos", Integer.valueOf(c.getPosition())

@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_left_rect"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="80dp"
             android:layout_marginLeft="-2dp" />
 
         <ImageView
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_right_rect"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="80dp"
             android:layout_marginRight="-2dp" />
 
     </FrameLayout>
