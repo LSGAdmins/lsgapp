@@ -166,7 +166,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 
 		public void updateCondLists() {
 			exclude_cond = new String();
-			Cursor exclude = myDB.query(Functions.DB_EXCLUDE_TABLE, new String[] {Functions.DB_RAW_FACH, Functions.DB_NEEDS_SYNC},
+			Cursor exclude = myDB.query(Functions.DB_EXCLUDE_TABLE, new String[] {Functions.DB_RAW_FACH},
 					null, null, null, null, null);
 			exclude.moveToFirst();
 			int i = 0;
@@ -178,7 +178,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			}
 			exclude.close();
 			include_cond = new String();
-			Cursor include = myDB.query(Functions.INCLUDE_TABLE, new String[] {Functions.DB_FACH, Functions.DB_NEEDS_SYNC},
+			Cursor include = myDB.query(Functions.INCLUDE_TABLE, new String[] {Functions.DB_FACH},
 					null, null, null, null, null);
 			include.moveToFirst();
 			i = 0;
@@ -235,8 +235,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
 								Functions.DB_LENGTH, "'pupils' AS type" }, mine_cond, where_conds,
 						null, null, null);
-				Log.d("mine_cond", mine_cond);
-				Log.d("klasse", where_conds[0]);
 			}
 			where_conds[0] = "%";
 			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {
@@ -378,14 +376,16 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				holder.date.setVisibility(View.VISIBLE);
 				holder.date.setText(date);
 				oldclass = "";
-				}
-			
-			String klassenstufe = cursor.getString(cursor.getColumnIndex(Functions.DB_CLASS_LEVEL));
-			String klasse = cursor.getString(cursor.getColumnIndex(Functions.DB_KLASSE));
-			if(!klasse.equals("infotext")) {
-				//hide
+			}
+
+			String klassenstufe = cursor.getString(cursor
+					.getColumnIndex(Functions.DB_CLASS_LEVEL));
+			String klasse = cursor.getString(cursor
+					.getColumnIndex(Functions.DB_KLASSE));
+			if (!klasse.equals("infotext")) {
+				// hide
 				holder.webv.setVisibility(View.GONE);
-				//show needed views
+				// show needed views
 				holder.title.setVisibility(View.VISIBLE);
 				holder.type.setVisibility(View.VISIBLE);
 				holder.when.setVisibility(View.VISIBLE);
@@ -394,20 +394,28 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				if (klassenstufe.equals(oldclass)
 						&& (((cursor.getString(cursor.getColumnIndex("type"))
 								.equals("teachers") && cursor.getString(
-								cursor.getColumnIndex(Functions.DB_VERTRETER)).equals(oldvertreter)) || cursor.getString(cursor.getColumnIndex("type")).equals("pupils")))
-								)
+								cursor.getColumnIndex(Functions.DB_VERTRETER))
+								.equals(oldvertreter)) || cursor.getString(
+								cursor.getColumnIndex("type")).equals("pupils"))))
 					holder.klasse.setVisibility(View.GONE);
 				else {
 					holder.klasse.setVisibility(View.VISIBLE);
-					}
-				if(Integer.valueOf(klassenstufe) < 14)
-					holder.klasse.setText(klassenstufe + ". " + context.getString(R.string.classes));
-				else if(cursor.getString(cursor.getColumnIndex("type")).equals("teachers"))
-					holder.klasse.setText(getString(R.string.vplan_of) + " " + cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER)));
+				}
+				if (Integer.valueOf(klassenstufe) < 14)
+					holder.klasse.setText(klassenstufe + ". "
+							+ context.getString(R.string.classes));
+				else if (cursor.getString(cursor.getColumnIndex("type"))
+						.equals("teachers"))
+					holder.klasse.setText(getString(R.string.vplan_of)
+							+ " "
+							+ cursor.getString(cursor
+									.getColumnIndex(Functions.DB_VERTRETER)));
 				else
-					holder.klasse.setText(context.getString(R.string.no_classes));
+					holder.klasse.setText(context
+							.getString(R.string.no_classes));
 
-				String type = cursor.getString(cursor.getColumnIndex(Functions.DB_TYPE));
+				String type = cursor.getString(cursor
+						.getColumnIndex(Functions.DB_TYPE));
 				holder.type.setText(type);
 
 				holder.type.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);

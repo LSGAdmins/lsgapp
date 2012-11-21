@@ -1,72 +1,84 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/standard_rellayout"
-    android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
     <!-- possible seperators -->
+
     <TextView
-        style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+id/vertretung_date"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="30sp"
-  	    android:gravity="center_vertical|center_horizontal"
-        android:textColor="@color/darkblue" />
-    <TextView
         style="?android:attr/listSeparatorTextViewStyle"
-        android:id="@+id/vertretung_class"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-  	    android:gravity="center_vertical|center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="@color/darkblue"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/vertretung_class"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal"
         android:textColor="@color/lightblue"
-         />
+        android:textSize="16sp" />
     <!-- content -->
+
     <TextView
         android:id="@+id/vertretung_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
         android:layout_marginLeft="5sp"
-        android:textColor="@color/fontblack" />
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:stretchColumns="1">
-    <TableRow>
-        <TextView
-            android:id="@+id/vertretung_type"
-    	    android:textSize="14sp"
-            android:layout_column="1"
-      	    android:layout_marginLeft="5sp"
-      	    android:textColor="@color/fontgrey" />
-        <!-- Attention! Text size modified in VPlan.java -> Vertretungadapter -->
-        <TextView
-            android:id="@+id/vertretung_when"
-            android:gravity="right"
-    	    android:textSize="14sp"
-            android:layout_marginRight="5sp"
-            android:textColor="@color/fontgrey" />
-    </TableRow>
-</TableLayout>
+        android:textColor="@color/fontblack"
+        android:textSize="22sp" />
+
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="1" >
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/vertretung_type"
+                android:layout_column="1"
+                android:layout_marginLeft="5sp"
+                android:textColor="@color/fontgrey"
+                android:textSize="14sp" />
+            <!-- Attention! Text size modified in VPlan.java -> Vertretungadapter -->
+
+            <TextView
+                android:id="@+id/vertretung_when"
+                android:layout_marginRight="5sp"
+                android:gravity="right"
+                android:textColor="@color/fontgrey"
+                android:textSize="14sp" />
+        </TableRow>
+    </TableLayout>
+
     <TextView
         android:id="@+id/vertretung_text"
-    	android:textSize="14sp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5sp"
-        android:textColor="@color/fontgrey" />
+        android:textColor="@color/fontgrey"
+        android:textSize="14sp" />
+
     <TextView
         android:id="@+id/vertretung_bottom"
-    	    android:textSize="14sp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5sp"
-        android:textColor="@color/fontgrey" />
+        android:textColor="@color/fontgrey"
+        android:textSize="14sp" />
+
     <WebView
         android:id="@+id/standard_webview"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@layout/background" ></WebView>
+        android:background="@layout/background" >
+    </WebView>
+
 </LinearLayout>

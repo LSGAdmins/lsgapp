@@ -8,6 +8,28 @@
    	    android:background="@layout/background"
    	    android:orientation="vertical" >
         <TextView
+            android:text="@string/help_setupassistant_head"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:textColor="@color/darkblue"
+   	        android:textSize="26sp" />
+  	    <TextView
+        	android:text="@string/help_setupassistant_content"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:textColor="@color/fontblack" />
+        <TextView
+            android:text="@string/help_timetable_head"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:textColor="@color/darkblue"
+   	        android:textSize="26sp" />
+  	    <TextView
+        	android:text="@string/help_timetable_content"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:textColor="@color/fontblack" />
+        <TextView
             android:text="@string/help_vplan_head"
     	    android:layout_width="fill_parent"
     	    android:layout_height="wrap_content"
@@ -43,6 +65,17 @@
         	android:layout_height="wrap_content"
         	android:textColor="@color/fontblack" />
   	    
+        <TextView
+            android:text="@string/help_settings_head"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:textColor="@color/darkblue"
+   	        android:textSize="26sp" />
+  	    <TextView
+        	android:text="@string/help_settings_content"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:textColor="@color/fontblack" />
   	    <TextView
         	android:text="@string/help_bottom"
         	android:layout_width="fill_parent"

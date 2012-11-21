@@ -106,22 +106,6 @@
         Der Sourcecode ist auf GitHub zu finden: http://github.com/LSGAdmins/lsgapp \n
         Der Bugtracker ist auch auf GitHub: http://github.com/LSGAdmins/lsgapp/issues \n
         Wer keinen GitHub-Account hat, kann Wünsche, Kritik und Fehler an lsgadmins@googlegroups.com mailen.</string>
-    <string name="help">Hilfe</string>
-    <string name="help_vplan_head">Vertretungsplan</string>
-    <string name="help_vplan_content">Beim ersten Aufruf des Vertretungsplans öffnen sich automatisch die Einstellungen, wo ihr euch mit euren normalen Schulaccounts
-        anmelden könnt. \n Bei Android 3.0+ Geräten gibt es in der Actionbar ein Knopf zum aktualisieren und einer um die Suchleiste zu öffnen. Zudem kann dort zwischen
-	    \"Meine Vertretungen\" und \"Alle Vertretungen\" gewechselt werden. \n
-	    Bei Android 1.5 - 2.3.7 geschieht das über ein Menü, das über die Menü-Taste aufgerufen werden kann. \n
-	    Des weiteren gibt es im Menü die Option  \"Einstellungen\". In den Einstellungen finden sich eine \"Whitelist\" und eine \"Blacklist\".
-	    Vertretungen von Kursen auf diesen Listen werden nicht mehr bzw. immer bei \"Meine Vertretungen\" angezeigt. Kurse zu diesen Listen hinzufügen könnt ihr am
-	    leichtesten indem ihr beim Vertretungsplan lange auf eine Vertretung drückt oder unter Menü > Fächerübersicht auf ein Fach.</string>
-    <string name="help_events_head">Termine</string>
-    <string name="help_events_content">Hier könnt ihr euch die Termine anzeigen lassen, die sich auch auf der Homepage unter Termine befinden.
-        Mit der Suchleiste könnt ihr die Termine filtern.</string>
-    <string name="help_smvblog_head">SMVBlog</string>
-    <string name="help_smvblog_content">Hier wird der SMV-Blog angezeigt. Wenn ihr in den Einstellungen euren Account angegeben habt,
-        werdet ihr hier automatisch angemeldet.</string>
-    <string name="help_bottom">	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden</string>
     <string name="vplan_mine_empty">Keine Vertretungen für mich!</string>
     <string name="events_empty">Keine Termine!</string>
     <string name="timetable_empty">Keine Stunden!</string>
@@ -153,4 +137,23 @@
     <string name="rerun_setup_assistant">Wollen Sie den Setup-Assistenten wirklich erneut ausführen?</string>
     <string name="homeasuphelp">Klicke auf das LSGäpp-Logo, um das Menü anzuzeigen.</string>
     <string name="swipehelp">Nach rechts und links wischen, um die Seiten zu wechseln</string>
+    <string name="help">Hilfe</string>
+    <string name="help_setupassistant_head">Setup-Assistent</string>
+    <string name="help_setupassistant_content">Der Setup-Assistent führt dich durch die Einrichtung der LSGäpp.</string>
+    <string name="help_timetable_head">Stundenplan</string>
+    <string name="help_timetable_content">Hier kannst du deinen Stundenplan einsehen. Stunden mit Vertretungen werden dabei weiß unterlegt.</string>
+    <string name="help_vplan_head">Vertretungsplan</string>
+    <string name="help_vplan_content">Hier wird der Vertretungsplan angezeigt, auf der ersten Seite nur eure Vertretungen, auf der zweiten Seite alle.
+        Die Anzeige von \"Meine Vertretungen\" könnt ihr durch die Black- und Whitelist verändern. Von allen Vertretungen, die ein Kontextmenü zeigen, könnt ihr die Fächer dort hinzufügen.
+        Die Black- und Whitelist könnt ihr auch in den Einstellungen bearbeiten.</string>
+    <string name="help_events_head">Termine</string>
+    <string name="help_events_content">Hier könnt ihr euch die Termine anzeigen lassen, die sich auch auf der Homepage unter Termine befinden.
+        Mit der Suchleiste könnt ihr die Termine filtern.</string>
+    <string name="help_smvblog_head">SMVBlog</string>
+    <string name="help_smvblog_content">Hier wird der SMV-Blog angezeigt. Wenn ihr in den Einstellungen euren Account angegeben habt,
+        werdet ihr hier automatisch angemeldet.</string>
+    <string name="help_settings_head">Einstellungen</string>
+    <string name="help_settings_content">Hier könnt ihr das Verhalten der LSGäpp verändern. Die Änderung von Login-Daten und Details für den Stundenplan ruft automatisch die entsprechende
+        Seite im Setup-Assistenten auf. Es gibt hier auch Einträge für die Black- und Whitelist.</string>
+    <string name="help_bottom">	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden</string>
 </resources>

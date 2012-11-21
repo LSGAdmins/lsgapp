@@ -349,7 +349,6 @@ public class SlideMenu {
 			
 			@Override
 			public void onAnimationEnd(Animation animation) {
-
 				FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) menu.getLayoutParams();
 				params.setMargins(20000, 20000, 0, 0);
 				menu.setLayoutParams(params);
