@@ -358,8 +358,12 @@ public class SlideMenu {
 	public void fill() {
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
 		if (prefs.getBoolean(Functions.IS_LOGGED_IN, false)) {
-			items = new SlideMenuAdapter.MenuDesc[9];
-			for (int i = 0; i < 9; i++) {
+			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
+					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
+				items = new SlideMenuAdapter.MenuDesc[9];
+			else
+				items = new SlideMenuAdapter.MenuDesc[8];
+			for (int i = 0; i < items.length; i++) {
 				items[i] = new SlideMenuAdapter.MenuDesc();
 			}
 			items[0].icon = R.drawable.ic_timetable;
@@ -419,19 +423,31 @@ public class SlideMenu {
 			}
 		} else {
 
-			items = new SlideMenuAdapter.MenuDesc[3];
-			for (int i = 0; i < 3; i++) {
+			items = new SlideMenuAdapter.MenuDesc[5];
+			for (int i = 0; i < items.length; i++) {
 				items[i] = new SlideMenuAdapter.MenuDesc();
 			}
-			items[0].icon = R.drawable.ic_launcher;
+			items[0].icon = R.drawable.ic_settings;
 			items[0].label = "Setup-Assistent";
 			items[0].action = SetupAssistant.class;
-			items[1].icon = R.drawable.ic_launcher;
+			items[1].icon = R.drawable.ic_events;
 			items[1].label = "Termine";
 			items[1].action = Events.class;
-			items[2].icon = R.drawable.ic_launcher;
+			items[2].icon = R.drawable.ic_smv;
 			items[2].label = "SMVBlog";
 			items[2].action = SMVBlog.class;
+			items[3].icon = R.drawable.ic_help;
+			items[3].label = "Hilfe";
+			items[3].action = null;
+			items[3].actIntent = new Intent(act, HelpAbout.class);
+			items[3].actIntent.putExtra(Functions.HELPABOUT, Functions.help);
+			items[3].useSlideMenu = false;
+			items[4].icon = R.drawable.ic_about;
+			items[4].label = "Über";
+			items[4].action = null;
+			items[4].actIntent = new Intent(act, HelpAbout.class);
+			items[4].actIntent.putExtra(Functions.HELPABOUT, Functions.about);
+			items[4].useSlideMenu = false;
 		}
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
