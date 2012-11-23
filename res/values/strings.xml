@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, lsgapp!</string>
-    <string name="versionname">beta1</string>
+    <string name="versionname">beta1fixed</string>
     <string name="app_name">LSGäpp</string>
     <string name="dark_actionbar">Dunkle ActionBar</string>
     <string name="showwithoutclass_off">Vertretungen ohne Klassen nicht angezeigt</string>

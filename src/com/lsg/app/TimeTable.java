@@ -168,7 +168,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 		private String[] titles = new String[5];
 		private String klasse;
 		private String teacher;
-		private boolean ownClass;
+		private boolean ownClass = false;
 
 		public TimeTableViewPagerAdapter(TimeTable act) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(act);
@@ -863,12 +863,17 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	}
 	private boolean refreshing = false;
 	private static ServiceHandler hand;
+	private View actionView = null;
 	@TargetApi(11)
 	public void updateTimeTable() {
 		refreshing = true;
-		final View actionView;
 		if (Functions.getSDK() >= 11) {
-			actionView = refresh.getActionView();
+			try {
+				actionView = refresh.getActionView();
+			} catch (Exception e) {
+				Log.d("TimeTable", "error getting action view");
+				actionView = null;
+			}
 			refresh.setActionView(new ProgressBar(this));
 		} else {
 			actionView = null;
@@ -884,7 +889,7 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				if (Functions.getSDK() >= 11)
+				if (Functions.getSDK() >= 11 && actionView != null)
 					refresh.setActionView(actionView);
 				else
 					loading.cancel();
@@ -978,7 +983,8 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 			footer.setText(savedInstanceState.getString("selshort"));
 		}
 		viewpageradap.updateCursor();
-		if(Functions.getSDK() >= 11) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(Functions.getSDK() >= 11 && (prefs.getBoolean(Functions.RIGHTS_ADMIN, false) || prefs.getBoolean(Functions.RIGHTS_TEACHER, false))) {
 			suppressSelect = true;
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.setSelectedItem(savedInstanceState.getInt("navlistselected"), this);

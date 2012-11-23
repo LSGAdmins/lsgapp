@@ -322,7 +322,8 @@ public class SlideMenu {
 		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
     	parm.setMargins(0, 0, 0, 0);
     	content.setLayoutParams(parm);
-    	
+
+		parent = (FrameLayout) content.getParent();
     	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
     	try {
     		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
