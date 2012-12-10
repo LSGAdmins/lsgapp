@@ -66,7 +66,12 @@ public class SetupAssistant extends Activity {
 		@Override
 		protected void onPostExecute(String success) {
 			super.onPostExecute(success);
+			try {
 			loading.cancel();
+			} catch(Exception e) {
+				Log.w("LSGäpp", "Loading view not attached");
+				e.printStackTrace();
+			}
 			if (success.equals("true")) {
 				loginsuccess = true;
 				step = 1;

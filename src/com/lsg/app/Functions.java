@@ -336,7 +336,12 @@ public class Functions {
 		}
 		result.close();
 		myDB.close();
+		try {
 		matchVPlanTimeTable(context);
+		} catch(Exception e) {
+			Log.e("LSGäpp", "exception in matching vplan");
+			e.printStackTrace();
+		}
 	}
 	public static void matchVPlanTimeTable(Context context) {
 		SQLiteDatabase myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);

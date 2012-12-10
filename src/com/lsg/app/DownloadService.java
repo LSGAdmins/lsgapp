@@ -27,7 +27,9 @@ public class DownloadService extends Service {
 		Toast.makeText(getApplicationContext(),
 				getString(R.string.downloading_update), Toast.LENGTH_LONG)
 				.show();
-		if (intent.getExtras().getString("started").equals("notification"))
+		if (intent.getExtras().getString("started") != null
+				&& intent.getExtras().getString("started")
+						.equals("notification"))
 			((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
 					.cancel(NOTIFICATION_ID);
 		final SharedPreferences prefs = PreferenceManager

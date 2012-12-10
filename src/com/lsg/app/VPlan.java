@@ -758,7 +758,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		} else {
 			actionView = null;
 			loading = ProgressDialog.show(this, null,
-					"Lade...");
+					getString(R.string.loading_vplan));
 		}
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
@@ -768,10 +768,15 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 
 			@Override
 			public void onFinishedService() {
+				try {
 				if (Functions.getSDK() >= 11 && actionView != null)
 					refresh.setActionView(actionView);
 				else
 					loading.cancel();
+				} catch(Exception e) {
+					Log.w("LSGäpp", "Error dismissing loading dialog");
+					e.printStackTrace();
+				}
 				refreshing = false;
 			}
 		});

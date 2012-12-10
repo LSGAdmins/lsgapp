@@ -8,7 +8,9 @@ import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 
 public class GCMIntentService extends GCMBaseIntentService {
-
+	public GCMIntentService() {
+		super(Functions.GCM_ID);
+	}
 	@Override
 	protected void onError(Context context, String error) {
 		Log.w("LSGäpp", "gcm error: " + error);

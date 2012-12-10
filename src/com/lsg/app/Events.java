@@ -286,10 +286,15 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	}
 	@Override
 	public void updateList() {
-		events = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
-				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
-				where_conds_events, null, null, null);
-		evadap.changeCursor(events);
+		if (myDB.isOpen()) {
+			events = myDB.query(Functions.DB_EVENTS_TABLE, new String[] {
+					Functions.DB_ROWID, Functions.DB_DATES,
+					Functions.DB_ENDDATES, Functions.DB_TIMES,
+					Functions.DB_ENDTIMES, Functions.DB_TITLE,
+					Functions.DB_VENUE }, where_cond, where_conds_events, null,
+					null, null);
+			evadap.changeCursor(events);
+		}
 	}
 	@Override
 	public void onDestroy() {

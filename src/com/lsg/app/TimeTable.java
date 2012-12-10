@@ -863,22 +863,24 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 	}
 	private boolean refreshing = false;
 	private static ServiceHandler hand;
-	private View actionView = null;
 	@TargetApi(11)
 	public void updateTimeTable() {
 		refreshing = true;
+		final View actionView;
+		View v;
 		if (Functions.getSDK() >= 11) {
 			try {
-				actionView = refresh.getActionView();
-			} catch (Exception e) {
-				Log.d("TimeTable", "error getting action view");
-				actionView = null;
+				v = refresh.getActionView();
+				refresh.setActionView(new ProgressBar(this));
+			} catch (NullPointerException e) {
+				loading = ProgressDialog.show(this, null, getString(R.string.loading_timetable));
+				v = null;
 			}
-			refresh.setActionView(new ProgressBar(this));
+			actionView = v;
 		} else {
 			actionView = null;
 			loading = ProgressDialog.show(this, null,
-					"Lade...");
+					getString(R.string.loading_timetable));
 		}
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
@@ -889,10 +891,15 @@ public class TimeTable extends Activity implements SelectedCallback, HomeCall, R
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
+				try {
 				if (Functions.getSDK() >= 11 && actionView != null)
 					refresh.setActionView(actionView);
 				else
 					loading.cancel();
+				} catch(Exception e) {
+					Log.w("LSGäpp", "Error hiding loading");
+					e.printStackTrace();
+				}
 				refreshing = false;
 			}
 		});
