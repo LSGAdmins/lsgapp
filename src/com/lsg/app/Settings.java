@@ -13,7 +13,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
-import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;

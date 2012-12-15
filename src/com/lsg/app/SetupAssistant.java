@@ -38,7 +38,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.lsg.app.TimeTable.TimeTableUpdater;
-import com.lsg.app.lib.ExceptionHandler;
 
 public class SetupAssistant extends Activity {
 	private SharedPreferences prefs;

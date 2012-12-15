@@ -58,7 +58,7 @@
      transform="translate(-195,-499.46218)">
     <text
        xml:space="preserve"
-       style="font-size:100px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
+       style="font-size:100px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0099CC;fill-opacity:1;stroke:none;font-family:Linux Biolinum Keyboard O;-inkscape-font-specification:Linux Biolinum Keyboard O Bold"
        x="183"
        y="574.86218"
        id="text3776"
@@ -87,21 +87,21 @@
        y="19.099998"
        transform="translate(195,499.46218)" />
     <rect
-       style="fill:none;stroke:#00ff00;stroke-width:1.89999998;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#0099CC;stroke-width:1.89999998;stroke-miterlimit:4;stroke-dasharray:none"
        id="rect3916"
        width="54.5"
        height="57.5"
        x="209"
        y="520.06219" />
     <rect
-       style="fill:none;stroke:#00ff00;stroke-width:3.87061381;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#0099CC;stroke-width:3.87061381;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3924"
        width="0.060385991"
        height="4.5603857"
        x="217.21982"
        y="516.28198" />
     <rect
-       style="fill:none;stroke:#00ff00;stroke-width:3.87061381;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#0099CC;stroke-width:3.87061381;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3924-1"
        width="0.060385991"
        height="4.5603857"
@@ -111,7 +111,7 @@
        inkscape:transform-center-y="-9.7154998" />
     <text
        xml:space="preserve"
-       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:none;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#0099CC;fill-opacity:1;stroke:none;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
        x="214.5"
        y="567.06219"
        id="text3946"

@@ -836,6 +836,10 @@ public class Functions {
 			View view = viewGroup.getChildAt(i);
 			if(view.isFocusable())
 				view.setEnabled(enabled);
+			if(view instanceof ExtendedViewPager)
+				((ExtendedViewPager) view).setPagingEnabled(enabled);
+			if(view instanceof ExtendedPagerTabStrip)
+				((ExtendedPagerTabStrip) view).setNavEnabled(enabled);
 			if (view instanceof ViewGroup) {
 				enableDisableViewGroup((ViewGroup) view, enabled);
 				} else if (view instanceof ListView) {

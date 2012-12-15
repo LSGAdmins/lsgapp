@@ -1,7 +1,5 @@
 package com.lsg.app;
 
-import com.lsg.app.lib.ExceptionHandler;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.database.Cursor;

@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -56,8 +57,8 @@ public class SlideMenu {
 			public int icon;
 			public String label;
 			public String title;
-			public Class<?extends Activity> action;
-			public Intent actIntent;
+			public Class<?extends Activity> openActivity;
+			public Intent openIntent;
 		}
 		public SlideMenuAdapter(Activity act, SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
 			super(act, R.id.menu_label, items);
@@ -114,10 +115,10 @@ public class SlideMenu {
 	private static boolean menuShown = false;
 	private static boolean menuToHide = false;
 	private static View menu;
-	private static LinearLayout content;
-	private static FrameLayout parent;
+	private static LinearLayout contentContainer;
+	private static FrameLayout containerParent;
 	private static int menuSize;
-	private static int statusHeight = 0;
+	private static int statusBarHeight = 0;
 	private Activity act;
 	private static Class<? extends Activity> curAct;
 	private SharedPreferences prefs;
@@ -126,19 +127,18 @@ public class SlideMenu {
 		this.act = act;
 		SlideMenu.curAct = curAct;
 		prefs = PreferenceManager.getDefaultSharedPreferences(act);
-	}
-	public void checkEnabled() {
-    	content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
-		content.setBackgroundResource(R.layout.background);
+    	contentContainer = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
+    	(act.findViewById(android.R.id.content)).setBackgroundResource(R.layout.background);
 		
-		parent = (FrameLayout) content.getParent();
+		containerParent = (FrameLayout) contentContainer.getParent();
     	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	menu = inflater.inflate(R.layout.menu, null);
     	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
     	lays.setMargins(20000, 20000, 0, 0);
     	menu.setLayoutParams(lays);
-    	content.bringToFront();
-    	parent.addView(menu);
+    	contentContainer.bringToFront();
+    	containerParent.addView(menu);
+    	menu.findViewById(R.id.overlay).bringToFront();
     	
     	menu.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -156,12 +156,14 @@ public class SlideMenu {
 		if(menuShown)
 			this.show(false);
 	}
+	public void checkEnabled() {
+	}
 	public void show() {
-		if(statusHeight == 0) {
+		if(statusBarHeight == 0) {
 			Rect rectgle = new Rect();
 			Window window = act.getWindow();
 			window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
-			statusHeight = rectgle.top;
+			statusBarHeight = rectgle.top;
 			}
 		this.show(true, 0);
 	}
@@ -169,65 +171,76 @@ public class SlideMenu {
 	public void show(boolean animate) {
 		show(animate, 0);
 	}
+	//LayoutParams to move content & menu around
+	private FrameLayout.LayoutParams contentContainerLayoutParams;
+	private FrameLayout.LayoutParams menuLayoutParams;
+	//store motion events
+	private float motionStartX;
+	private float lastX;
+	private float previousX;
+	private int maxDiff = 0;
+	private int lastDiff;
 	public void show(boolean animate, int offset) {
+		contentContainer.bringToFront();
     	menuSize = Functions.dpToPx(250, act);
     	if(offset == 0)
     		offset = menuSize;
-    	FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
-    	parm.setMargins(menuSize, 0, -menuSize, 0);
-    	content.setLayoutParams(parm);
-    	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
-    	lays.setMargins(0,statusHeight, 0, 0);
-    	menu.setLayoutParams(lays);
-		FrameLayout.LayoutParams parms = new FrameLayout.LayoutParams(-1, -1, 3);
-		parms.setMargins(menuSize, 0, -menuSize, 0);
-		content.setLayoutParams(parms);
     	
+    	//move content & ActionBar out to right
+    	contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer.getLayoutParams();
+    	contentContainerLayoutParams.setMargins(menuSize, 0, -menuSize, 0);
+    	contentContainer.setLayoutParams(contentContainerLayoutParams);
+    	
+    	//set menu to left side
+    	menuLayoutParams = new FrameLayout.LayoutParams(-1, -1, 3);
+    	menuLayoutParams.setMargins(0, statusBarHeight, 0, 0);
+    	menu.setLayoutParams(menuLayoutParams);
+    	
+    	//onClick management for menu ListView
     	ListView list = (ListView) act.findViewById(R.id.menu_listview);
     	list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (items[position].action == null || !items[position].action.equals(curAct)) {
-					Log.d("pos", Long.valueOf(id).toString());
+				// if not clicked item for current Activity
+				if (items[position].openActivity == null
+						|| !items[position].openActivity.equals(curAct)) {
+					// mark this menu to be hidden
 					if (items[position].useSlideMenu)
 						menuToHide = true;
-					if (items[position].action != null) {
-						Intent intent = new Intent(act, items[position].action);
+					//start new activity / intent
+					if (items[position].openActivity != null) {
+						Intent intent = new Intent(act, items[position].openActivity);
 						intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 						act.startActivity(intent);
 					} else
-						act.startActivity(items[position].actIntent);
+						act.startActivity(items[position].openIntent);
 				} else {
 					hide();
 				}
-				}
-			});
+			}
+		});
     	
-    	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
-    	try {    		
-    		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(false);
-			((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs))
-					.setNavEnabled(false);
-		} catch (Exception e) {
-			// no viewpager to disable :)
-		}
+    	//disable views in normal content
+    	Functions.enableDisableViewGroup((LinearLayout) contentContainer, false);
+    	
 		if (animate) {
-			TranslateAnimation slideoutanim = new TranslateAnimation(-offset, 0,
-					0, 0);
-			slideoutanim.setDuration(Math.abs(offset) * 500 / menuSize);
-			
-			TranslateAnimation slideinanim = new TranslateAnimation(
-					-(offset / 2), 0, 0, 0);
-			slideinanim.setDuration(Math.abs(offset) * 500 / menuSize);
-			menu.startAnimation(slideinanim);
-			content.startAnimation(slideoutanim);
+			// slide out content
+			TranslateAnimation contentSlideOut = new TranslateAnimation(
+					-offset, 0, 0, 0);
+			contentSlideOut.setDuration(Math.abs(offset) * 500 / menuSize);
+			contentContainer.startAnimation(contentSlideOut);
 
-			content.bringToFront();
-			slideinanim.setAnimationListener(new AnimationListener() {
+			// slide in menu
+			TranslateAnimation menuSlideIn = new TranslateAnimation(
+					-(offset / 2), 0, 0, 0);
+			menuSlideIn.setDuration(Math.abs(offset) * 500 / menuSize);
+			menu.startAnimation(menuSlideIn);
+
+			menuSlideIn.setAnimationListener(new AnimationListener() {
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					// to enable view that is clicked for slide-back
+					// to enable content overlay view for slide-back
 					menu.bringToFront();
 				}
 				@Override
@@ -239,120 +252,107 @@ public class SlideMenu {
 					// not needed here
 				}
 			});
-		}
+		} else
+			menu.bringToFront();
+		
 		menuShown = true;
-    	menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
+    	(menu.findViewById(R.id.overlay)).setOnClickListener(new OnClickListener() {
     		@Override
     		public void onClick(View v) {
-    			//need this to get onTouch, don't know why
+    			//need this to get onTouch to work, don't know why
+    			Log.d("asdf", "onclick");
     		}
     	});
-    	
-		((FrameLayout) menu.findViewById(R.id.overlay)).setOnTouchListener(new View.OnTouchListener() {
+    	(menu.findViewById(R.id.overlay)).setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				
+				// TODO nicer slides
 				switch(event.getAction()) {
 				case MotionEvent.ACTION_DOWN:
-					xPos = event.getX();
-					Log.d("xpos", Float.valueOf(xPos).toString());
-					content_lays = (FrameLayout.LayoutParams) content.getLayoutParams();
-					menu_lays = (FrameLayout.LayoutParams) menu.getLayoutParams();
-			    	content.bringToFront();
+					/*if(event.getX() < menuSize)
+						return false;*/
+					motionStartX = event.getX();
+					contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer.getLayoutParams();
+					contentContainerLayoutParams.setMargins(0, 0, 0, 0);
+					contentContainer.setLayoutParams(contentContainerLayoutParams);
+					
+					menuLayoutParams = (FrameLayout.LayoutParams) menu.getLayoutParams();
+			    	contentContainer.bringToFront();
+			    	//contentContainer.scrollBy(menuSize, 0);
 					break;
 				case MotionEvent.ACTION_MOVE:
-					int diff = Float.valueOf(xPos - event.getX()).intValue();
-			    	prevX = lastX;
+			    	previousX = lastX;
 					lastX = event.getX();
-					if(diff < 0)
-						diff = 0;
-					if(lastDiff == diff || lastDiff -1 == diff)
+					int positionDiff = Float.valueOf(motionStartX - lastX).intValue();
+					if(positionDiff < 0)
+						positionDiff = 0;
+					if(lastDiff == positionDiff || lastDiff -1 == positionDiff)
 						break;
-					lastDiff = diff;
+					lastDiff = positionDiff;
 					if(lastDiff < maxDiff)
 						maxDiff = lastDiff;
 
-			    	content_lays.setMargins(menuSize - diff, 0, -menuSize + diff, 0);
-			    	content.setLayoutParams(content_lays);
+			    	/*contentContainerLayoutParams.setMargins(menuSize - positionDiff, 0, -menuSize + positionDiff, 0);
+			    	contentContainer.setLayoutParams(contentContainerLayoutParams);
+					Log.d("menuSize", Integer.valueOf(menuSize).toString());*/
+					contentContainer.scrollTo(-menuSize + positionDiff, 0);
 			    	
-			    	menu_lays.setMargins(-diff / 2, statusHeight, diff / 2, 0);
-			    	menu.setLayoutParams(menu_lays);
+			    	/*menuLayoutParams.setMargins(-positionDiff / 2, statusBarHeight, positionDiff / 2, 0);
+			    	menu.setLayoutParams(menuLayoutParams);*/
+					menu.scrollTo(positionDiff / 2, 0);
 					break;
 				case MotionEvent.ACTION_UP:
-					Log.d("xPos", Float.valueOf(xPos).toString());
-					Log.d("lastX", Float.valueOf(lastX).toString());
-					Log.d("prevX", Float.valueOf(prevX).toString());
-					Log.d("pos", Float.valueOf(event.getX()).toString());
-					if(prevX < event.getX() && lastDiff > Functions.dpToPx(5, act)) {
-						menu.bringToFront();
+					contentContainer.scrollTo(0, 0);
+					menu.scrollTo(0, 0);
+					if(previousX < event.getX() && lastDiff > Functions.dpToPx(5, act)) {
 						show(true, lastDiff);
 					} else
 						hide(lastDiff);
 					break;
 				}
-				return false;
+				return true;
 			}
 		});
 	}
-	private FrameLayout.LayoutParams content_lays;
-	private FrameLayout.LayoutParams menu_lays;
-	private float xPos;
-	private float lastX;
-	private float prevX;
-	private int maxDiff = 0;
-	private int lastDiff;
 	public void hide() {
 		hide(0);
 	}
 	public void hide(int offset) {
-		AnimationSet menuAnimations = new AnimationSet(true);
-		menuAnimations.setDuration(500);
-		/*AlphaAnimation menuFadeOut = new AlphaAnimation(1.0F, 0.0F);
-		menuFadeOut.setDuration(500);*/
+		contentContainer.bringToFront();
+		//slide out menu to left
 		TranslateAnimation menuSlideOut = new TranslateAnimation(0, -((menuSize - offset) / 3), 0, 0);
 		menuSlideOut.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
-		//menuAnimations.addAnimation(menuFadeOut);
-		menuAnimations.addAnimation(menuSlideOut);
 		menu.startAnimation(menuSlideOut);
 		
-		TranslateAnimation content_in = new TranslateAnimation(menuSize - offset, 0, 0, 0);
-		content_in.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
-		content.startAnimation(content_in);
-		//((LinearLayout) act.findViewById(android.R.id.content).getParent()).bringToFront();
-		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
-    	parm.setMargins(0, 0, 0, 0);
-    	content.setLayoutParams(parm);
+		//slide in content from right
+		TranslateAnimation contentSlideIn = new TranslateAnimation(menuSize - offset, 0, 0, 0);
+		contentSlideIn.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
+		contentContainer.startAnimation(contentSlideIn);
+		
+		contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer.getLayoutParams();
+    	contentContainerLayoutParams.setMargins(0, 0, 0, 0);
+    	contentContainer.setLayoutParams(contentContainerLayoutParams);
 
-		parent = (FrameLayout) content.getParent();
-    	Functions.enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
-    	try {
-    		((ExtendedViewPager) act.findViewById(R.id.viewpager)).setPagingEnabled(true);
-    		((ExtendedPagerTabStrip) act.findViewById(R.id.viewpager_tabs)).setNavEnabled(true);
-    	} catch(Exception e) {
-    		//no viewpager :)
-    	}
+    	//re-enable all Views
+    	Functions.enableDisableViewGroup((LinearLayout) containerParent.findViewById(android.R.id.content).getParent(), true);
+    	
     	menuShown = false;
-		content.bringToFront();
-		parent.invalidate();
-		menu.invalidate();
-		content.invalidate();
+		
 		menuSlideOut.setAnimationListener(new AnimationListener() {
-			
 			@Override
 			public void onAnimationStart(Animation animation) {
+				// not needed here
 			}
-			
 			@Override
 			public void onAnimationRepeat(Animation animation) {
-				// TODO Auto-generated method stub
-				
+				// not needed here	
 			}
-			
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) menu.getLayoutParams();
-				params.setMargins(20000, 20000, 0, 0);
-				menu.setLayoutParams(params);
+				// move menu out of visible scope
+				menuLayoutParams = (FrameLayout.LayoutParams) menu.getLayoutParams();
+				menuLayoutParams.setMargins(20000, 20000, 0, 0);
+				menu.setLayoutParams(menuLayoutParams);
 			}
 		});
 	}
@@ -369,31 +369,31 @@ public class SlideMenu {
 			}
 			items[0].icon = R.drawable.ic_timetable;
 			items[0].label = "Stundenplan";
-			items[0].action = TimeTable.class;
+			items[0].openActivity = TimeTable.class;
 			items[1].icon = R.drawable.ic_vplan_green;
 			items[1].label = "Vertretungsplan";
-			items[1].action = VPlan.class;
+			items[1].openActivity = VPlan.class;
 			items[2].icon = R.drawable.ic_events;
 			items[2].label = "Termine";
-			items[2].action = Events.class;
+			items[2].openActivity = Events.class;
 			items[3].icon = R.drawable.ic_smv;
 			items[3].label = "SMVBlog";
-			items[3].action = SMVBlog.class;
+			items[3].openActivity = SMVBlog.class;
 			items[4].icon = R.drawable.ic_settings;
 			items[4].label = "Einstellungen";
-			items[4].action = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
+			items[4].openActivity = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
 					: Settings.class;
 			items[5].icon = R.drawable.ic_help;
 			items[5].label = "Hilfe";
-			items[5].action = null;
-			items[5].actIntent = new Intent(act, HelpAbout.class);
-			items[5].actIntent.putExtra(Functions.HELPABOUT, Functions.help);
+			items[5].openActivity = null;
+			items[5].openIntent = new Intent(act, HelpAbout.class);
+			items[5].openIntent.putExtra(Functions.HELPABOUT, Functions.help);
 			items[5].useSlideMenu = false;
 			items[6].icon = R.drawable.ic_about;
 			items[6].label = "Über";
-			items[6].action = null;
-			items[6].actIntent = new Intent(act, HelpAbout.class);
-			items[6].actIntent.putExtra(Functions.HELPABOUT, Functions.about);
+			items[6].openActivity = null;
+			items[6].openIntent = new Intent(act, HelpAbout.class);
+			items[6].openIntent.putExtra(Functions.HELPABOUT, Functions.about);
 			items[6].useSlideMenu = false;
 			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, "");
 			items[7].type = Functions.TYPE_INFO;
@@ -402,10 +402,10 @@ public class SlideMenu {
 			items[7].label = news_pupils.substring(0,
 					((news_pupils.length() > 60) ? 60 : news_pupils.length()))
 					+ ((news_pupils.length() > 60) ? "..." : "");
-			items[7].action = null;
-			items[7].actIntent = new Intent(act, InfoActivity.class);
-			items[7].actIntent.putExtra("type", "info");
-			items[7].actIntent.putExtra("info_type", "pupils");
+			items[7].openActivity = null;
+			items[7].openIntent = new Intent(act, InfoActivity.class);
+			items[7].openIntent.putExtra("type", "info");
+			items[7].openIntent.putExtra("info_type", "pupils");
 			items[7].useSlideMenu = false;
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
 					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) {
@@ -417,9 +417,9 @@ public class SlideMenu {
 				items[8].label = news_teachers.substring(0, ((news_teachers
 						.length() > 60) ? 60 : news_teachers.length()))
 						+ ((news_teachers.length() > 60) ? "..." : "");
-				items[8].actIntent = new Intent(act, InfoActivity.class);
-				items[8].actIntent.putExtra("type", "info");
-				items[8].actIntent.putExtra("info_type", "teachers");
+				items[8].openIntent = new Intent(act, InfoActivity.class);
+				items[8].openIntent.putExtra("type", "info");
+				items[8].openIntent.putExtra("info_type", "teachers");
 				items[8].useSlideMenu = false;
 			}
 		} else {
@@ -430,24 +430,24 @@ public class SlideMenu {
 			}
 			items[0].icon = R.drawable.ic_settings;
 			items[0].label = "Setup-Assistent";
-			items[0].action = SetupAssistant.class;
+			items[0].openActivity = SetupAssistant.class;
 			items[1].icon = R.drawable.ic_events;
 			items[1].label = "Termine";
-			items[1].action = Events.class;
+			items[1].openActivity = Events.class;
 			items[2].icon = R.drawable.ic_smv;
 			items[2].label = "SMVBlog";
-			items[2].action = SMVBlog.class;
+			items[2].openActivity = SMVBlog.class;
 			items[3].icon = R.drawable.ic_help;
 			items[3].label = "Hilfe";
-			items[3].action = null;
-			items[3].actIntent = new Intent(act, HelpAbout.class);
-			items[3].actIntent.putExtra(Functions.HELPABOUT, Functions.help);
+			items[3].openActivity = null;
+			items[3].openIntent = new Intent(act, HelpAbout.class);
+			items[3].openIntent.putExtra(Functions.HELPABOUT, Functions.help);
 			items[3].useSlideMenu = false;
 			items[4].icon = R.drawable.ic_about;
 			items[4].label = "Über";
-			items[4].action = null;
-			items[4].actIntent = new Intent(act, HelpAbout.class);
-			items[4].actIntent.putExtra(Functions.HELPABOUT, Functions.about);
+			items[4].openActivity = null;
+			items[4].openIntent = new Intent(act, HelpAbout.class);
+			items[4].openIntent.putExtra(Functions.HELPABOUT, Functions.about);
 			items[4].useSlideMenu = false;
 		}
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);

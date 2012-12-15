@@ -48,7 +48,6 @@ import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.interfaces.SelectedCallback;
-import com.lsg.app.lib.ExceptionHandler;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
