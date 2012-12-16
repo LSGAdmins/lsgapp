@@ -119,6 +119,11 @@
     <string name="teacher_short">Kürzel</string>
     <string name="select_short">Kürzel auswählen</string>
     <string name="vplan_num">Vertretungsanzahl:</string>
+    <string name="tasks">Aufgaben</string>
+    <string name="exams">Schulaufgaben</string>
+    <string name="newExam">Neue Schulaufgabe</string>
+    <string name="homework">Hausaufgaben</string>
+    <string name="grades">Noten</string>
     <string name="date">Datum:</string>
     <string name="homebutton">Home-Button</string>
     <string name="searchbutton">Button zum Suchen</string>

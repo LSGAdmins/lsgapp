@@ -124,6 +124,7 @@
             android:theme="@style/AppThemeDialog" >
         </activity>
         <activity android:name="OverlayHelp" android:theme="@style/Theme.Transparent" android:excludeFromRecents="true"></activity>
+        <activity android:name=".tasks.Tasks" android:label="@string/tasks"></activity>
     </application>
 
 </manifest>

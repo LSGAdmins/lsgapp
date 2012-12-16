@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ListActivity;
 import android.view.Menu;
 import android.webkit.WebView;
 
@@ -27,6 +28,9 @@ public class AdvancedWrapper {
 
 	public void homeasup(Activity act) {
 		Advanced.homeasup(act);
+	}
+	public void alwaysDisplayFastScroll(ListActivity act) {
+		Advanced.alwaysDisplayFastScroll(act);
 	}
 	@TargetApi(5)
 	public void postUrl(WebView webv, String url, byte[] data) {

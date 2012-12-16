@@ -16,21 +16,17 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lsg.app.Events;
-import com.lsg.app.ExtendedPagerTabStrip;
-import com.lsg.app.ExtendedViewPager;
 import com.lsg.app.Functions;
 import com.lsg.app.HelpAbout;
 import com.lsg.app.InfoActivity;
@@ -41,6 +37,7 @@ import com.lsg.app.SettingsAdvanced;
 import com.lsg.app.SetupAssistant;
 import com.lsg.app.TimeTable;
 import com.lsg.app.VPlan;
+import com.lsg.app.tasks.Tasks;
 
 public class SlideMenu {
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
@@ -361,66 +358,78 @@ public class SlideMenu {
 		if (prefs.getBoolean(Functions.IS_LOGGED_IN, false)) {
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
 					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
-				items = new SlideMenuAdapter.MenuDesc[9];
+				items = new SlideMenuAdapter.MenuDesc[10];
 			else
-				items = new SlideMenuAdapter.MenuDesc[8];
+				items = new SlideMenuAdapter.MenuDesc[9];
 			for (int i = 0; i < items.length; i++) {
 				items[i] = new SlideMenuAdapter.MenuDesc();
 			}
+			//TimeTable
 			items[0].icon = R.drawable.ic_timetable;
 			items[0].label = "Stundenplan";
 			items[0].openActivity = TimeTable.class;
+			//VPlan
 			items[1].icon = R.drawable.ic_vplan_green;
 			items[1].label = "Vertretungsplan";
 			items[1].openActivity = VPlan.class;
-			items[2].icon = R.drawable.ic_events;
-			items[2].label = "Termine";
-			items[2].openActivity = Events.class;
-			items[3].icon = R.drawable.ic_smv;
-			items[3].label = "SMVBlog";
-			items[3].openActivity = SMVBlog.class;
-			items[4].icon = R.drawable.ic_settings;
-			items[4].label = "Einstellungen";
-			items[4].openActivity = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
+			//Tasks
+			items[2].icon = R.drawable.ic_tasks;
+			items[2].label = "Aufgaben";
+			items[2].openActivity = Tasks.class;
+			//Events
+			items[3].icon = R.drawable.ic_events;
+			items[3].label = "Termine";
+			items[3].openActivity = Events.class;
+			//SMVBlog
+			items[4].icon = R.drawable.ic_smv;
+			items[4].label = "SMVBlog";
+			items[4].openActivity = SMVBlog.class;
+			//Settings
+			items[5].icon = R.drawable.ic_settings;
+			items[5].label = "Einstellungen";
+			items[5].openActivity = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
 					: Settings.class;
-			items[5].icon = R.drawable.ic_help;
-			items[5].label = "Hilfe";
-			items[5].openActivity = null;
-			items[5].openIntent = new Intent(act, HelpAbout.class);
-			items[5].openIntent.putExtra(Functions.HELPABOUT, Functions.help);
-			items[5].useSlideMenu = false;
-			items[6].icon = R.drawable.ic_about;
-			items[6].label = "Über";
+			//Help
+			items[6].icon = R.drawable.ic_help;
+			items[6].label = "Hilfe";
 			items[6].openActivity = null;
 			items[6].openIntent = new Intent(act, HelpAbout.class);
-			items[6].openIntent.putExtra(Functions.HELPABOUT, Functions.about);
+			items[6].openIntent.putExtra(Functions.HELPABOUT, Functions.help);
 			items[6].useSlideMenu = false;
+			//About
+			items[7].icon = R.drawable.ic_about;
+			items[7].label = "Über";
+			items[7].openActivity = null;
+			items[7].openIntent = new Intent(act, HelpAbout.class);
+			items[7].openIntent.putExtra(Functions.HELPABOUT, Functions.about);
+			items[7].useSlideMenu = false;
+			//News 4 Pupils
 			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, "");
-			items[7].type = Functions.TYPE_INFO;
-			items[7].title = "Aktuell";
-			items[7].icon = R.drawable.ic_launcher;
-			items[7].label = news_pupils.substring(0,
+			items[8].type = Functions.TYPE_INFO;
+			items[8].title = "Aktuell";
+			items[8].icon = R.drawable.ic_launcher;
+			items[8].label = news_pupils.substring(0,
 					((news_pupils.length() > 60) ? 60 : news_pupils.length()))
 					+ ((news_pupils.length() > 60) ? "..." : "");
-			items[7].openActivity = null;
-			items[7].openIntent = new Intent(act, InfoActivity.class);
-			items[7].openIntent.putExtra("type", "info");
-			items[7].openIntent.putExtra("info_type", "pupils");
-			items[7].useSlideMenu = false;
+			items[8].openActivity = null;
+			items[8].openIntent = new Intent(act, InfoActivity.class);
+			items[8].openIntent.putExtra("type", "info");
+			items[8].openIntent.putExtra("info_type", "pupils");
+			items[8].useSlideMenu = false;
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
 					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) {
 				String news_teachers = prefs.getString(Functions.NEWS_TEACHERS,
 						"");
-				items[8].type = Functions.TYPE_INFO;
-				items[8].title = "Lehrerinfo";
-				items[8].icon = R.drawable.ic_launcher;
-				items[8].label = news_teachers.substring(0, ((news_teachers
+				items[9].type = Functions.TYPE_INFO;
+				items[9].title = "Lehrerinfo";
+				items[9].icon = R.drawable.ic_launcher;
+				items[9].label = news_teachers.substring(0, ((news_teachers
 						.length() > 60) ? 60 : news_teachers.length()))
 						+ ((news_teachers.length() > 60) ? "..." : "");
-				items[8].openIntent = new Intent(act, InfoActivity.class);
-				items[8].openIntent.putExtra("type", "info");
-				items[8].openIntent.putExtra("info_type", "teachers");
-				items[8].useSlideMenu = false;
+				items[9].openIntent = new Intent(act, InfoActivity.class);
+				items[9].openIntent.putExtra("type", "info");
+				items[9].openIntent.putExtra("info_type", "teachers");
+				items[9].useSlideMenu = false;
 			}
 		} else {
 

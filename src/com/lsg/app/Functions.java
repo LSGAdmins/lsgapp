@@ -16,6 +16,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -185,6 +186,15 @@ public class Functions {
 			AdvancedWrapper advWrapper = new AdvancedWrapper();
 			advWrapper.homeasup(act);
 		} catch (Exception e) {
+		}
+	}
+	public static void alwaysDisplayFastScroll(ListActivity act) {
+		if (Functions.getSDK() >= 11) {
+			try {
+				AdvancedWrapper advWrapper = new AdvancedWrapper();
+				advWrapper.alwaysDisplayFastScroll(act);
+			} catch (Exception e) {
+			}
 		}
 	}
 	/**

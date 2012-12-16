@@ -1,5 +1,7 @@
 package com.lsg.app;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
@@ -37,15 +40,33 @@ import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 
 public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCall, TextWatcher, WorkerService.WorkerClass {
-	public static class EventAdapter extends CursorAdapter {
+	public static class EventAdapter extends CursorAdapter implements SectionIndexer {
 		class Standard {
 			public TextView month;
 			public TextView title;
 			public TextView date;
 			public TextView place;
 		}
-		public EventAdapter(Context context, Cursor d) {
-			super(context, d, false);
+		private ArrayList<String[]> headers = new ArrayList<String[]>();
+		public EventAdapter(Context context, Cursor cursor) {
+			super(context, cursor, false);
+			for (cursor.moveToFirst(); cursor.getPosition() < cursor.getCount(); cursor.moveToNext()) {
+				String date = cursor.getString(cursor
+						.getColumnIndex(Functions.DB_DATES));
+				String olddate = "e.e";
+				if (cursor.getPosition() > 0) {
+					cursor.moveToPosition(cursor.getPosition() - 1);
+					olddate = cursor.getString(cursor
+							.getColumnIndex(Functions.DB_DATES));
+					cursor.moveToNext();
+				}
+				String datebeginning = cursor.getString(cursor.getColumnIndex(Functions.DB_DATES));
+				String[] oldmonth = olddate.split("\\.");
+				String[] month = datebeginning.split("\\.");
+				if (!oldmonth[1].equals(month[1])) {
+					headers.add(new String[] {month[1], Integer.valueOf(cursor.getPosition()).toString()});
+				}
+			}
 			}
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -110,6 +131,22 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			}
 			else
 				holder.month.setVisibility(View.GONE);
+		}
+		@Override
+		public int getPositionForSection(int section) {
+			return Integer.valueOf(headers.get(section)[1]);
+		}
+		@Override
+		public int getSectionForPosition(int position) {
+			return 0;
+		}
+		@Override
+		public Object[] getSections() {
+			String[] toReturn = new String[headers.size()];
+			for(int i = 0; i < headers.size(); i++) {
+				toReturn[i] = headers.get(i)[0];
+			}
+			return toReturn;
 		}
 	}
 	public static class EventUpdate {
@@ -181,6 +218,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		getListView().setAdapter(evadap);
 		getListView().setEmptyView(getListView().findViewById(R.id.list_view_empty));
 		((TextView) findViewById(R.id.list_view_empty)).setText(R.string.events_empty);
+		getListView().setFastScrollEnabled(true);
 		
 		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_EVENTS_TABLE);
 		long count = num_rows.simpleQueryForLong();
@@ -194,6 +232,7 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		titlebar.addRefresh(this);
 		titlebar.setTitle(getTitle());
 		
+		Functions.alwaysDisplayFastScroll(this);
 		Functions.checkMessage(this, new String[] {Functions.OVERLAY_HOMEBUTTON});
 	}
 	private boolean refreshing = false;
