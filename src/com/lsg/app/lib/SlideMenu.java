@@ -1,5 +1,7 @@
 package com.lsg.app.lib;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
@@ -39,7 +42,7 @@ import com.lsg.app.TimeTable;
 import com.lsg.app.VPlan;
 import com.lsg.app.tasks.Tasks;
 
-public class SlideMenu {
+public class SlideMenu implements OnTouchListener {
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
 		Activity act;
 		SlideMenu.SlideMenuAdapter.MenuDesc[] items;
@@ -113,7 +116,7 @@ public class SlideMenu {
 	private static boolean menuToHide = false;
 	private static View menu;
 	private static LinearLayout contentContainer;
-	private static FrameLayout containerParent;
+	private static FrameLayout decorView;
 	private static int menuSize;
 	private static int statusBarHeight = 0;
 	private Activity act;
@@ -127,15 +130,43 @@ public class SlideMenu {
     	contentContainer = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
     	(act.findViewById(android.R.id.content)).setBackgroundResource(R.layout.background);
 		
-		containerParent = (FrameLayout) contentContainer.getParent();
+		decorView = (FrameLayout) contentContainer.getParent();
     	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	
     	menu = inflater.inflate(R.layout.menu, null);
-    	FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
-    	lays.setMargins(20000, 20000, 0, 0);
-    	menu.setLayoutParams(lays);
-    	contentContainer.bringToFront();
-    	containerParent.addView(menu);
-    	menu.findViewById(R.id.overlay).bringToFront();
+    	menuLayoutParams = new FrameLayout.LayoutParams(-1, -1, 3);
+    	menuLayoutParams.setMargins(20000, 20000, 0, 0);
+    	menu.setLayoutParams(menuLayoutParams);
+    	
+    	decorView.removeAllViews();
+    	FrameLayout.LayoutParams parentLays = new FrameLayout.LayoutParams(-1, -1);
+    	CustomFrameLayout parent = new CustomFrameLayout(act);
+    	parent.setLayoutParams(parentLays);
+    	decorView.addView(parent);
+    	
+
+    	FrameLayout.LayoutParams contentLays = new FrameLayout.LayoutParams(-1, -1);
+    	contentContainer.setLayoutParams(contentLays);
+    	//menu added before content, to have in back
+    	parent.addView(menu);
+    	parent.addView(contentContainer);
+    	parent.setOnTouchListener(this);
+    	parent.setOnTouchIntercept(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				motionStartX = event.getX();
+				if (event.getAction() == MotionEvent.ACTION_DOWN
+						&& event.getX() > menuSize && menuShown) {
+					contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer
+							.getLayoutParams();
+					contentContainerLayoutParams.setMargins(0, 0, 0, 0);
+					contentContainer.setLayoutParams(contentContainerLayoutParams);
+					contentContainer.scrollTo(-menuSize, 0);
+					return true;
+				} else
+				return false;
+			}
+		});
     	
     	menu.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -178,7 +209,6 @@ public class SlideMenu {
 	private int maxDiff = 0;
 	private int lastDiff;
 	public void show(boolean animate, int offset) {
-		contentContainer.bringToFront();
     	menuSize = Functions.dpToPx(250, act);
     	if(offset == 0)
     		offset = menuSize;
@@ -218,9 +248,6 @@ public class SlideMenu {
 			}
 		});
     	
-    	//disable views in normal content
-    	Functions.enableDisableViewGroup((LinearLayout) contentContainer, false);
-    	
 		if (animate) {
 			// slide out content
 			TranslateAnimation contentSlideOut = new TranslateAnimation(
@@ -233,89 +260,13 @@ public class SlideMenu {
 					-(offset / 2), 0, 0, 0);
 			menuSlideIn.setDuration(Math.abs(offset) * 500 / menuSize);
 			menu.startAnimation(menuSlideIn);
-
-			menuSlideIn.setAnimationListener(new AnimationListener() {
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					// to enable content overlay view for slide-back
-					menu.bringToFront();
-				}
-				@Override
-				public void onAnimationRepeat(Animation animation) {
-					// not needed here
-				}
-				@Override
-				public void onAnimationStart(Animation animation) {
-					// not needed here
-				}
-			});
-		} else
-			menu.bringToFront();
-		
+		}
 		menuShown = true;
-    	(menu.findViewById(R.id.overlay)).setOnClickListener(new OnClickListener() {
-    		@Override
-    		public void onClick(View v) {
-    			//need this to get onTouch to work, don't know why
-    			Log.d("asdf", "onclick");
-    		}
-    	});
-    	(menu.findViewById(R.id.overlay)).setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO nicer slides
-				switch(event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					/*if(event.getX() < menuSize)
-						return false;*/
-					motionStartX = event.getX();
-					contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer.getLayoutParams();
-					contentContainerLayoutParams.setMargins(0, 0, 0, 0);
-					contentContainer.setLayoutParams(contentContainerLayoutParams);
-					
-					menuLayoutParams = (FrameLayout.LayoutParams) menu.getLayoutParams();
-			    	contentContainer.bringToFront();
-			    	//contentContainer.scrollBy(menuSize, 0);
-					break;
-				case MotionEvent.ACTION_MOVE:
-			    	previousX = lastX;
-					lastX = event.getX();
-					int positionDiff = Float.valueOf(motionStartX - lastX).intValue();
-					if(positionDiff < 0)
-						positionDiff = 0;
-					if(lastDiff == positionDiff || lastDiff -1 == positionDiff)
-						break;
-					lastDiff = positionDiff;
-					if(lastDiff < maxDiff)
-						maxDiff = lastDiff;
-
-			    	/*contentContainerLayoutParams.setMargins(menuSize - positionDiff, 0, -menuSize + positionDiff, 0);
-			    	contentContainer.setLayoutParams(contentContainerLayoutParams);
-					Log.d("menuSize", Integer.valueOf(menuSize).toString());*/
-					contentContainer.scrollTo(-menuSize + positionDiff, 0);
-			    	
-			    	/*menuLayoutParams.setMargins(-positionDiff / 2, statusBarHeight, positionDiff / 2, 0);
-			    	menu.setLayoutParams(menuLayoutParams);*/
-					menu.scrollTo(positionDiff / 2, 0);
-					break;
-				case MotionEvent.ACTION_UP:
-					contentContainer.scrollTo(0, 0);
-					menu.scrollTo(0, 0);
-					if(previousX < event.getX() && lastDiff > Functions.dpToPx(5, act)) {
-						show(true, lastDiff);
-					} else
-						hide(lastDiff);
-					break;
-				}
-				return true;
-			}
-		});
 	}
 	public void hide() {
 		hide(0);
 	}
 	public void hide(int offset) {
-		contentContainer.bringToFront();
 		//slide out menu to left
 		TranslateAnimation menuSlideOut = new TranslateAnimation(0, -((menuSize - offset) / 3), 0, 0);
 		menuSlideOut.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
@@ -329,9 +280,6 @@ public class SlideMenu {
 		contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer.getLayoutParams();
     	contentContainerLayoutParams.setMargins(0, 0, 0, 0);
     	contentContainer.setLayoutParams(contentContainerLayoutParams);
-
-    	//re-enable all Views
-    	Functions.enableDisableViewGroup((LinearLayout) containerParent.findViewById(android.R.id.content).getParent(), true);
     	
     	menuShown = false;
 		
@@ -461,5 +409,36 @@ public class SlideMenu {
 		}
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
+	}
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		// TODO nicer slides
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+				break;
+		case MotionEvent.ACTION_MOVE:
+			previousX = lastX;
+			lastX = event.getX();
+			int positionDiff = Float.valueOf(motionStartX - lastX).intValue();
+			if (positionDiff < 0)
+				positionDiff = 0;
+			if (lastDiff == positionDiff || lastDiff - 1 == positionDiff)
+				break;
+			lastDiff = positionDiff;
+			if (lastDiff < maxDiff)
+				maxDiff = lastDiff;
+			contentContainer.scrollTo(-menuSize + positionDiff, 0);
+			menu.scrollTo(positionDiff / 2, 0);
+			break;
+		case MotionEvent.ACTION_UP:
+			contentContainer.scrollTo(0, 0);
+			menu.scrollTo(0, 0);
+			if (previousX < event.getX() && lastDiff > Functions.dpToPx(5, act)) {
+				show(true, lastDiff);
+			} else
+				hide(lastDiff);
+			break;
+		}
+		return true;
 	}
 }

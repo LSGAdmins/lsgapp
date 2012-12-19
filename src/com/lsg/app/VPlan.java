@@ -614,7 +614,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		}
 	
 	private VPlanPagerAdapter adapter;
-	private ExtendedViewPager pager;
+	private ViewPager pager;
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
 	private SlideMenu slidemenu;
@@ -626,7 +626,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
         getWindow().setBackgroundDrawableResource(R.layout.background);
 		setContentView(R.layout.viewpager);
 	    adapter = new VPlanPagerAdapter(this);
-	    pager = (ExtendedViewPager)findViewById(R.id.viewpager);
+	    pager = (ViewPager)findViewById(R.id.viewpager);
 	    //pager.setOnPageChangeListener(this);
 	    pager.setAdapter(adapter);
 		pager.setPageMargin(Functions.dpToPx(40, this));

@@ -140,6 +140,13 @@ public class Functions {
 	public static final String DB_TIME_TABLE_HEADERS_TEACHERS = "tt_headers_teacher";
 	public static final String DB_SHORT = "short";
 	public static final String TEACHER_SHORT = DB_SHORT;
+	//Exams & Homework
+	public static final String DB_EXAMS_TABLE = "exams";
+	public static final String DB_HOMEWORK_TABLE = "homework";
+	public static final String DB_YEAR = "year";
+	public static final String DB_MONTH = "month";
+	public static final String DB_DAYOFMONTH = "dayofmonth";
+	public static final String DB_CONTENT = "content";
 	// classes
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
@@ -517,6 +524,29 @@ public class Functions {
     				+ Functions.DB_SHORT + " TEXT,"
     				+ Functions.DB_TEACHER + " TEXT"
     				+ ");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EXAMS_TABLE
+    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
+    				+ Functions.DB_DATE + " STRING,"
+    				+ Functions.DB_YEAR + " INTEGER,"
+    				+ Functions.DB_MONTH + " INTEGER,"
+    				+ Functions.DB_DAYOFMONTH + " INTEGER,"
+    				+ Functions.DB_TYPE + " STRING,"
+    				+ Functions.DB_RAW_FACH + " STRING,"
+    				+ Functions.DB_FACH + " STRING,"
+    				+ Functions.DB_TITLE + " STRING,"
+    				+ Functions.DB_CONTENT + " CONTENT"
+    				+ ");");
+    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_HOMEWORK_TABLE
+    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
+    	    		+ Functions.DB_DATE + " STRING,"
+    				+ Functions.DB_YEAR + " INTEGER,"
+    				+ Functions.DB_MONTH + " INTEGER,"
+    				+ Functions.DB_DAYOFMONTH + " INTEGER,"
+    				+ Functions.DB_RAW_FACH + " STRING,"
+    				+ Functions.DB_FACH + " STRING,"
+    				+ Functions.DB_TITLE + " STRING,"
+    				+ Functions.DB_CONTENT + " CONTENT"
+    				+ ");");
     		//upgrades for table
     		if(myDB.getVersion() == 0) {
     			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_FACH);
@@ -839,31 +869,6 @@ public class Functions {
 	    Resources r = ctx.getResources();
 	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
 	}
-	//source: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
-	public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
-		int childCount = viewGroup.getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			View view = viewGroup.getChildAt(i);
-			if(view.isFocusable())
-				view.setEnabled(enabled);
-			if(view instanceof ExtendedViewPager)
-				((ExtendedViewPager) view).setPagingEnabled(enabled);
-			if(view instanceof ExtendedPagerTabStrip)
-				((ExtendedPagerTabStrip) view).setNavEnabled(enabled);
-			if (view instanceof ViewGroup) {
-				enableDisableViewGroup((ViewGroup) view, enabled);
-				} else if (view instanceof ListView) {
-					if(view.isFocusable())
-						view.setEnabled(enabled);
-					ListView listView = (ListView) view;
-					int listChildCount = listView.getChildCount();
-					for (int j = 0; j < listChildCount; j++) {
-						if(view.isFocusable())
-							listView.getChildAt(j).setEnabled(false);
-						}
-					}
-			}
-		}
 	/**
 	 * lock the rotation for asynctask
 	 * @param ctx the app context

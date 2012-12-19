@@ -122,6 +122,7 @@
     <string name="tasks">Aufgaben</string>
     <string name="exams">Schulaufgaben</string>
     <string name="newExam">Neue Schulaufgabe</string>
+    <string name="editExam">Schulaufgabe bearbeiten</string>
     <string name="homework">Hausaufgaben</string>
     <string name="grades">Noten</string>
     <string name="date">Datum:</string>
