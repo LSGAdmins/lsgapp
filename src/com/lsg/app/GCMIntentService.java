@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
-import com.lsg.app.timetable.TimeTable;
+import com.lsg.app.timetable.TimeTableFragment;
 
 public class GCMIntentService extends GCMBaseIntentService {
 	public GCMIntentService() {
@@ -27,7 +27,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 			Intent intent = new Intent(this, WorkerService.class);
 			// Create a new Messenger for the communication back
 			intent.putExtra(WorkerService.WORKER_CLASS,
-					TimeTable.class.getCanonicalName());
+					TimeTableFragment.class.getCanonicalName());
 			intent.putExtra(WorkerService.WHAT, what);
 			startService(intent);
 		} else if (action.equals("vplan")) {

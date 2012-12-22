@@ -28,7 +28,7 @@
         android:id="@+id/date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Datum / Art" />
+        android:text="Datum / Fach" />
     <Button
         android:id="@+id/type"
         android:layout_width="fill_parent"

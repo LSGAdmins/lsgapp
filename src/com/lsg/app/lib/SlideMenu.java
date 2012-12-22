@@ -39,7 +39,7 @@ import com.lsg.app.SettingsAdvanced;
 import com.lsg.app.SetupAssistant;
 import com.lsg.app.VPlan;
 import com.lsg.app.tasks.TasksOverView;
-import com.lsg.app.timetable.TimeTable;
+import com.lsg.app.timetable.TimeTableFragment;
 
 public class SlideMenu implements OnTouchListener {
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
@@ -341,7 +341,7 @@ public class SlideMenu implements OnTouchListener {
 			//TimeTable
 			items[0].icon = R.drawable.ic_timetable;
 			items[0].label = "Stundenplan";
-			items[0].openFragment = TimeTable.class;
+			items[0].openFragment = TimeTableFragment.class;
 			items[0].containerActivity = MainActivity.class;
 			//VPlan
 			items[1].icon = R.drawable.ic_vplan_green;

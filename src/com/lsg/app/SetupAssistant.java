@@ -37,7 +37,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.lsg.app.timetable.TimeTable;
+import com.lsg.app.timetable.TimeTableFragment;
 import com.lsg.app.timetable.TimeTableUpdater;
 
 public class SetupAssistant extends Activity {
@@ -774,8 +774,8 @@ public class SetupAssistant extends Activity {
 			myDB.close();
 			edit.putBoolean(Functions.IS_LOGGED_IN, true);
 			edit.commit();
-			startActivity(new Intent(this, TimeTable.class));
-			TimeTable.blacklistTimeTable(this);
+			startActivity(new Intent(this, MainActivity.class));
+			TimeTableUpdater.blacklistTimeTable(getApplicationContext());
 			break;
 		}
 		// step += 1;
@@ -792,7 +792,7 @@ public class SetupAssistant extends Activity {
 		Log.d("text", (String) ((Button) v).getText());
 		if (((String) ((Button) v).getText())
 				.equals(getString(R.string.timetable))) {
-			Intent timetable = new Intent(this, TimeTable.class);
+			Intent timetable = new Intent(this, TimeTableFragment.class);
 			startActivity(timetable);
 		}
 		if (((String) ((Button) v).getText())

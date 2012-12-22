@@ -33,24 +33,23 @@ public class TimeTableUpdater {
 			add = "&"
 					+ URLEncoder.encode("date", "UTF-8")
 					+ "="
-					+ URLEncoder.encode(
-							prefs.getString("timetable_date", ""), "UTF-8")
+					+ URLEncoder.encode(prefs.getString("timetable_date", ""),
+							"UTF-8")
 					+ "&"
 					+ URLEncoder.encode("time", "UTF-8")
 					+ "="
-					+ URLEncoder.encode(
-							prefs.getString("timetable_time", ""), "UTF-8")
+					+ URLEncoder.encode(prefs.getString("timetable_time", ""),
+							"UTF-8")
 					+ "&"
 					+ URLEncoder.encode("class", "UTF-8")
 					+ "="
 					+ URLEncoder.encode(
-							prefs.getString(Functions.FULL_CLASS, ""),
-							"UTF-8");
+							prefs.getString(Functions.FULL_CLASS, ""), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.d("encoding", e.getMessage());
 		}
-		String get = Functions.getData(Functions.TIMETABLE_URL, context,
-				true, add);
+		String get = Functions.getData(Functions.TIMETABLE_URL, context, true,
+				add);
 		if (!get.equals("networkerror") && !get.equals("loginerror")
 				&& !get.equals("noact")) {
 			try {
@@ -76,9 +75,10 @@ public class TimeTableUpdater {
 					headerval.put(Functions.DB_TEACHER, one);
 					headerval.put(Functions.DB_SECOND_TEACHER, two);
 					headerval.put(Functions.DB_KLASSE, klasse);
-					myDB.insert(Functions.DB_TIME_TABLE_HEADERS_PUPILS, null, headerval);
+					myDB.insert(Functions.DB_TIME_TABLE_HEADERS_PUPILS, null,
+							headerval);
 					edit.commit();
-					for(int ii = 1; ii < one_class.length(); ii++) {
+					for (int ii = 1; ii < one_class.length(); ii++) {
 						JSONObject jObject = one_class.getJSONObject(ii);
 						ContentValues values = new ContentValues();
 						values.put(Functions.DB_LEHRER,
@@ -87,13 +87,11 @@ public class TimeTableUpdater {
 								jObject.getString("subject"));
 						values.put(Functions.DB_RAW_FACH,
 								jObject.getString("rawsubject"));
-						values.put(Functions.DB_ROOM,
-								jObject.getString("room"));
+						values.put(Functions.DB_ROOM, jObject.getString("room"));
 						values.put(Functions.DB_LENGTH,
 								jObject.getInt("length"));
 						values.put(Functions.DB_DAY, jObject.getInt("day"));
-						values.put(Functions.DB_HOUR,
-								jObject.getInt("hour"));
+						values.put(Functions.DB_HOUR, jObject.getInt("hour"));
 						values.put(Functions.DB_CLASS,
 								jObject.getString("class"));
 						values.put(Functions.DB_RAW_LEHRER,
@@ -103,17 +101,16 @@ public class TimeTableUpdater {
 										new String[] { Functions.DB_ROWID },
 										Functions.DB_TEACHER + "=? AND "
 												+ Functions.DB_RAW_FACH
-												+ "=? AND "
-												+ Functions.DB_HOUR
-												+ "=? AND "
-												+ Functions.DB_DAY + "=?",
+												+ "=? AND " + Functions.DB_HOUR
+												+ "=? AND " + Functions.DB_DAY
+												+ "=?",
 										new String[] {
 												values.getAsString(Functions.DB_RAW_LEHRER),
 												values.getAsString(Functions.DB_RAW_FACH),
 												values.getAsString(Functions.DB_HOUR),
 												values.getAsString(Functions.DB_DAY) },
 										null, null, null);
-//						c.moveToFirst();
+						// c.moveToFirst();
 						if (c.getCount() > 0) {
 							values.put(Functions.DB_DISABLED, 1);
 						} else
@@ -136,6 +133,7 @@ public class TimeTableUpdater {
 					context.getString(R.string.loginerror) };
 		return new String[] { "success", "" };
 	}
+
 	public String[] updateTeachers() {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -145,17 +143,19 @@ public class TimeTableUpdater {
 					+ URLEncoder.encode("date", "UTF-8")
 					+ "="
 					+ URLEncoder.encode(
-							prefs.getString("timetable_teachers_date", ""), "UTF-8")
+							prefs.getString("timetable_teachers_date", ""),
+							"UTF-8")
 					+ "&"
 					+ URLEncoder.encode("time", "UTF-8")
 					+ "="
 					+ URLEncoder.encode(
-							prefs.getString("timetable_teachers_time", ""), "UTF-8");
+							prefs.getString("timetable_teachers_time", ""),
+							"UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.d("encoding", e.getMessage());
 		}
-		String get = Functions.getData(Functions.TIMETABLE_TEACHERS_URL, context,
-				true, add);
+		String get = Functions.getData(Functions.TIMETABLE_TEACHERS_URL,
+				context, true, add);
 		if (!get.equals("networkerror") && !get.equals("loginerror")
 				&& !get.equals("noact")) {
 			try {
@@ -165,7 +165,8 @@ public class TimeTableUpdater {
 				// clear timetable
 				myDB.delete(Functions.DB_TIME_TABLE_TEACHERS, null, null);
 				// clear headers
-				myDB.delete(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, null, null);
+				myDB.delete(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, null,
+						null);
 				for (int i = 0; i < classes.length(); i++) {
 					JSONArray one_teacher = classes.getJSONArray(i);
 					JSONObject teacher_info = one_teacher.getJSONObject(0);
@@ -179,26 +180,27 @@ public class TimeTableUpdater {
 					ContentValues headerval = new ContentValues();
 					headerval.put(Functions.DB_TEACHER, name);
 					headerval.put(Functions.DB_SHORT, short_);
-					myDB.insert(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, null, headerval);
+					myDB.insert(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, null,
+							headerval);
 					edit.commit();
-					for(int ii = 1; ii < one_teacher.length(); ii++) {
+					for (int ii = 1; ii < one_teacher.length(); ii++) {
 						JSONObject jObject = one_teacher.getJSONObject(ii);
 						ContentValues values = new ContentValues();
 						values.put(Functions.DB_SHORT, short_);
 						values.put(Functions.DB_BREAK_SURVEILLANCE,
 								jObject.getString("pausenaufsicht"));
-						values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
-						values.put(Functions.DB_FACH,
-								jObject.getString("fach"));
-						values.put(Functions.DB_ROOM,
-								jObject.getString("room"));
+						values.put(Functions.DB_RAW_FACH,
+								jObject.getString("rawfach"));
+						values.put(Functions.DB_FACH, jObject.getString("fach"));
+						values.put(Functions.DB_ROOM, jObject.getString("room"));
 						values.put(Functions.DB_CLASS,
 								jObject.getString("class"));
-						values.put(Functions.DB_LENGTH, jObject.getInt("length"));
+						values.put(Functions.DB_LENGTH,
+								jObject.getInt("length"));
 						values.put(Functions.DB_DAY, jObject.getInt("day"));
-						values.put(Functions.DB_HOUR,
-								jObject.getInt("hour"));
-						myDB.insert(Functions.DB_TIME_TABLE_TEACHERS, null, values);
+						values.put(Functions.DB_HOUR, jObject.getInt("hour"));
+						myDB.insert(Functions.DB_TIME_TABLE_TEACHERS, null,
+								values);
 					}
 				}
 				myDB.close();
@@ -214,5 +216,65 @@ public class TimeTableUpdater {
 			return new String[] { "loginerror",
 					context.getString(R.string.loginerror) };
 		return new String[] { "success", "" };
+	}
+
+	public static void blacklistTimeTable(Context context) {
+		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
+				Context.MODE_PRIVATE, null);
+		Cursor allSubjects = myDB.query(Functions.DB_TIME_TABLE, new String[] {
+				Functions.DB_ROWID, Functions.DB_DAY, Functions.DB_HOUR,
+				Functions.DB_RAW_FACH, Functions.DB_RAW_LEHRER }, null, null,
+				null, null, null);
+		allSubjects.moveToFirst();
+		ContentValues vals = new ContentValues();
+		vals.put(Functions.DB_DISABLED, 2);
+		myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
+		if (allSubjects.getCount() > 0)
+			do {
+				Cursor exclude = myDB
+						.query(Functions.DB_EXCLUDE_TABLE,
+								new String[] { Functions.DB_ROWID },
+								Functions.DB_TEACHER + "=? AND "
+										+ Functions.DB_RAW_FACH + "=? AND "
+										+ Functions.DB_HOUR + "=? AND "
+										+ Functions.DB_DAY + "=?",
+								new String[] {
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_RAW_LEHRER)),
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_RAW_FACH)),
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_HOUR)),
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_DAY)) },
+								null, null, null);
+				Cursor exclude_oldstyle = myDB
+						.query(Functions.DB_EXCLUDE_TABLE,
+								new String[] { Functions.DB_ROWID },
+								Functions.DB_RAW_FACH + "=? AND "
+										+ Functions.DB_TYPE + "=?",
+								new String[] {
+										allSubjects.getString(allSubjects
+												.getColumnIndex(Functions.DB_RAW_FACH)),
+										"oldstyle" }, null, null, null);
+				if (exclude.getCount() > 0 || exclude_oldstyle.getCount() > 0) {
+					myDB.execSQL(
+							"UPDATE " + Functions.DB_TIME_TABLE + " SET "
+									+ Functions.DB_DISABLED + "=? WHERE "
+									+ Functions.DB_ROWID + "=?",
+							new String[] {
+									"1",
+									allSubjects.getString(allSubjects
+											.getColumnIndex(Functions.DB_ROWID)) });
+				}
+				exclude.close();
+				exclude_oldstyle.close();
+			} while (allSubjects.moveToNext());
+		allSubjects.close();
+		try {
+			myDB.close();
+		} catch (Exception e) {
+
+		}
 	}
 }

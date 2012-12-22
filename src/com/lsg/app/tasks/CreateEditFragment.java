@@ -3,17 +3,22 @@ package com.lsg.app.tasks;
 import java.util.Calendar;
 
 import android.app.DatePickerDialog;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.lsg.app.Functions;
 import com.lsg.app.R;
+import com.lsg.app.lib.FragmentActivityCallbacks;
 
 public class CreateEditFragment extends Fragment implements DatePickerDialog.OnDateSetListener{
 	@Override
@@ -29,7 +34,6 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 		}
 		return inflater.inflate(layout, null);
 	}
-	int year, month, day;
 	private SQLiteDatabase myDB;
 	private Calendar cal;
 	@Override
@@ -49,10 +53,32 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 				(new DatePickerDialog(getActivity(), CreateEditFragment.this, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))).show();
 			}
 		});
+		myDB = ((FragmentActivityCallbacks) getActivity()).getDB();
 	}
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date chosen by the user
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        boolean weekend = false;
+        if(cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+        	weekend = true;
+        if(weekend)
+        	Toast.makeText(getActivity(), "Ausgewähltes Datum ist am Wochenende!", Toast.LENGTH_LONG).show();
+		if (((TaskSelected) getActivity()).getCurTask() == TaskSelected.TASK_EDIT_EXAMS) {
+			Cursor res = myDB.query(
+					Functions.DB_TIME_TABLE,
+					new String[] { Functions.DB_ROWID, Functions.DB_RAW_FACH,
+							Functions.DB_FACH },
+					Functions.DB_DAY + "=?",
+					new String[] { Integer.valueOf(
+							cal.get(Calendar.DAY_OF_WEEK) - 2).toString() },
+					null, null, null);
+			for(res.moveToFirst(); !res.isAfterLast(); res.moveToNext()) {
+				Log.d("subject", res.getString(res.getColumnIndex(Functions.DB_FACH)));
+			}
+        }
+        Log.d("dayofweek", Integer.valueOf(cal.get(Calendar.DAY_OF_WEEK)).toString());
     }
 	public void save(View v) {
 		
