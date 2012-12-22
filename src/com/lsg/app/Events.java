@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.TargetApi;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,6 +17,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
+import android.support.v4.app.ListFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -34,13 +34,13 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 
-public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCall, TextWatcher, WorkerService.WorkerClass {
+public class Events extends ListFragment implements SQLlist, RefreshCall, TextWatcher, WorkerService.WorkerClass {
 	public static class EventAdapter extends CursorAdapter implements SectionIndexer {
+		Cursor cursor;
 		class Standard {
 			public TextView month;
 			public TextView title;
@@ -48,8 +48,18 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			public TextView place;
 		}
 		private ArrayList<String[]> headers = new ArrayList<String[]>();
+		private ArrayList<Integer> headerPositions = new ArrayList<Integer>();
 		public EventAdapter(Context context, Cursor cursor) {
 			super(context, cursor, false);
+			this.cursor = cursor;
+			updateHeaders();
+			}
+		@Override
+		public void changeCursor(Cursor cursor) {
+			updateHeaders();
+			super.changeCursor(cursor);
+		}
+		public void updateHeaders() {
 			for (cursor.moveToFirst(); cursor.getPosition() < cursor.getCount(); cursor.moveToNext()) {
 				String date = cursor.getString(cursor
 						.getColumnIndex(Functions.DB_DATES));
@@ -65,9 +75,10 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 				String[] month = datebeginning.split("\\.");
 				if (!oldmonth[1].equals(month[1])) {
 					headers.add(new String[] {month[1], Integer.valueOf(cursor.getPosition()).toString()});
+					headerPositions.add(cursor.getPosition());
 				}
 			}
-			}
+		}
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			LayoutInflater inflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -134,10 +145,20 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		}
 		@Override
 		public int getPositionForSection(int section) {
+			try {
 			return Integer.valueOf(headers.get(section)[1]);
+			} catch(Exception e) {
+				return 0;
+			}
 		}
 		@Override
 		public int getSectionForPosition(int position) {
+			int prevPos = 0;
+			for(int i = 0; i < headerPositions.size(); i++) {
+				if(position > prevPos && position <= headerPositions.get(i))
+					return i;
+				prevPos = Integer.valueOf(headerPositions.get(i));
+			}
 			return 0;
 		}
 		@Override
@@ -194,30 +215,38 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	private String[] where_conds_events = new String[6];
 	private Cursor events;
 	private SQLiteDatabase myDB;
-	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		titlebar = new TitleCompat(this, true);
-		myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		updateWhereCond("%");
-		events = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
-				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
-				where_conds_events, null, null, null);
-		evadap = new EventAdapter(this, events);
-		setContentView(R.layout.list);
-		//set header search bar
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		if(Functions.getSDK() < 11) {
-			LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 			View search = inflater.inflate(R.layout.search, null);
 			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
 			searchEdit.addTextChangedListener(this);
 			getListView().addHeaderView(search);
 			}
+		return inflater.inflate(R.layout.list, null);
+	}
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Functions.checkMessage(getActivity(), new String[] {Functions.OVERLAY_HOMEBUTTON});
+	}
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		myDB = getActivity().openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+		updateWhereCond("%");
+		events = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
+				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
+				where_conds_events, null, null, null);
+		evadap = new EventAdapter(getActivity(), events);
+		//setContentView(R.layout.list);
+
+		//set header search bar
 		getListView().setAdapter(evadap);
 		getListView().setEmptyView(getListView().findViewById(R.id.list_view_empty));
-		((TextView) findViewById(R.id.list_view_empty)).setText(R.string.events_empty);
+		((TextView) getActivity().findViewById(R.id.list_view_empty)).setText(R.string.events_empty);
 		getListView().setFastScrollEnabled(true);
 		
 		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_EVENTS_TABLE);
@@ -226,19 +255,20 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			updateEvents();
 		num_rows.close();
 		
-		slidemenu = new SlideMenu(this, Events.class);
-		slidemenu.checkEnabled();
-		titlebar.init(this);
+		titlebar = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
 		titlebar.addRefresh(this);
-		titlebar.setTitle(getTitle());
-		
-		Functions.alwaysDisplayFastScroll(this);
-		Functions.checkMessage(this, new String[] {Functions.OVERLAY_HOMEBUTTON});
+		getActivity().setTitle(R.string.events);
+		titlebar.setTitle(getActivity().getTitle());
+		Functions.alwaysDisplayFastScroll(getListView());
+		setHasOptionsMenu(true);
+		if (savedInstanceState != null)
+			refreshing = savedInstanceState.getBoolean("refreshing");
+
+		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(Events.class);
 	}
 	private boolean refreshing = false;
 	private MenuItem refresh;
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 	    inflater.inflate(R.menu.events, menu);
 	    if(Functions.getSDK() >= 11) {
 			AdvancedWrapper ahelp = new AdvancedWrapper();
@@ -248,7 +278,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 			menu.removeItem(R.id.search);
 			menu.removeItem(R.id.refresh);
 		}
-	    return true;
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -257,9 +286,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	    case R.id.refresh:
 	    	onRefreshPress();
 	    	return true;
-        case android.R.id.home:
-        	onHomePress();
-            return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
@@ -273,15 +299,16 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		if (Functions.getSDK() >= 11) {
 			try {
 				v = refresh.getActionView();
-				refresh.setActionView(new ProgressBar(this));
+				refresh.setActionView(new ProgressBar(getActivity()));
+				refresh.getActionView().setSaveEnabled(false);
 			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(this, null, getString(R.string.loading_events));
+				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_events));
 				v = null;
 			}
 			actionView = v;
 		} else {
 			actionView = null;
-			loading = ProgressDialog.show(this, null,
+			loading = ProgressDialog.show(getActivity(), null,
 					"Lade...");
 		}
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
@@ -306,13 +333,13 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 		});
 		Handler handler = hand.getHandler();
 		
-		Intent intent = new Intent(this, WorkerService.class);
+		Intent intent = new Intent(getActivity(), WorkerService.class);
 	    // Create a new Messenger for the communication back
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
 	    intent.putExtra(WorkerService.WORKER_CLASS, Events.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
-	    startService(intent);
+	    getActivity().startService(intent);
 	}
 	@Override
 	public void updateWhereCond(String searchText) {
@@ -343,11 +370,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	}
 
 	@Override
-	public void onHomePress() {
-		slidemenu.show();
-	}
-
-	@Override
 	public void onRefreshPress() {
 		updateEvents();
 	}
@@ -372,10 +394,6 @@ public class Events extends ListActivity implements SQLlist, HomeCall, RefreshCa
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 	  super.onSaveInstanceState(savedInstanceState);
 	  savedInstanceState.putBoolean("refreshing", refreshing);
-	}
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		refreshing = savedInstanceState.getBoolean("refreshing");
 	}
 	@Override
 	public void update(int what, Context c) {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
+import com.lsg.app.timetable.TimeTable;
 
 public class GCMIntentService extends GCMBaseIntentService {
 	public GCMIntentService() {

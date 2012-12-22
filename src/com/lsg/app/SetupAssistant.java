@@ -37,7 +37,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.lsg.app.TimeTable.TimeTableUpdater;
+import com.lsg.app.timetable.TimeTable;
+import com.lsg.app.timetable.TimeTableUpdater;
 
 public class SetupAssistant extends Activity {
 	private SharedPreferences prefs;
@@ -154,7 +155,7 @@ public class SetupAssistant extends Activity {
 	class RetrieveTeacherVPlan extends AsyncTask <Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... params) {
-			TimeTable.TimeTableUpdater upd = new TimeTable.TimeTableUpdater(getApplicationContext());
+			TimeTableUpdater upd = new TimeTableUpdater(getApplicationContext());
 			upd.updateTeachers();
 			return null;
 		}
@@ -224,7 +225,7 @@ public class SetupAssistant extends Activity {
 
 				edit.putBoolean(Functions.IS_LOGGED_IN, true);
 				edit.commit();
-				startActivity(new Intent(SetupAssistant.this, TimeTable.class));
+				startActivity(new Intent(SetupAssistant.this, MainActivity.class));
 			}
 			setup(step, false);
 		}

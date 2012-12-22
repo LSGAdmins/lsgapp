@@ -3,7 +3,6 @@ package com.lsg.app.tasks;
 import java.util.Calendar;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,11 +29,9 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 		}
 		return inflater.inflate(layout, null);
 	}
-
+	int year, month, day;
 	private SQLiteDatabase myDB;
-	private int year = 2012;
-	private int month = 0;
-	private int day = 0;
+	private Calendar cal;
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -48,7 +45,8 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 			
 			@Override
 			public void onClick(View v) {
-				(new DatePickerDialog(getActivity(), CreateEditFragment.this, CreateEditFragment.this.year, CreateEditFragment.this.month, CreateEditFragment.this.day)).show();
+				cal = Calendar.getInstance();
+				(new DatePickerDialog(getActivity(), CreateEditFragment.this, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))).show();
 			}
 		});
 	}

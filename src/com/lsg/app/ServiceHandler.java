@@ -12,7 +12,7 @@ public class ServiceHandler {
 	private final ServiceHandlerCallback callback;
 	private Handler handler;
 
-	ServiceHandler(ServiceHandlerCallback callback) {
+	public ServiceHandler(ServiceHandlerCallback callback) {
 		this.callback = callback;
 		handler = new Handler() {
 			public void handleMessage(Message message) {

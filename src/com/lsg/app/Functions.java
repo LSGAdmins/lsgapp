@@ -195,11 +195,11 @@ public class Functions {
 		} catch (Exception e) {
 		}
 	}
-	public static void alwaysDisplayFastScroll(ListActivity act) {
+	public static void alwaysDisplayFastScroll(ListView lv) {
 		if (Functions.getSDK() >= 11) {
 			try {
 				AdvancedWrapper advWrapper = new AdvancedWrapper();
-				advWrapper.alwaysDisplayFastScroll(act);
+				advWrapper.alwaysDisplayFastScroll(lv);
 			} catch (Exception e) {
 			}
 		}

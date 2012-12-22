@@ -1,18 +1,16 @@
 package com.lsg.app.lib;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -33,14 +31,15 @@ import com.lsg.app.Events;
 import com.lsg.app.Functions;
 import com.lsg.app.HelpAbout;
 import com.lsg.app.InfoActivity;
+import com.lsg.app.MainActivity;
 import com.lsg.app.R;
 import com.lsg.app.SMVBlog;
 import com.lsg.app.Settings;
 import com.lsg.app.SettingsAdvanced;
 import com.lsg.app.SetupAssistant;
-import com.lsg.app.TimeTable;
 import com.lsg.app.VPlan;
-import com.lsg.app.tasks.Tasks;
+import com.lsg.app.tasks.TasksOverView;
+import com.lsg.app.timetable.TimeTable;
 
 public class SlideMenu implements OnTouchListener {
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
@@ -58,6 +57,8 @@ public class SlideMenu implements OnTouchListener {
 			public String label;
 			public String title;
 			public Class<?extends Activity> openActivity;
+			public Class<?extends Fragment> openFragment;
+			public Class<?extends Activity> containerActivity;
 			public Intent openIntent;
 		}
 		public SlideMenuAdapter(Activity act, SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
@@ -121,6 +122,7 @@ public class SlideMenu implements OnTouchListener {
 	private static int statusBarHeight = 0;
 	private Activity act;
 	private static Class<? extends Activity> curAct;
+	private static Class<? extends Fragment> fragment;
 	private SharedPreferences prefs;
 	SlideMenuAdapter.MenuDesc[] items;
 	public SlideMenu(Activity act, Class<? extends Activity> curAct) {
@@ -186,6 +188,9 @@ public class SlideMenu implements OnTouchListener {
 	}
 	public void checkEnabled() {
 	}
+	public void setFragment(Class<?extends Fragment> fragment) {
+		this.fragment = fragment;
+	}
 	public void show() {
 		if(statusBarHeight == 0) {
 			Rect rectgle = new Rect();
@@ -230,16 +235,37 @@ public class SlideMenu implements OnTouchListener {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// if not clicked item for current Activity
-				if (items[position].openActivity == null
-						|| !items[position].openActivity.equals(curAct)) {
+				if(fragment != null && fragment.equals(items[position].openFragment))
+					hide();
+				else if ((items[position].openActivity == null
+						|| !items[position].openActivity.equals(curAct))) {
 					// mark this menu to be hidden
 					if (items[position].useSlideMenu)
 						menuToHide = true;
-					//start new activity / intent
+					// start new activity / intent
 					if (items[position].openActivity != null) {
-						Intent intent = new Intent(act, items[position].openActivity);
+						Intent intent = new Intent(act,
+								items[position].openActivity);
 						intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 						act.startActivity(intent);
+
+					} else if (items[position].containerActivity != null) {
+						Log.d("container", items[position].containerActivity
+								.getCanonicalName());
+						Log.d("curAct", curAct.getCanonicalName());
+						if (!items[position].containerActivity.equals(curAct)) {
+							Intent intent = new Intent(act,
+									items[position].containerActivity);
+							intent.putExtra("fragment",
+									items[position].openFragment);
+							act.startActivity(intent);
+						} else {
+							// TODO change to a more general interface
+							Log.d("slide", "change fragment");
+							((MainActivity) act)
+									.changeFragment(items[position].openFragment);
+							hide();
+						}
 					} else
 						act.startActivity(items[position].openIntent);
 				} else {
@@ -315,23 +341,28 @@ public class SlideMenu implements OnTouchListener {
 			//TimeTable
 			items[0].icon = R.drawable.ic_timetable;
 			items[0].label = "Stundenplan";
-			items[0].openActivity = TimeTable.class;
+			items[0].openFragment = TimeTable.class;
+			items[0].containerActivity = MainActivity.class;
 			//VPlan
 			items[1].icon = R.drawable.ic_vplan_green;
 			items[1].label = "Vertretungsplan";
-			items[1].openActivity = VPlan.class;
+			items[1].openFragment = VPlan.class;
+			items[1].containerActivity = MainActivity.class;
 			//Tasks
 			items[2].icon = R.drawable.ic_tasks;
 			items[2].label = "Aufgaben";
-			items[2].openActivity = Tasks.class;
+			items[2].containerActivity = MainActivity.class;
+			items[2].openFragment = TasksOverView.class;
 			//Events
 			items[3].icon = R.drawable.ic_events;
 			items[3].label = "Termine";
-			items[3].openActivity = Events.class;
+			items[3].openFragment = Events.class;
+			items[3].containerActivity = MainActivity.class;
 			//SMVBlog
 			items[4].icon = R.drawable.ic_smv;
 			items[4].label = "SMVBlog";
-			items[4].openActivity = SMVBlog.class;
+			items[4].openFragment = SMVBlog.class;
+			items[4].containerActivity = MainActivity.class;
 			//Settings
 			items[5].icon = R.drawable.ic_settings;
 			items[5].label = "Einstellungen";
@@ -390,10 +421,12 @@ public class SlideMenu implements OnTouchListener {
 			items[0].openActivity = SetupAssistant.class;
 			items[1].icon = R.drawable.ic_events;
 			items[1].label = "Termine";
-			items[1].openActivity = Events.class;
+			items[1].openFragment = Events.class;
+			items[1].containerActivity = MainActivity.class;
 			items[2].icon = R.drawable.ic_smv;
 			items[2].label = "SMVBlog";
-			items[2].openActivity = SMVBlog.class;
+			items[2].openFragment = SMVBlog.class;
+			items[2].containerActivity = MainActivity.class;
 			items[3].icon = R.drawable.ic_help;
 			items[3].label = "Hilfe";
 			items[3].openActivity = null;

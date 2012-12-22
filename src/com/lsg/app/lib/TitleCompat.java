@@ -106,4 +106,16 @@ public class TitleCompat {
 			adv.dropDownNav(activity, R.array.timetable_actions, callback, 0);
 		}
 	}
+	public void removeSpinnerNavigation() {
+		// TODO test on pre-honeycomb
+		if(Functions.getSDK() < 11) {
+			(activity.findViewById(R.id.title)).setVisibility(View.VISIBLE);
+			Spinner spinner = (Spinner) activity
+					.findViewById(R.id.titlebar_spinner);
+			spinner.setVisibility(View.GONE);
+		} else {
+			AdvancedWrapper adv = new AdvancedWrapper();
+			adv.standardNavigation(activity);
+		}
+	}
 }

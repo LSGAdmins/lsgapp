@@ -1,10 +1,16 @@
 package com.lsg.app;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -13,63 +19,43 @@ import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 
-public class SMVBlog extends Activity implements HomeCall, RefreshCall {
+public class SMVBlog extends Fragment implements HomeCall, RefreshCall {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		((MainActivity) getActivity()).getSlideMenu().setFragment(SMVBlog.class);
+		FrameLayout parent = (FrameLayout) Functions.webv.getParent();
+		if (parent != null)
+			parent.removeAllViews();
+		return Functions.webv;
+	}
 	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		getActivity().setProgressBarVisibility(true);
 		if(Functions.webv == null)
-		  Functions.init(this);
-		titlebar = new TitleCompat(this, true);
+		  Functions.init(getActivity());
 		super.onCreate(savedInstanceState);
-		//getWindow().requestFeature(Window.FEATURE_PROGRESS);
-		Functions.setTheme(false, true, this);
-		
-		/*WebView webview = new WebView(this);
-		setContentView(webview);
-		webview.getSettings().setJavaScriptEnabled(true);
-		final Activity activity = this;
-		webview.setWebChromeClient(new WebChromeClient() {
+		Functions.webv.getSettings().setJavaScriptEnabled(true);
+		Functions.webv.setWebChromeClient(new WebChromeClient() {
 			public void onProgressChanged(WebView view, int progress) {
-				activity.setProgress(progress*1000);
+				if (getActivity() != null)
+					getActivity().setProgress(progress * 1000);
 				}
 			});
-		webview.setWebViewClient(new WebViewClient() {
-			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-				Toast.makeText(activity, getString(R.string.oops) + " " + description, Toast.LENGTH_SHORT).show();
-				}
-			});
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String postData = "log=" + prefs.getString("username", "")
-				+ "&pwd=" + prefs.getString("password", "") + "&redirect_to=http://www.lsg.musin.de/smv/aktuelles/";
-		if(Functions.getSDK() >= 5) {
-			AdvancedWrapper advWrapper = new AdvancedWrapper();
-			advWrapper.postUrl(webview, "http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
-			advWrapper = null;
-		}
-		else
-			webview.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");*/
-		try {
-			setContentView(Functions.webv);
-		} catch(RuntimeException e) {
-			FrameLayout parent = (FrameLayout) Functions.webv.getParent();
-			parent.removeAllViews();
-			setContentView(Functions.webv);
-		}
-		/*WebView webv = new WebView(this);
-		webv.restoreState(Functions.webvSave);
-		setContentView(webv);*/
-		Log.d("SMVBlog", "load");
-		slidemenu = new SlideMenu(this, SMVBlog.class);
-		slidemenu.checkEnabled();
-		titlebar.init(this);
-		titlebar.addRefresh(this);
-		titlebar.setTitle(getTitle());
 	}
 	@Override
-	public void onConfigurationChanged(Configuration newConfig){        
-	    super.onConfigurationChanged(newConfig);
-	    Log.d("config", "change: " + newConfig.toString());
+	public void onActivityCreated(Bundle savedInstanceState) {
+		slidemenu = ((MainActivity) getActivity()).getSlideMenu();
+		slidemenu.checkEnabled();
+		titlebar = ((MainActivity) getActivity()).getTitlebar();
+		titlebar.init(this);
+		titlebar.addRefresh(this);
+		getActivity().setTitle(R.string.smvblog);
+		titlebar.setTitle(getActivity().getTitle());
+		super.onActivityCreated(savedInstanceState);
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -22,6 +21,7 @@ import android.os.Handler;
 import android.os.Messenger;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -46,12 +46,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 
-public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerService.WorkerClass {
+public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerService.WorkerClass {
 	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
 		private String[] where_conds = new String[4];
 		private String[] where_conds_events = new String[6];
@@ -84,7 +84,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			titles[0] = getString(R.string.vplan_mine);
 			titles[1] = getString(R.string.vplan_pupils);
 			titles[2] = getString(R.string.vplan_teachers);
-			prefs = PreferenceManager.getDefaultSharedPreferences(act);
+			prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 			exclude_subjects[1] = (prefs.getString(Functions.GENDER, "").equals("m")) ? "Sw" : "Sm";
 			if(prefs.getString(Functions.RELIGION, "").equals(Functions.KATHOLISCH)) {
 				exclude_subjects[2] = Functions.EVANGELISCH;
@@ -96,7 +96,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				exclude_subjects[2] = Functions.KATHOLISCH;
 				exclude_subjects[3] = Functions.EVANGELISCH;
 			}
-			context = (Context) act;
+			context = (Context) getActivity();
 			this.act = act;
 			
 			myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
@@ -612,38 +612,46 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 				return new String[] {"success", " "};
 				}
 		}
-	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.viewpager, null);
+	}
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	    adapter = new VPlanPagerAdapter(this);
+	    
+
+	    prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		setHasOptionsMenu(true);
+	}
 	private VPlanPagerAdapter adapter;
 	private ViewPager pager;
 	private SharedPreferences prefs;
 	private ProgressDialog loading;
-	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
-	public void onCreate(Bundle savedInstanceState) {
-		titlebar = new TitleCompat(this, true);
-		super.onCreate(savedInstanceState);
-		Functions.setTheme(false, true, this);
-        getWindow().setBackgroundDrawableResource(R.layout.background);
-		setContentView(R.layout.viewpager);
-	    adapter = new VPlanPagerAdapter(this);
-	    pager = (ViewPager)findViewById(R.id.viewpager);
-	    //pager.setOnPageChangeListener(this);
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+	    pager = (ViewPager) getActivity().findViewById(R.id.viewpager);
 	    pager.setAdapter(adapter);
-		pager.setPageMargin(Functions.dpToPx(40, this));
+		pager.setPageMargin(Functions.dpToPx(40, getActivity()));
 		pager.setPageMarginDrawable(R.layout.viewpager_margin);
 		
-	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    slidemenu = new SlideMenu(this, VPlan.class);
-	    slidemenu.checkEnabled();
+
+		titlebar = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
 	    titlebar.init(this);
 	    titlebar.addRefresh(this);
-	    titlebar.setTitle(getTitle());
+	    titlebar.setTitle(getActivity().getTitle());
+	    getActivity().setTitle(R.string.vplan);
+	    titlebar.setTitle(getActivity().getTitle());
+		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(VPlan
+				.class);
 	    }
 	
 	private MenuItem refresh;
 	private boolean refreshing;
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 	    inflater.inflate(R.menu.vplan, menu);
 	    if(Functions.getSDK() >= 11) {
 	    	AdvancedWrapper ahelp = new AdvancedWrapper();
@@ -653,7 +661,6 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 			menu.removeItem(R.id.search);
 			menu.removeItem(R.id.refresh);
 		}
-	    return true;
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -663,12 +670,12 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	    	onRefreshPress();
 	    	return true;
 	    case R.id.subjects:
-	    	Toast.makeText(this, getString(R.string.subjectlist_info), Toast.LENGTH_LONG).show();
-            Intent subjects = new Intent(this, SubjectList.class);
+	    	Toast.makeText(getActivity(), getString(R.string.subjectlist_info), Toast.LENGTH_LONG).show();
+            Intent subjects = new Intent(getActivity(), SubjectList.class);
             startActivity(subjects);
 	    	return true;
 	    case R.id.info:
-	    	Intent intent = new Intent(this, InfoActivity.class);
+	    	Intent intent = new Intent(getActivity(), InfoActivity.class);
 	    	intent.putExtra("type", "vplan");
 	    	intent.putExtra("vplan_num", Integer.valueOf(adapter.cursor_all.getCount()).toString());
 	    	intent.putExtra("mine_num", Integer.valueOf(adapter.cursor_mine.getCount()).toString());
@@ -690,20 +697,20 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	  super.onSaveInstanceState(savedInstanceState);
 	  savedInstanceState.putBoolean("refreshing", refreshing);
 	}
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		refreshing = savedInstanceState.getBoolean("refreshing");
-	}
+//	@Override
+//	public void onRestoreInstanceState(Bundle savedInstanceState) {
+//		refreshing = savedInstanceState.getBoolean("refreshing");
+//	}
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		String table = (pager.getCurrentItem() != 2) ? Functions.DB_VPLAN_TABLE : Functions.DB_VPLAN_TEACHER;
-		Functions.createContextMenu(menu, v, menuInfo, this, table);
+		Functions.createContextMenu(menu, v, menuInfo, getActivity(), table);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
 		String table = (pager.getCurrentItem() != 2) ? Functions.DB_VPLAN_TABLE : Functions.DB_VPLAN_TEACHER;
-		return Functions.contextMenuSelect(item, this, adapter, table);
+		return Functions.contextMenuSelect(item, getActivity(), adapter, table);
 	}
 	public static void blacklistVPlan(Context context) {
 		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
@@ -749,15 +756,16 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		if (Functions.getSDK() >= 11) {
 			try {
 				v = refresh.getActionView();
-				refresh.setActionView(new ProgressBar(this));
+				refresh.setActionView(new ProgressBar(getActivity()));
+				refresh.getActionView().setSaveEnabled(false);
 			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(this, null, getString(R.string.loading_vplan));
+				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_vplan));
 				v = null;
 			}
 			actionView = v;
 		} else {
 			actionView = null;
-			loading = ProgressDialog.show(this, null,
+			loading = ProgressDialog.show(getActivity(), null,
 					getString(R.string.loading_vplan));
 		}
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
@@ -782,13 +790,13 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 		});
 		Handler handler = hand.getHandler();
 		
-		Intent intent = new Intent(this, WorkerService.class);
+		Intent intent = new Intent(getActivity(), WorkerService.class);
 	    // Create a new Messenger for the communication back
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
 	    intent.putExtra(WorkerService.WORKER_CLASS, VPlan.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
-	    startService(intent);
+	    getActivity().startService(intent);
 	}
 	@Override
 	public void onDestroy() {
@@ -797,7 +805,7 @@ public class VPlan extends Activity implements HomeCall, RefreshCall, WorkerServ
 	}
 	@Override
 	public void onHomePress() {
-		slidemenu.show();
+		//slidemenu.show();
 	}
 	@Override
 	public void onRefreshPress() {

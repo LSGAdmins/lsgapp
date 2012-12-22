@@ -2,9 +2,9 @@ package com.lsg.app;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.view.Menu;
 import android.webkit.WebView;
+import android.widget.ListView;
 
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.interfaces.SelectedCallback;
@@ -29,8 +29,11 @@ public class AdvancedWrapper {
 	public void homeasup(Activity act) {
 		Advanced.homeasup(act);
 	}
-	public void alwaysDisplayFastScroll(ListActivity act) {
-		Advanced.alwaysDisplayFastScroll(act);
+	public void alwaysDisplayFastScroll(ListView lv) {
+		Advanced.alwaysDisplayFastScroll(lv);
+	}
+	public void standardNavigation(Activity act) {
+		Advanced.standardNavigation(act);
 	}
 	@TargetApi(5)
 	public void postUrl(WebView webv, String url, byte[] data) {

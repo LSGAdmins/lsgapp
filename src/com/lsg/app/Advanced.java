@@ -3,11 +3,11 @@ package com.lsg.app;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SpinnerAdapter;
 
@@ -29,8 +29,8 @@ public class Advanced implements SearchView.OnQueryTextListener {
 		ActionBar bar = act.getActionBar();
 		return bar.getSelectedNavigationIndex();
 	}
-	public static void alwaysDisplayFastScroll(ListActivity act) {
-		act.getListView().setFastScrollAlwaysVisible(true);
+	public static void alwaysDisplayFastScroll(ListView lv) {
+		lv.setFastScrollAlwaysVisible(true);
 	}
 	public static void dropDownNav(Activity context, int actionArrayRes, final SelectedCallback navlistener, int selPosition) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -46,6 +46,9 @@ public class Advanced implements SearchView.OnQueryTextListener {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);
 		actionBar.setSelectedNavigationItem(selPosition);
+	}
+	public static void standardNavigation(Activity act) {
+		act.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
 	public void searchBarInit(Menu menu, final SQLlist list) {
 		this.list = list;
