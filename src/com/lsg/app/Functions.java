@@ -146,6 +146,8 @@ public class Functions {
 	public static final String DB_YEAR = "year";
 	public static final String DB_MONTH = "month";
 	public static final String DB_DAYOFMONTH = "dayofmonth";
+	public static final String DB_LEARNING_MATTER = "learning_matter";
+	public static final String DB_NOTES = "notes";
 	public static final String DB_CONTENT = "content";
 	// classes
 	public static final String DB_CLASS_TABLE = "classes";
@@ -534,7 +536,8 @@ public class Functions {
     				+ Functions.DB_RAW_FACH + " STRING,"
     				+ Functions.DB_FACH + " STRING,"
     				+ Functions.DB_TITLE + " STRING,"
-    				+ Functions.DB_CONTENT + " CONTENT"
+    				+ Functions.DB_LEARNING_MATTER + " STRING,"
+    	    		+ Functions.DB_NOTES + " STRING"
     				+ ");");
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_HOMEWORK_TABLE
     				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"

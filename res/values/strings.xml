@@ -126,6 +126,16 @@
     <string name="homework">Hausaufgaben</string>
     <string name="grades">Noten</string>
     <string name="date">Datum:</string>
+    <string name="pick_date">Datum wählen</string>
+    <string name="pick_subjects">Fach wählen</string>
+    <string name="no_subject">Kein Fach</string>
+    <string name="discard">Abbrechen</string>
+    <string name="done">Fertig</string>
+    <string name="other_subject">Anderes Fach</string>
+    <string name="exam_type">Art der Arbeit</string>
+    <string name="big_test">Schulaufgabe / Klausur</string>
+    <string name="small_test">Kurzarbeit</string>
+    <string name="other_test">Etwas Anderes</string>
     <string name="homebutton">Home-Button</string>
     <string name="searchbutton">Button zum Suchen</string>
     <string name="icon">Icon</string>

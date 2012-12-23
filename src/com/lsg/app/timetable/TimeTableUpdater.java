@@ -23,6 +23,7 @@ public class TimeTableUpdater {
 
 	public TimeTableUpdater(Context c) {
 		context = c;
+	    TimeTableUpdater.blacklistTimeTable(context);
 	}
 
 	public String[] updatePupils() {

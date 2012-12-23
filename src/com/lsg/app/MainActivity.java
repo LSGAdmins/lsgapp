@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
@@ -30,6 +29,10 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if(savedInstanceState != null) {
+			task = savedInstanceState.getInt("task");
+			id = savedInstanceState.getInt("id");
+		}
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		Functions.setupDB(this);
 		myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
@@ -66,7 +69,7 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 		}
 
 		Bundle extras = getIntent().getExtras();
-		if (extras != null)
+		if (extras != null && extras.containsKey("fragment"))
 			frag = (Class<? extends Fragment>) extras
 					.getSerializable("fragment");
 		Fragment fragment;
@@ -162,6 +165,13 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 		Bundle args = new Bundle();
 		args.putLong(TaskSelected.ID, rowId);
 		changeFragment(frag, args);
+	}
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putInt("task", task);
+		outState.putInt("id", id);
+		super.onSaveInstanceState(outState);
+		// NOTE restore is done in onCreate
 	}
 	@Override
 	public SQLiteDatabase getDB() {

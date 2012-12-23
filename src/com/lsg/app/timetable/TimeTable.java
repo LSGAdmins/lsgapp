@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
@@ -64,6 +65,10 @@ public class TimeTable {
 		this.displayingTeacher = teacher;
 		this.displayingClass = null;
 	}
+	public void updateAll() {
+		updateExclude();
+		updateCursor();
+	}
 	public void updateCursor() {
 		if (this.displayingClass == null) {
 			for (int i = 0; i < timetableCursors.length; i++) {
@@ -102,11 +107,16 @@ public class TimeTable {
 								Functions.DB_HOUR, Functions.DB_DAY,
 								Functions.DB_RAW_FACH }, wherecond,
 						excludeSubjects, null, null, null);
+				Log.d("where", excludeSubjects[i]);
 			}
 		}
 	}
+
 	public Cursor getCursor(int position) {
-		return timetableCursors[position];
+		if (position >= 0 && position < timetableCursors.length)
+			return timetableCursors[position];
+		else
+			return null;
 	}
 	public void closeCursors() {
 		for(int i = 0; i < timetableCursors.length; i++)
