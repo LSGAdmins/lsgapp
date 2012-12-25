@@ -8,6 +8,7 @@ import android.widget.Button;
 
 public class DateButton extends Button {
 	private Calendar cal = Calendar.getInstance();
+	private boolean modified = false;
 
 	public DateButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -28,9 +29,19 @@ public class DateButton extends Button {
 		updateText();
 	}
 
+	public void setCalendar(Calendar cal) {
+		this.cal = cal;
+		updateText();
+	}
+
 	private void updateText() {
 		setText(cal.get(Calendar.DAY_OF_MONTH) + "." + cal.get(Calendar.MONTH)
 				+ "." + cal.get(Calendar.YEAR));
+		modified = true;
+	}
+
+	public boolean getModified() {
+		return modified;
 	}
 
 	public Calendar getCalendar() {

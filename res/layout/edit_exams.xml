@@ -5,15 +5,26 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/title"
+        <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/newExam"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:background="@color/backgroundgrey" >
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/newExam"
+                android:padding="20dp"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </FrameLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical" >
 
         <EditText
             android:id="@+id/editTitle"
@@ -38,37 +49,65 @@
                 android:id="@+id/date"
                 style="?android:attr/spinnerStyle"
                 android:layout_width="fill_parent"
-                android:text="Datum"
+                android:layout_height="50sp"
                 android:layout_weight="1"
-                android:layout_height="50sp" />
+                android:text="Datum" />
+
             <Spinner
                 android:id="@+id/subject"
                 style="?android:attr/spinnerStyle"
                 android:layout_width="fill_parent"
-                android:text="Datum"
+                android:layout_height="50sp"
                 android:layout_weight="1"
-                android:layout_height="50sp" />
+                android:text="Datum" />
         </LinearLayout>
 
-        <Button
+        <Spinner
             android:id="@+id/type"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Art" />
 
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Stoff" />
+
         <EditText
-            android:id="@+id/editContent"
+            android:id="@+id/editLearningMatter"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Weitere Angaben" />
+            android:hint="Zu lernender Stoff..."
+            android:minLines="2" />
 
-        <Button
+        <CheckBox
+            android:id="@+id/checkbox_lock_exam"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:onClick="save"
-            android:text="Speichern" />
+            android:text="Felder für Schüler sperren" />
+
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Notizen" />
+
+        <EditText
+            android:id="@+id/editNotes"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="Weitere Notizen..."
+            android:minLines="2" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/actionButtons"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </ScrollView>

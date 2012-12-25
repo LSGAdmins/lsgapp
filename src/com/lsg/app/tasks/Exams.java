@@ -21,8 +21,12 @@ public class Exams extends ListFragment {
 	
 	public static class Descriptor {
 		public String title;
-		public Calendar date = Calendar.getInstance();
+		public Calendar date;
+		public String rawSubject;
 		public String type;
+		public String learningMatters;
+		public boolean isLocked;
+		public boolean notes;
 	}
 	
 	public static final String BIG_TEST = "big_test";

@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -62,5 +64,16 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	}
 	public boolean onQueryTextSubmit(String text) {
 		return true;
+	}
+	public static void setActionBarCustomView(Activity act, View customActionBarView) {
+        final ActionBar actionBar = act.getActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(customActionBarView, new ActionBar.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+	}
+	public static void removeActionBarCustomView(Activity act) {
+		act.getActionBar().setDisplayOptions(0, ActionBar.DISPLAY_SHOW_CUSTOM);
+		act.getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
 	}
 }

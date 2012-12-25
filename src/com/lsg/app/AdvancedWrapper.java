@@ -3,6 +3,7 @@ package com.lsg.app;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.view.Menu;
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.ListView;
 
@@ -34,6 +35,12 @@ public class AdvancedWrapper {
 	}
 	public void standardNavigation(Activity act) {
 		Advanced.standardNavigation(act);
+	}
+	public void setActionBarCustomView(Activity act, View customActionBarView) {
+		Advanced.setActionBarCustomView(act, customActionBarView);
+	}
+	public void removeActionBarCustomView(Activity act) {
+		Advanced.removeActionBarCustomView(act);
 	}
 	@TargetApi(5)
 	public void postUrl(WebView webv, String url, byte[] data) {

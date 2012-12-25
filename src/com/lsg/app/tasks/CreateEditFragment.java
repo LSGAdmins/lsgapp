@@ -3,7 +3,6 @@ package com.lsg.app.tasks;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
@@ -21,10 +20,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsg.app.AdvancedWrapper;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
 import com.lsg.app.lib.FragmentActivityCallbacks;
@@ -43,19 +45,12 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 			default:
 				return null;
 		}
-		Log.d("layout", Integer.valueOf(layout).toString());
 		return inflater.inflate(layout, null);
 	}
 	private SQLiteDatabase myDB;
-	private Exams.Descriptor eDesc;
-	private String[] subjects;
-	//the ActionBar default display options, save for reset
-	private int displayOptions;
-	// TODO remove this
-	@TargetApi(11)
+	private ArrayList<String> subjects = new ArrayList<String>();
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		eDesc = new Exams.Descriptor();
 		super.onActivityCreated(savedInstanceState);
 		switch(((TaskSelected) getActivity()).getCurTask()) {
 		case TaskSelected.TASK_EDIT_EXAMS:
@@ -80,46 +75,36 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 			}
 		});
 		((Spinner) getActivity().findViewById(R.id.subject)).setEnabled(false);
-		subjects = new String[1];
-		subjects[0] = getActivity().getString(R.string.no_subject);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, subjects);
-		((Spinner) getActivity().findViewById(R.id.subject)).setAdapter(adapter);
-		((Button) getActivity().findViewById(R.id.type)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				final CharSequence types[]  = new CharSequence[3];
-				types[0] = getActivity().getString(R.string.big_test);
-				types[1] = getActivity().getString(R.string.small_test);
-				types[2] = getActivity().getString(R.string.other_test);
-				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-				builder.setTitle(R.string.exam_type);
-				builder.setItems(types, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-						case 0:
-							eDesc.type = Exams.BIG_TEST;
-							break;
-						case 1:
-							eDesc.type = Exams.SMALL_TEST;
-							break;
-						case 2:
-							eDesc.type = Exams.OTHER_TEST;
-							break;
-						default:
-							break;
-						}
-						((Button) getActivity().findViewById(R.id.type)).setText(types[which]);
-					}
-				});
-				AlertDialog dialog = builder.create();
-				dialog.show();
-			}
-		});
+		subjects.clear();
+		subjects.add(getActivity().getString(R.string.no_subject));
+		ArrayAdapter<String> dateAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, subjects);
+		((Spinner) getActivity().findViewById(R.id.subject)).setAdapter(dateAdapter);
+		((Spinner) getActivity().findViewById(R.id.subject)).setEnabled(false);
+		
+		String[] types = new String[3];
+		types[0] = getActivity().getString(R.string.big_test);
+		types[1] = getActivity().getString(R.string.small_test);
+		types[2] = getActivity().getString(R.string.other_test);
+		ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, types);
+		((Spinner) getActivity().findViewById(R.id.type)).setAdapter(typeAdapter);
 		myDB = ((FragmentActivityCallbacks) getActivity()).getDB();
-
-        // TODO implement for pre-honeycomb
+		if(savedInstanceState != null) {
+			if(savedInstanceState.getSerializable("date") != null) {
+				//get DateButton & set date
+				DateButton dateButton = ((DateButton) getActivity().findViewById(R.id.date)); 
+				dateButton.setCalendar((Calendar) savedInstanceState.getSerializable("date"));
+				//set Adapter for subjects spinner / enable
+				subjects = getSubjectSpinnerData(dateButton.getCalendar());
+				dateAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, subjects);
+				((Spinner) getActivity().findViewById(R.id.subject)).setAdapter(dateAdapter);
+				((Spinner) getActivity().findViewById(R.id.subject)).setEnabled(true);
+				//set selected subject
+				((Spinner) getActivity().findViewById(R.id.subject)).setSelection(savedInstanceState.getInt("selectedSubject"));
+			}
+		}
+	}
+	@Override
+	public void onResume() {
 		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View customActionBarView = inflater.inflate(
                 R.layout.actionbar_buttons, null);
@@ -127,34 +112,80 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO save data
+                        String title = ((EditText) getActivity().findViewById(R.id.editTitle)).getText().toString();
+                        Calendar date = ((DateButton) getActivity().findViewById(R.id.date)).getCalendar();
+                        
+                        subjectsCursor.moveToPosition(((Spinner) getActivity().findViewById(R.id.subject)).getSelectedItemPosition());
+                        String subject =  subjectsCursor.getString(subjectsCursor.getColumnIndex(Functions.DB_RAW_FACH));
+                        Log.d("subject", subject);
+                        String type;
+                        switch(((Spinner) getActivity().findViewById(R.id.type)).getSelectedItemPosition()) {
+                        case 0:
+                        	type = Exams.BIG_TEST;
+                        	break;
+                        case 1:
+                        	type = Exams.SMALL_TEST;
+                        	break;
+                        case 2:
+                        	default:
+                        	type = Exams.OTHER_TEST;
+                        	break;
+                        }
+                        String learningMatters = ((EditText) getActivity().findViewById(R.id.editLearningMatter)).getText().toString();
+                        String notes = ((EditText) getActivity().findViewById(R.id.editNotes)).getText().toString();
+                        Log.d(learningMatters, notes);
                     }
                 });
         customActionBarView.findViewById(R.id.actionbar_discard).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO ask user if he really wants to exit
-                    }
-                });
-
-        final ActionBar actionBar = getActivity().getActionBar();
-        /*actionBar.setDisplayOptions(
-                ActionBar.DISPLAY_SHOW_CUSTOM,
-                ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
-                        | ActionBar.DISPLAY_SHOW_TITLE);*/
-        getActivity().getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(customActionBarView, new ActionBar.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-		displayOptions = getActivity().getActionBar().getDisplayOptions();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Wirklich abbrechen?");
+                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								getActivity().getSupportFragmentManager().popBackStack();
+							}
+						});
+                        builder.setNegativeButton(R.string.no, null);
+                        AlertDialog alert = builder.create();
+                        alert.show();
+					}
+				});
+		if (Functions.getSDK() < 11)
+			((LinearLayout) getActivity().findViewById(R.id.actionButtons))
+					.addView(customActionBarView,
+							new LinearLayout.LayoutParams(
+									ViewGroup.LayoutParams.MATCH_PARENT,
+									ViewGroup.LayoutParams.MATCH_PARENT));
+		else {
+			AdvancedWrapper adv = new AdvancedWrapper();
+			adv.setActionBarCustomView(getActivity(), customActionBarView);
+        }
+		super.onResume();
+	}
+	private Cursor subjectsCursor;
+	public ArrayList<String> getSubjectSpinnerData(Calendar cal) {
+		TimeTable timeTable = new TimeTable(getActivity(), myDB);
+		timeTable.setClass("", true);
+		timeTable.updateAll();
+		subjectsCursor = timeTable.getCursor(cal.get(Calendar.DAY_OF_WEEK) - 2);
+		ArrayList<String> subjects = new ArrayList<String>();
+		if (subjectsCursor != null) {
+			for (subjectsCursor.moveToFirst(); !subjectsCursor
+					.isAfterLast(); subjectsCursor.moveToNext()) {
+				subjects.add(subjectsCursor.getString(subjectsCursor
+						.getColumnIndex(Functions.DB_FACH)));
+			}
+		}
+		subjects.add(getActivity().getString(R.string.other_subject));
+		return subjects;
 	}
 	/*workaround for wrong behaviour on jb
 	 * TODO test this on HoneyComb / JellyBean mr1
 	 */
 	private boolean alreadyCalled = false;
-	private Cursor subjectsCursor;
-	private int timeTableId;
     public void onDateSet(DatePicker view, int year, int month, int day) {
     	if(Functions.getSDK() == 16 && !alreadyCalled) {
     		alreadyCalled = true;
@@ -175,23 +206,12 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
         if(weekend)
         	Toast.makeText(getActivity(), "Ausgewähltes Datum ist am Wochenende!", Toast.LENGTH_LONG).show();
 		if (((TaskSelected) getActivity()).getCurTask() == TaskSelected.TASK_EDIT_EXAMS) {
-			TimeTable timeTable = new TimeTable(getActivity(), myDB);
-			timeTable.setClass("", true);
-			timeTable.updateAll();
-			subjectsCursor = timeTable.getCursor(dateButton.getCalendar().get(Calendar.DAY_OF_WEEK) - 2);
-			ArrayList<String> subjects = new ArrayList<String>();
-			if (subjectsCursor != null) {
-				for (subjectsCursor.moveToFirst(); !subjectsCursor
-						.isAfterLast(); subjectsCursor.moveToNext()) {
-					subjects.add(subjectsCursor.getString(subjectsCursor
-							.getColumnIndex(Functions.DB_FACH)));
-				}
-			}
-			subjects.add(getActivity().getString(R.string.other_subject));
+			subjects.clear();
+			subjects = getSubjectSpinnerData(dateButton.getCalendar());
 			
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, subjects);
 			((Spinner) getActivity().findViewById(R.id.subject)).setAdapter(adapter);
-			
+			// TODO handle selection of non-existing subject -> EditText for name
 			
 //			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 //		    builder.setTitle(R.string.pick_subjects);
@@ -210,18 +230,25 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 //		    dialog.show();
         }
     }
-	public void save(View v) {
-		
-	}
-	// TODO implement for pre-honeycomb
-	@TargetApi(11)
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+    	DateButton dateButton = ((DateButton) getActivity().findViewById(R.id.date)); 
+    	if(dateButton.getModified()) {
+    		outState.putSerializable("date", dateButton.getCalendar());
+    		outState.putInt("selectedSubject", ((Spinner) getActivity().findViewById(R.id.subject)).getSelectedItemPosition());
+    	} else {
+    		outState.putSerializable("date", null);
+    		outState.putInt("selectedSubject", 0);
+    	}
+    	
+    	super.onSaveInstanceState(outState);
+    }
 	@Override
 	public void onStop() {
-		getActivity().getActionBar().setDisplayOptions(displayOptions);
-		getActivity().getActionBar().setDisplayOptions(0, ActionBar.DISPLAY_SHOW_CUSTOM);
-		getActivity().getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
-		getActivity().getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
-		Log.d("fragment", "onstop");
+		if(Functions.getSDK() > 11) {
+			AdvancedWrapper adv = new AdvancedWrapper();
+			adv.removeActionBarCustomView(getActivity());
+		}
 		super.onStop();
 	}
 }

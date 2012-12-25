@@ -125,35 +125,44 @@ public class SlideMenu implements OnTouchListener {
 	private static Class<? extends Fragment> fragment;
 	private SharedPreferences prefs;
 	SlideMenuAdapter.MenuDesc[] items;
+
 	public SlideMenu(Activity act, Class<? extends Activity> curAct) {
 		this.act = act;
 		SlideMenu.curAct = curAct;
 		prefs = PreferenceManager.getDefaultSharedPreferences(act);
-    	contentContainer = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
-    	(act.findViewById(android.R.id.content)).setBackgroundResource(R.layout.background);
-		
-		decorView = (FrameLayout) contentContainer.getParent();
-    	LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	
-    	menu = inflater.inflate(R.layout.menu, null);
-    	menuLayoutParams = new FrameLayout.LayoutParams(-1, -1, 3);
-    	menuLayoutParams.setMargins(20000, 20000, 0, 0);
-    	menu.setLayoutParams(menuLayoutParams);
-    	
-    	decorView.removeAllViews();
-    	FrameLayout.LayoutParams parentLays = new FrameLayout.LayoutParams(-1, -1);
-    	CustomFrameLayout parent = new CustomFrameLayout(act);
-    	parent.setLayoutParams(parentLays);
-    	decorView.addView(parent);
-    	
+		contentContainer = ((LinearLayout) act.findViewById(
+				android.R.id.content).getParent());
+		(act.findViewById(android.R.id.content))
+				.setBackgroundResource(R.layout.background);
 
-    	FrameLayout.LayoutParams contentLays = new FrameLayout.LayoutParams(-1, -1);
-    	contentContainer.setLayoutParams(contentLays);
-    	//menu added before content, to have in back
-    	parent.addView(menu);
-    	parent.addView(contentContainer);
-    	parent.setOnTouchListener(this);
-    	parent.setOnTouchIntercept(new View.OnTouchListener() {
+		decorView = (FrameLayout) contentContainer.getParent();
+		LayoutInflater inflater = (LayoutInflater) act
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		menu = inflater.inflate(R.layout.menu, null);
+		menuLayoutParams = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				FrameLayout.LayoutParams.MATCH_PARENT, 3);
+		menuLayoutParams.setMargins(20000, 20000, 0, 0);
+		menu.setLayoutParams(menuLayoutParams);
+
+		decorView.removeAllViews();
+		FrameLayout.LayoutParams parentLays = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.MATCH_PARENT,
+				FrameLayout.LayoutParams.MATCH_PARENT);
+		CustomFrameLayout parent = new CustomFrameLayout(act);
+		parent.setLayoutParams(parentLays);
+		decorView.addView(parent);
+
+		FrameLayout.LayoutParams contentLays = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.MATCH_PARENT,
+				FrameLayout.LayoutParams.MATCH_PARENT);
+		contentContainer.setLayoutParams(contentLays);
+		// menu added before content, to have in back
+		parent.addView(menu);
+		parent.addView(contentContainer);
+		parent.setOnTouchListener(this);
+		parent.setOnTouchIntercept(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				motionStartX = event.getX();
@@ -445,7 +454,6 @@ public class SlideMenu implements OnTouchListener {
 	}
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		// TODO nicer slides
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 				break;

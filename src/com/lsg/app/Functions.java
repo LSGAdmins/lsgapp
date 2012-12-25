@@ -149,6 +149,7 @@ public class Functions {
 	public static final String DB_LEARNING_MATTER = "learning_matter";
 	public static final String DB_NOTES = "notes";
 	public static final String DB_CONTENT = "content";
+	public static final String DB_LOCKED = "locked";
 	// classes
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
@@ -537,7 +538,8 @@ public class Functions {
     				+ Functions.DB_FACH + " STRING,"
     				+ Functions.DB_TITLE + " STRING,"
     				+ Functions.DB_LEARNING_MATTER + " STRING,"
-    	    		+ Functions.DB_NOTES + " STRING"
+    	    		+ Functions.DB_NOTES + " STRING,"
+    	    		+ Functions.DB_LOCKED + " INTEGER"
     				+ ");");
     		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_HOMEWORK_TABLE
     				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
