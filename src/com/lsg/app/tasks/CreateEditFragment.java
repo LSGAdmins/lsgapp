@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -113,11 +114,15 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
                     @Override
                     public void onClick(View v) {
                         String title = ((EditText) getActivity().findViewById(R.id.editTitle)).getText().toString();
-                        Calendar date = ((DateButton) getActivity().findViewById(R.id.date)).getCalendar();
+                        DateButton dateButton = ((DateButton) getActivity().findViewById(R.id.date));
+                        if(!dateButton.getModified()) {
+                        	Toast.makeText(getActivity(), getActivity().getString(R.string.exam_not_complete), Toast.LENGTH_LONG).show();
+                        	return;
+                        }
+                        Calendar date = dateButton.getCalendar();
                         
                         subjectsCursor.moveToPosition(((Spinner) getActivity().findViewById(R.id.subject)).getSelectedItemPosition());
                         String subject =  subjectsCursor.getString(subjectsCursor.getColumnIndex(Functions.DB_RAW_FACH));
-                        Log.d("subject", subject);
                         String type;
                         switch(((Spinner) getActivity().findViewById(R.id.type)).getSelectedItemPosition()) {
                         case 0:
@@ -132,8 +137,16 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
                         	break;
                         }
                         String learningMatters = ((EditText) getActivity().findViewById(R.id.editLearningMatter)).getText().toString();
+                        boolean locked = ((CheckBox) getActivity().findViewById(R.id.checkbox_lock_exam)).isChecked();
                         String notes = ((EditText) getActivity().findViewById(R.id.editNotes)).getText().toString();
-                        Log.d(learningMatters, notes);
+                        
+                        Log.d("title", title);
+                        Log.d("date", date.toString());
+                        Log.d("subject", subject);
+                        Log.d("type", type);
+                        Log.d("locked", Boolean.valueOf(locked).toString());
+                        Log.d("learningMatters", learningMatters);
+                        Log.d("notes", notes);
                     }
                 });
         customActionBarView.findViewById(R.id.actionbar_discard).setOnClickListener(
@@ -212,22 +225,6 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, subjects);
 			((Spinner) getActivity().findViewById(R.id.subject)).setAdapter(adapter);
 			// TODO handle selection of non-existing subject -> EditText for name
-			
-//			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//		    builder.setTitle(R.string.pick_subjects);
-//		    AlertDialog dialog = builder.setItems(subjects, new DialogInterface.OnClickListener() {
-//		               public void onClick(DialogInterface dialog, int which) {
-//		               if(subjectsCursor != null && which < subjectsCursor.getCount()) {
-//		            	   subjectsCursor.moveToPosition(which);
-//		            	   Log.d("subject", subjectsCursor.getString(subjectsCursor.getColumnIndex(Functions.DB_FACH)));
-//		            	   timeTableId = subjectsCursor.getInt(subjectsCursor.getColumnIndex(Functions.DB_ROWID));
-//		               } else {
-//		            	   timeTableId = -1;
-//		            	   // TODO handle input of not existing subject
-//							}
-//		           }
-//		    }).create();
-//		    dialog.show();
         }
     }
     @Override

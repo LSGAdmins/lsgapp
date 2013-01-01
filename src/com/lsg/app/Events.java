@@ -56,8 +56,9 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 			}
 		@Override
 		public void changeCursor(Cursor cursor) {
-			updateHeaders();
 			super.changeCursor(cursor);
+			this.cursor = cursor;
+			updateHeaders();
 		}
 		public void updateHeaders() {
 			for (cursor.moveToFirst(); cursor.getPosition() < cursor.getCount(); cursor.moveToNext()) {
