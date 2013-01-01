@@ -41,6 +41,7 @@ import com.lsg.app.lib.TitleCompat.RefreshCall;
 public class Events extends ListFragment implements SQLlist, RefreshCall, TextWatcher, WorkerService.WorkerClass {
 	public static class EventAdapter extends CursorAdapter implements SectionIndexer {
 		Cursor cursor;
+		Context context;
 		class Standard {
 			public TextView month;
 			public TextView title;
@@ -52,6 +53,7 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 		public EventAdapter(Context context, Cursor cursor) {
 			super(context, cursor, false);
 			this.cursor = cursor;
+			this.context = context;
 			updateHeaders();
 			}
 		@Override
@@ -74,8 +76,10 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 				String datebeginning = cursor.getString(cursor.getColumnIndex(Functions.DB_DATES));
 				String[] oldmonth = olddate.split("\\.");
 				String[] month = datebeginning.split("\\.");
+				String[] monthsshort = context.getResources().getStringArray(R.array.monthsshort);
 				if (!oldmonth[1].equals(month[1])) {
-					headers.add(new String[] {month[1], Integer.valueOf(cursor.getPosition()).toString()});
+					Log.d("month", ((String[]) context.getResources().getStringArray(R.array.monthsshort))[Integer.valueOf(month[1]) - 1]);
+					headers.add(new String[] {monthsshort[Integer.valueOf(month[1]) - 1], Integer.valueOf(cursor.getPosition()).toString()});
 					headerPositions.add(cursor.getPosition());
 				}
 			}
