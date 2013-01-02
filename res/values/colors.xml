@@ -1,38 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<color name="lightblue">#33B5E5</color>
-<color name="darkblue">#0099CC</color>
 
-<color name="lightpurple">#AA66CC</color>
-<color name="darkpurple">#9933CC</color>
+    <color name="lightblue">#33B5E5</color>
+    <color name="darkblue">#0099CC</color>
+    <color name="lightpurple">#AA66CC</color>
+    <color name="darkpurple">#9933CC</color>
+    <color name="lightgreen">#99CC00</color>
+    <color name="darkgreen">#669900</color>
+    <color name="lightorange">#FFBB33</color>
+    <color name="darkorange">#FF8800</color>
+    <color name="lightred">#FF4444</color>
+    <color name="darkred">#CC0000</color>
+    <color name="lightgrey">#F5F5F5</color>
+    <color name="darkgrey">#DFDFDF</color>
+    <color name="white">#FFF</color>
+    <color name="margingrey">#A2A2A2</color>
+    <color name="darkblack">#111111</color>
+    <color name="dividerblack">#1F1F1F</color>
+    <color name="lightblack">#5F5F5F</color>
+    <color name="slideblack">#1d1d1d</color>
+    <color name="oldblue">#0000ff</color>
+    <color name="floralwhite">#fffaf0</color>
+    <color name="ghostwhite">#f8f8ff</color>
+    <color name="mintcream">#f5fffa</color>
+    <color name="seperatorgrey">#DDD</color>
+    <color name="backgroundgrey">#EEE</color>
+    <color name="inactivegrey">#AAA</color>
+    <color name="fontgrey">#666</color>
+    <color name="fontblack">#222</color>
+    <color name="halfTransparent">#29000000</color>
 
-<color name="lightgreen">#99CC00</color>
-<color name="darkgreen">#669900</color>
-
-<color name="lightorange">#FFBB33</color>
-<color name="darkorange">#FF8800</color>
-
-<color name="lightred">#FF4444</color>
-<color name="darkred">#CC0000</color>
-
-<color name="lightgrey">#F5F5F5</color>
-<color name="darkgrey">#DFDFDF</color>
-<color name="white">#FFF</color>
-<color name="margingrey">#A2A2A2</color>
-<color name="darkblack">#111111</color>
-<color name="dividerblack">#1F1F1F</color>
-<color name="lightblack">#5F5F5F</color>
-
-<color name="oldblue">#0000ff</color>
-
-<color name="floralwhite">#fffaf0</color>
-<color name="ghostwhite">#f8f8ff</color>
-
-<color name="mintcream">#f5fffa</color>
-<color name="seperatorgrey">#DDD</color>
-<color name="backgroundgrey">#EEE</color>
-<color name="inactivegrey">#AAA</color>
-<color name="fontgrey">#666</color>
-<color name="fontblack">#222</color>
-<color name="halfTransparent">#29000000</color>
 </resources>

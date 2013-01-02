@@ -305,7 +305,7 @@ public class SlideMenu implements OnTouchListener {
 	}
 	public void hide(int offset) {
 		//slide out menu to left
-		TranslateAnimation menuSlideOut = new TranslateAnimation(0, -((menuSize - offset) / 3), 0, 0);
+		TranslateAnimation menuSlideOut = new TranslateAnimation(-((offset) / 2), -((menuSize) / 2), 0, 0);
 		menuSlideOut.setDuration(Math.abs(menuSize - offset) *500 / menuSize);
 		menu.startAnimation(menuSlideOut);
 		

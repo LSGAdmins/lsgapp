@@ -1,22 +1,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
+
     <LinearLayout
-        android:orientation="vertical"
+        android:layout_width="250dp"
         android:layout_height="fill_parent"
-        android:layout_width="250dip"
-        android:background="@color/darkblack">
+        android:background="@color/slideblack"
+        android:orientation="vertical" >
+
         <ListView
             android:id="@+id/menu_listview"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:divider="@color/dividerblack"
-            android:dividerHeight="2dip"
-            android:cacheColorHint="@color/darkblack"  />
+            android:cacheColorHint="@color/slideblack"
+            android:divider="@color/darkblack"
+            android:dividerHeight="1dp" />
     </LinearLayout>
-    <FrameLayout
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </FrameLayout>
+
 </LinearLayout>
