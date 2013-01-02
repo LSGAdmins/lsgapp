@@ -1,9 +1,7 @@
 package com.lsg.app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -25,7 +23,6 @@ import com.lsg.app.timetable.TimeTableFragment;
 public class MainActivity extends FragmentActivity implements HomeCall, FragmentActivityCallbacks, TaskSelected {
 	private TitleCompat titlebar;
 	private SlideMenu slidemenu;
-	private SQLiteDatabase myDB;
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -34,14 +31,12 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 			id = savedInstanceState.getInt("id");
 		}
 		requestWindowFeature(Window.FEATURE_PROGRESS);
-		Functions.setupDB(this);
-		myDB = openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
 		
 		super.onCreate(savedInstanceState);
-		slidemenu = new SlideMenu(this, MainActivity.class);
 		titlebar = new TitleCompat(this, true);
 		titlebar.init(this);
 		titlebar.setTitle(getTitle());
+		slidemenu = new SlideMenu(this, MainActivity.class);
 		setContentView(R.layout.fragment_main);
 		
 		Class<?extends Fragment> frag = null;
@@ -167,6 +162,11 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 		changeFragment(frag, args);
 	}
 	@Override
+	public void onBackPressed() {
+		if(!slidemenu.handleBack())
+			super.onBackPressed();
+	}
+	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putInt("task", task);
 		outState.putInt("id", id);
@@ -174,12 +174,7 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 		// NOTE restore is done in onCreate
 	}
 	@Override
-	public SQLiteDatabase getDB() {
-		return myDB;
-	}
-	@Override
 	protected void onDestroy() {
-		myDB.close();
 		super.onDestroy();
 	}
 }

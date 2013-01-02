@@ -1,4 +1,4 @@
-package com.lsg.app.lib;
+package com.lsg.app.widget;
 
 import android.content.Context;
 import android.view.MotionEvent;

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class TimeTableAdapter extends CursorAdapter {
 
@@ -59,19 +60,19 @@ public class TimeTableAdapter extends CursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		TimetableItem holder = (TimetableItem) view.getTag();
 		holder.timetable_day.setVisibility(View.GONE);
-		int hour = cursor.getInt(cursor.getColumnIndex(Functions.DB_HOUR)) + 1;
+		int hour = cursor.getInt(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_HOUR)) + 1;
 		String when = Integer.valueOf(hour).toString();
 		int i = 1;
 		int length = cursor.getInt(cursor
-				.getColumnIndex(Functions.DB_LENGTH));
+				.getColumnIndex(LSGSQliteOpenHelper.DB_LENGTH));
 		while (i < length) {
 			when += ", " + Integer.valueOf(hour + i).toString();
 			i++;
 		}
 		if (cursor
-				.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNG)) != null
+				.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG)) != null
 				&& cursor.getString(
-						cursor.getColumnIndex(Functions.DB_VERTRETUNG))
+						cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG))
 						.equals("true"))
 			holder.lay.setBackgroundResource(R.layout.background_info);
 		else
@@ -82,29 +83,29 @@ public class TimeTableAdapter extends CursorAdapter {
 				.setText(context.getString(R.string.room)
 						+ " "
 						+ cursor.getString(cursor
-								.getColumnIndex(Functions.DB_ROOM)));
+								.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM)));
 		String subtitle;
-		if (cursor.getColumnIndex(Functions.DB_BREAK_SURVEILLANCE) != -1) {
+		if (cursor.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE) != -1) {
 			if (!cursor.getString(
-					cursor.getColumnIndex(Functions.DB_BREAK_SURVEILLANCE))
+					cursor.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE))
 					.equals("null")) {
 				holder.break_surveillance.setVisibility(View.VISIBLE);
 				holder.break_surveillance.setText(context.getString(R.string.break_surveillance) + " " + cursor.getString(cursor
-						.getColumnIndex(Functions.DB_BREAK_SURVEILLANCE)));
+						.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE)));
 			} else
 				holder.break_surveillance.setVisibility(View.GONE);
-			subtitle = Functions.DB_CLASS;
+			subtitle = LSGSQliteOpenHelper.DB_CLASS;
 		} else {
 			holder.break_surveillance.setVisibility(View.GONE);
-			subtitle = Functions.DB_LEHRER;
+			subtitle = LSGSQliteOpenHelper.DB_LEHRER;
 		}
 		if(cursor.getString(cursor
-				.getColumnIndex(Functions.DB_ROOM)).equals("null"))
+				.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM)).equals("null"))
 			holder.timetable_room.setVisibility(View.GONE);
 		else
 			holder.timetable_room.setVisibility(View.VISIBLE);
 		holder.header.setText(cursor.getString(cursor
-				.getColumnIndex(Functions.DB_FACH)));
+				.getColumnIndex(LSGSQliteOpenHelper.DB_FACH)));
 		holder.subtitle.setText(cursor.getString(cursor
 				.getColumnIndex(subtitle)));
 		if(holder.subtitle.getText().equals("null"))

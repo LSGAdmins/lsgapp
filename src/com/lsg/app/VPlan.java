@@ -47,9 +47,11 @@ import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerService.WorkerClass {
 	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
@@ -99,12 +101,12 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			context = (Context) getActivity();
 			this.act = act;
 			
-			myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+			myDB = LSGApplication.getSqliteDatabase();
 			updateCondLists();
 			
-			SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TABLE);
+			SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + LSGSQliteOpenHelper.DB_VPLAN_TABLE);
 			long count = num_rows.simpleQueryForLong();
-			SQLiteStatement num_rows_2 = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_VPLAN_TEACHER);
+			SQLiteStatement num_rows_2 = myDB.compileStatement("SELECT COUNT(*) FROM " + LSGSQliteOpenHelper.DB_VPLAN_TEACHER);
 			long count2 = num_rows_2.simpleQueryForLong();
 			if(count == 0 && count2 == 0)
 				act.updateVP();
@@ -166,27 +168,27 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 
 		public void updateCondLists() {
 			exclude_cond = new String();
-			Cursor exclude = myDB.query(Functions.DB_EXCLUDE_TABLE, new String[] {Functions.DB_RAW_FACH},
+			Cursor exclude = myDB.query(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE, new String[] {LSGSQliteOpenHelper.DB_RAW_FACH},
 					null, null, null, null, null);
 			exclude.moveToFirst();
 			int i = 0;
 			while(i < exclude.getCount()) {
-				String fach = exclude.getString(exclude.getColumnIndex(Functions.DB_RAW_FACH));
-				exclude_cond += " AND " + Functions.DB_RAW_FACH + " != '" + fach + "' ";
+				String fach = exclude.getString(exclude.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH));
+				exclude_cond += " AND " + LSGSQliteOpenHelper.DB_RAW_FACH + " != '" + fach + "' ";
 				exclude.moveToNext();
 				i++;
 			}
 			exclude.close();
 			include_cond = new String();
-			Cursor include = myDB.query(Functions.INCLUDE_TABLE, new String[] {Functions.DB_FACH},
+			Cursor include = myDB.query(LSGSQliteOpenHelper.INCLUDE_TABLE, new String[] {LSGSQliteOpenHelper.DB_FACH},
 					null, null, null, null, null);
 			include.moveToFirst();
 			i = 0;
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 			String connector = "";
 			while(i < include.getCount()) {
-				String fach = include.getString(include.getColumnIndex(Functions.DB_FACH));
-				include_cond += connector + Functions.DB_FACH + " LIKE '%" + fach + "%' ";
+				String fach = include.getString(include.getColumnIndex(LSGSQliteOpenHelper.DB_FACH));
+				include_cond += connector + LSGSQliteOpenHelper.DB_FACH + " LIKE '%" + fach + "%' ";
 				connector = " OR ";
 				include.moveToNext();
 				i++;
@@ -203,61 +205,97 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 			String klasse = prefs.getString("full_class", "");
 			where_conds[0] =  "%" + klasse + "%";
-			String first = "( " + Functions.DB_KLASSE + " LIKE ? ";
+			String first = "( " + LSGSQliteOpenHelper.DB_KLASSE + " LIKE ? ";
 			String sec = "";
 			if(prefs.getBoolean("showwithoutclass", true))
-				sec = "OR " + Functions.DB_KLASSE + " LIKE 'null'";
-			sec += " OR " + Functions.DB_KLASSE + " LIKE 'infotext') AND ( " + Functions.DB_KLASSE
-					+ " LIKE ? OR " + Functions.DB_FACH + " LIKE ? OR " + Functions.DB_LEHRER + " LIKE ? )";
+				sec = "OR " + LSGSQliteOpenHelper.DB_KLASSE + " LIKE 'null'";
+			sec += " OR " + LSGSQliteOpenHelper.DB_KLASSE + " LIKE 'infotext') AND ( " + LSGSQliteOpenHelper.DB_KLASSE
+					+ " LIKE ? OR " + LSGSQliteOpenHelper.DB_FACH + " LIKE ? OR " + LSGSQliteOpenHelper.DB_LEHRER + " LIKE ? )";
 			String mine_cond = first + include_cond +  sec + exclude_cond;
 			String all_cond = first + sec;
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
-				cursor_mine = myDB.query(Functions.DB_VPLAN_TEACHER,
-						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
-								Functions.DB_TYPE, Functions.DB_STUNDE,
-								Functions.DB_LEHRER, Functions.DB_FACH,
-								Functions.DB_VERTRETUNGSTEXT,
-								Functions.DB_VERTRETER, Functions.DB_ROOM,
-								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
-								Functions.DB_LENGTH, "'teachers' AS type" },
-						Functions.DB_RAW_VERTRETER + "=? OR "
-								+ Functions.DB_RAW_LEHRER + "=?", new String[] {
-								prefs.getString(Functions.TEACHER_SHORT, ""),
-								prefs.getString(Functions.TEACHER_SHORT, "") },
+				cursor_mine = myDB
+						.query(LSGSQliteOpenHelper.DB_VPLAN_TEACHER,
+								new String[] { LSGSQliteOpenHelper.DB_ROWID,
+										LSGSQliteOpenHelper.DB_KLASSE,
+										LSGSQliteOpenHelper.DB_TYPE,
+										LSGSQliteOpenHelper.DB_STUNDE,
+										LSGSQliteOpenHelper.DB_LEHRER,
+										LSGSQliteOpenHelper.DB_FACH,
+										LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT,
+										LSGSQliteOpenHelper.DB_VERTRETER,
+										LSGSQliteOpenHelper.DB_ROOM,
+										LSGSQliteOpenHelper.DB_CLASS_LEVEL,
+										LSGSQliteOpenHelper.DB_DATE,
+										LSGSQliteOpenHelper.DB_LENGTH,
+										"'teachers' AS type" },
+								LSGSQliteOpenHelper.DB_RAW_VERTRETER + "=? OR "
+										+ LSGSQliteOpenHelper.DB_RAW_LEHRER
+										+ "=?",
+								new String[] {
+										prefs.getString(
+												LSGSQliteOpenHelper.TEACHER_SHORT,
+												""),
+										prefs.getString(
+												LSGSQliteOpenHelper.TEACHER_SHORT,
+												"") },
 						null, null, null);
 			} else {
-				cursor_mine = myDB.query(Functions.DB_VPLAN_TABLE,
-						new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
-								Functions.DB_TYPE, Functions.DB_STUNDE,
-								Functions.DB_LEHRER, Functions.DB_FACH,
-								Functions.DB_VERTRETUNGSTEXT,
-								Functions.DB_VERTRETER, Functions.DB_ROOM,
-								Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
-								Functions.DB_LENGTH, "'pupils' AS type" }, mine_cond, where_conds,
+				cursor_mine = myDB.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE,
+						new String[] { LSGSQliteOpenHelper.DB_ROWID,
+								LSGSQliteOpenHelper.DB_KLASSE,
+								LSGSQliteOpenHelper.DB_TYPE,
+								LSGSQliteOpenHelper.DB_STUNDE,
+								LSGSQliteOpenHelper.DB_LEHRER,
+								LSGSQliteOpenHelper.DB_FACH,
+								LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT,
+								LSGSQliteOpenHelper.DB_VERTRETER,
+								LSGSQliteOpenHelper.DB_ROOM,
+								LSGSQliteOpenHelper.DB_CLASS_LEVEL,
+								LSGSQliteOpenHelper.DB_DATE,
+								LSGSQliteOpenHelper.DB_LENGTH,
+								"'pupils' AS type" }, mine_cond, where_conds,
 						null, null, null);
 			}
 			where_conds[0] = "%";
-			cursor_all = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {
-					Functions.DB_ROWID, Functions.DB_KLASSE, Functions.DB_TYPE,
-					Functions.DB_STUNDE, Functions.DB_LEHRER,
-					Functions.DB_FACH, Functions.DB_VERTRETUNGSTEXT,
-					Functions.DB_VERTRETER, Functions.DB_ROOM,
-					Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
-					Functions.DB_LENGTH, "'pupils' AS type" }, all_cond, where_conds, null, null,
-					null);
-			cursor_teachers = myDB.query(Functions.DB_VPLAN_TEACHER,
-					new String[] { Functions.DB_ROWID, Functions.DB_KLASSE,
-							Functions.DB_TYPE, Functions.DB_STUNDE,
-							Functions.DB_LEHRER, Functions.DB_FACH,
-							Functions.DB_VERTRETUNGSTEXT,
-							Functions.DB_VERTRETER, Functions.DB_ROOM,
-							Functions.DB_CLASS_LEVEL, Functions.DB_DATE,
-							Functions.DB_LENGTH, "'teachers' AS type" }, all_cond, where_conds, null,
-					null, Functions.DB_ROWID + ", CASE "
-							+ Functions.DB_VERTRETER
+			cursor_all = myDB
+					.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE,
+							new String[] { LSGSQliteOpenHelper.DB_ROWID,
+									LSGSQliteOpenHelper.DB_KLASSE,
+									LSGSQliteOpenHelper.DB_TYPE,
+									LSGSQliteOpenHelper.DB_STUNDE,
+									LSGSQliteOpenHelper.DB_LEHRER,
+									LSGSQliteOpenHelper.DB_FACH,
+									LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT,
+									LSGSQliteOpenHelper.DB_VERTRETER,
+									LSGSQliteOpenHelper.DB_ROOM,
+									LSGSQliteOpenHelper.DB_CLASS_LEVEL,
+									LSGSQliteOpenHelper.DB_DATE,
+									LSGSQliteOpenHelper.DB_LENGTH,
+									"'pupils' AS type" }, all_cond,
+							where_conds, null, null,
+ null);
+			cursor_teachers = myDB
+					.query(LSGSQliteOpenHelper.DB_VPLAN_TEACHER,
+							new String[] { LSGSQliteOpenHelper.DB_ROWID,
+									LSGSQliteOpenHelper.DB_KLASSE,
+									LSGSQliteOpenHelper.DB_TYPE,
+									LSGSQliteOpenHelper.DB_STUNDE,
+									LSGSQliteOpenHelper.DB_LEHRER,
+									LSGSQliteOpenHelper.DB_FACH,
+									LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT,
+									LSGSQliteOpenHelper.DB_VERTRETER,
+									LSGSQliteOpenHelper.DB_ROOM,
+									LSGSQliteOpenHelper.DB_CLASS_LEVEL,
+									LSGSQliteOpenHelper.DB_DATE,
+									LSGSQliteOpenHelper.DB_LENGTH,
+									"'teachers' AS type" }, all_cond,
+							where_conds, null,
+					null, LSGSQliteOpenHelper.DB_ROWID + ", CASE "
+							+ LSGSQliteOpenHelper.DB_VERTRETER
 							+ " WHEN 'null' THEN 0 ELSE 1 END, "
-							+ Functions.DB_VERTRETER + ", "
-							+ Functions.DB_STUNDE);
+							+ LSGSQliteOpenHelper.DB_VERTRETER + ", "
+							+ LSGSQliteOpenHelper.DB_STUNDE);
 			vadapter_mine.changeCursor(cursor_mine);
 			vadapter_all.changeCursor(cursor_all);
 			vadapter_teachers.changeCursor(cursor_teachers);
@@ -288,7 +326,6 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 		public void closeCursorsDB() {
 			cursor_mine.close();
 			cursor_all.close();
-			myDB.close();
 		}
 		@Override
 		public void destroyItem( View pager, int position, Object view ) {
@@ -363,13 +400,13 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			int position = cursor.getPosition();
 			if(position > 0) {
 				cursor.moveToPosition(position-1);
-				olddate  = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
-				oldclass = cursor.getString(cursor.getColumnIndex(Functions.DB_CLASS_LEVEL));
-				oldvertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
+				olddate  = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_DATE));
+				oldclass = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_CLASS_LEVEL));
+				oldvertreter = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETER));
 				cursor.moveToPosition(position);
 				}
 			
-			String date = cursor.getString(cursor.getColumnIndex(Functions.DB_DATE));
+			String date = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_DATE));
 			if(date.equals(olddate))
 				holder.date.setVisibility(View.GONE);
 			else {
@@ -379,9 +416,9 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			}
 
 			String klassenstufe = cursor.getString(cursor
-					.getColumnIndex(Functions.DB_CLASS_LEVEL));
+					.getColumnIndex(LSGSQliteOpenHelper.DB_CLASS_LEVEL));
 			String klasse = cursor.getString(cursor
-					.getColumnIndex(Functions.DB_KLASSE));
+					.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE));
 			if (!klasse.equals("infotext")) {
 				// hide
 				holder.webv.setVisibility(View.GONE);
@@ -394,7 +431,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 				if (klassenstufe.equals(oldclass)
 						&& (((cursor.getString(cursor.getColumnIndex("type"))
 								.equals("teachers") && cursor.getString(
-								cursor.getColumnIndex(Functions.DB_VERTRETER))
+								cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETER))
 								.equals(oldvertreter)) || cursor.getString(
 								cursor.getColumnIndex("type")).equals("pupils"))))
 					holder.klasse.setVisibility(View.GONE);
@@ -409,18 +446,18 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 					holder.klasse.setText(getString(R.string.vplan_of)
 							+ " "
 							+ cursor.getString(cursor
-									.getColumnIndex(Functions.DB_VERTRETER)));
+									.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETER)));
 				else
 					holder.klasse.setText(context
 							.getString(R.string.no_classes));
 
 				String type = cursor.getString(cursor
-						.getColumnIndex(Functions.DB_TYPE));
+						.getColumnIndex(LSGSQliteOpenHelper.DB_TYPE));
 				holder.type.setText(type);
 
 				holder.type.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 				holder.title.setVisibility(View.VISIBLE);
-				String fach = cursor.getString(cursor.getColumnIndex(Functions.DB_FACH));
+				String fach = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_FACH));
 				if(fach.equals("null") && klasse.equals("null")) {
 					holder.type.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
 					holder.title.setVisibility(View.GONE);
@@ -434,7 +471,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 				
 				Integer lesson;
 				try {
-				lesson = Integer.valueOf(cursor.getString(cursor.getColumnIndex(Functions.DB_STUNDE)));
+				lesson = Integer.valueOf(cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_STUNDE)));
 				} catch(Exception e) {
 					//old db style, do act!!!
 					lesson = 0;
@@ -442,7 +479,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 				}
 				String when = lesson.toString();
 				int i = 0;
-				int length = cursor.getInt(cursor.getColumnIndex(Functions.DB_LENGTH));
+				int length = cursor.getInt(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_LENGTH));
 				while(i < length) {
 					lesson++;
 					when += ", " + lesson.toString();
@@ -450,19 +487,19 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 					}
 				when += ".";
 				holder.when.setText(when + context.getString(R.string.hour));
-				String vtext = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
+				String vtext = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT));
 				if(vtext.equals("null"))
 					holder.vtext.setVisibility(View.GONE);
 				else {
 					holder.vtext.setVisibility(View.VISIBLE);
 					holder.vtext.setText("[" + vtext + "]");
 					}
-				String lehrer    = cursor.getString(cursor.getColumnIndex(Functions.DB_LEHRER));
-				if(cursor.getString(cursor.getColumnIndex(Functions.DB_TYPE)).equals("Entfall")){
+				String lehrer    = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_LEHRER));
+				if(cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_TYPE)).equals("Entfall")){
 					holder.bottom.setText(context.getString(R.string.at) + " " + lehrer);
 					} else {
-						String vertreter = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETER));
-						String raum = cursor.getString(cursor.getColumnIndex(Functions.DB_ROOM));
+						String vertreter = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETER));
+						String raum = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM));
 						String raumInsert = "";
 						if(!raum.equals("null"))
 							raumInsert = '\n' + context.getString(R.string.room) + " " + raum;
@@ -480,7 +517,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 					//unhide needed views that could be hidden
 					holder.klasse.setVisibility(View.VISIBLE);
 					holder.webv.setVisibility(View.VISIBLE);
-					String info = cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT));
+					String info = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT));
 					holder.webv.loadData(info, "text/html", null);
 					//holder.vtext.setText(Html.fromHtml(cursor.getString(cursor.getColumnIndex(Functions.DB_VERTRETUNGSTEXT))));
 					}
@@ -503,33 +540,32 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 				try {
 					JSONArray jArray = new JSONArray(get);
 					int i = 0;
-					SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-					myDB.delete(Functions.DB_VPLAN_TABLE, null, null); //clear vertretungen
+					SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+					myDB.delete(LSGSQliteOpenHelper.DB_VPLAN_TABLE, null, null); //clear vertretungen
 					while(i < jArray.length() - 1) {
 						JSONObject jObject = jArray.getJSONObject(i);
 						ContentValues values = new ContentValues();
-						values.put(Functions.DB_CLASS_LEVEL, jObject.getString("klassenstufe"));
-						values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
-						values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
-						values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
-						values.put(Functions.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
-						values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
-						values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
-						values.put(Functions.DB_ROOM, jObject.getString("raum"));
-						values.put(Functions.DB_TYPE, jObject.getString("art"));
-						values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
-						values.put(Functions.DB_FACH, jObject.getString("fach"));
-						values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
-						values.put(Functions.DB_DATE, jObject.getString("date"));
-						values.put(Functions.DB_LENGTH,
+						values.put(LSGSQliteOpenHelper.DB_CLASS_LEVEL, jObject.getString("klassenstufe"));
+						values.put(LSGSQliteOpenHelper.DB_KLASSE, jObject.getString("klasse"));
+						values.put(LSGSQliteOpenHelper.DB_STUNDE, jObject.getString("stunde"));
+						values.put(LSGSQliteOpenHelper.DB_VERTRETER, jObject.getString("vertreter"));
+						values.put(LSGSQliteOpenHelper.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
+						values.put(LSGSQliteOpenHelper.DB_LEHRER, jObject.getString("lehrer"));
+						values.put(LSGSQliteOpenHelper.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
+						values.put(LSGSQliteOpenHelper.DB_ROOM, jObject.getString("raum"));
+						values.put(LSGSQliteOpenHelper.DB_TYPE, jObject.getString("art"));
+						values.put(LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
+						values.put(LSGSQliteOpenHelper.DB_FACH, jObject.getString("fach"));
+						values.put(LSGSQliteOpenHelper.DB_RAW_FACH, jObject.getString("rawfach"));
+						values.put(LSGSQliteOpenHelper.DB_DATE, jObject.getString("date"));
+						values.put(LSGSQliteOpenHelper.DB_LENGTH,
 								jObject.getInt("length"));
-						values.put(Functions.DB_DAY_OF_WEEK,
+						values.put(LSGSQliteOpenHelper.DB_DAY_OF_WEEK,
 								jObject.getInt("dayofweek"));
-						myDB.insert(Functions.DB_VPLAN_TABLE,
+						myDB.insert(LSGSQliteOpenHelper.DB_VPLAN_TABLE,
 								null, values);
 						i++;
 					}
-					myDB.close();
 					JSONObject jObject = jArray.getJSONObject(i);
 					String date = jObject.getString("date");
 					String time = jObject.getString("time");
@@ -537,7 +573,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 					edit.putString("vplan_date", date);
 					edit.putString("vplan_time", time);
 					edit.commit();
-					Functions.cleanVPlanTable(context, Functions.DB_VPLAN_TABLE);
+					Functions.cleanVPlanTable(LSGSQliteOpenHelper.DB_VPLAN_TABLE);
 					} catch(JSONException e) {
 						Log.w("jsonerror", e.getMessage());
 						return new String[] {"json", context.getString(R.string.jsonerror)};
@@ -566,29 +602,28 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 					try {
 						JSONArray jArray = new JSONArray(get);
 						int i = 0;
-						SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-						myDB.delete(Functions.DB_VPLAN_TEACHER, null, null); //clear vertretungen
+						SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+						myDB.delete(LSGSQliteOpenHelper.DB_VPLAN_TEACHER, null, null); //clear vertretungen
 						while(i < jArray.length() - 1) {
 							JSONObject jObject = jArray.getJSONObject(i);
 							ContentValues values = new ContentValues();
-							values.put(Functions.DB_CLASS_LEVEL, jObject.getString("klassenstufe"));
-							values.put(Functions.DB_KLASSE, jObject.getString("klasse"));
-							values.put(Functions.DB_STUNDE, jObject.getString("stunde"));
-							values.put(Functions.DB_VERTRETER, jObject.getString("vertreter"));
-							values.put(Functions.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
-							values.put(Functions.DB_LEHRER, jObject.getString("lehrer"));
-							values.put(Functions.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
-							values.put(Functions.DB_ROOM, jObject.getString("raum"));
-							values.put(Functions.DB_TYPE, jObject.getString("art"));
-							values.put(Functions.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
-							values.put(Functions.DB_FACH, jObject.getString("fach"));
-							values.put(Functions.DB_RAW_FACH, jObject.getString("rawfach"));
-							values.put(Functions.DB_DATE, jObject.getString("date"));
-							values.put(Functions.DB_LENGTH, jObject.getInt("length"));
-							myDB.insert(Functions.DB_VPLAN_TEACHER, null, values);
+							values.put(LSGSQliteOpenHelper.DB_CLASS_LEVEL, jObject.getString("klassenstufe"));
+							values.put(LSGSQliteOpenHelper.DB_KLASSE, jObject.getString("klasse"));
+							values.put(LSGSQliteOpenHelper.DB_STUNDE, jObject.getString("stunde"));
+							values.put(LSGSQliteOpenHelper.DB_VERTRETER, jObject.getString("vertreter"));
+							values.put(LSGSQliteOpenHelper.DB_RAW_VERTRETER, jObject.getString("rawvertreter"));
+							values.put(LSGSQliteOpenHelper.DB_LEHRER, jObject.getString("lehrer"));
+							values.put(LSGSQliteOpenHelper.DB_RAW_LEHRER, jObject.getString("rawlehrer"));
+							values.put(LSGSQliteOpenHelper.DB_ROOM, jObject.getString("raum"));
+							values.put(LSGSQliteOpenHelper.DB_TYPE, jObject.getString("art"));
+							values.put(LSGSQliteOpenHelper.DB_VERTRETUNGSTEXT, jObject.getString("vertretungstext"));
+							values.put(LSGSQliteOpenHelper.DB_FACH, jObject.getString("fach"));
+							values.put(LSGSQliteOpenHelper.DB_RAW_FACH, jObject.getString("rawfach"));
+							values.put(LSGSQliteOpenHelper.DB_DATE, jObject.getString("date"));
+							values.put(LSGSQliteOpenHelper.DB_LENGTH, jObject.getInt("length"));
+							myDB.insert(LSGSQliteOpenHelper.DB_VPLAN_TEACHER, null, values);
 							i++;
 							}
-						myDB.close();
 						JSONObject jObject            = jArray.getJSONObject(i);
 						String date                   = jObject.getString("date");
 						String time                   = jObject.getString("time");
@@ -697,55 +732,57 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 	  super.onSaveInstanceState(savedInstanceState);
 	  savedInstanceState.putBoolean("refreshing", refreshing);
 	}
-//	@Override
-//	public void onRestoreInstanceState(Bundle savedInstanceState) {
-//		refreshing = savedInstanceState.getBoolean("refreshing");
-//	}
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		String table = (pager.getCurrentItem() != 2) ? Functions.DB_VPLAN_TABLE : Functions.DB_VPLAN_TEACHER;
+		String table = (pager.getCurrentItem() != 2) ? LSGSQliteOpenHelper.DB_VPLAN_TABLE
+				: LSGSQliteOpenHelper.DB_VPLAN_TEACHER;
 		Functions.createContextMenu(menu, v, menuInfo, getActivity(), table);
 	}
+
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		String table = (pager.getCurrentItem() != 2) ? Functions.DB_VPLAN_TABLE : Functions.DB_VPLAN_TEACHER;
+		String table = (pager.getCurrentItem() != 2) ? LSGSQliteOpenHelper.DB_VPLAN_TABLE
+				: LSGSQliteOpenHelper.DB_VPLAN_TEACHER;
 		return Functions.contextMenuSelect(item, getActivity(), adapter, table);
 	}
+
 	public static void blacklistVPlan(Context context) {
-		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME,
-				Context.MODE_PRIVATE, null);
-		Cursor vplan = myDB.query(Functions.DB_VPLAN_TABLE, new String[] { Functions.DB_ROWID,
-				Functions.DB_RAW_FACH }, null, null, null, null, null);
+		SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+		Cursor vplan = myDB.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE,
+				new String[] { LSGSQliteOpenHelper.DB_ROWID,
+						LSGSQliteOpenHelper.DB_RAW_FACH }, null, null, null,
+				null, null);
 		vplan.moveToFirst();
 		ContentValues vals = new ContentValues();
-		vals.put(Functions.DB_DISABLED, 2);
-		myDB.update(Functions.DB_VPLAN_TABLE, vals, null, null);
-		if(vplan.getCount() > 0)
-		do {
+		vals.put(LSGSQliteOpenHelper.DB_DISABLED, 2);
+		myDB.update(LSGSQliteOpenHelper.DB_VPLAN_TABLE, vals, null, null);
+		if (vplan.getCount() > 0)
+			do {
 				Cursor exclude = myDB
-						.query(Functions.DB_EXCLUDE_TABLE,
-								new String[] { Functions.DB_ROWID },
-								Functions.DB_RAW_FACH + "=? AND "
-										+ Functions.DB_TYPE + "=?",
+						.query(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE,
+								new String[] { LSGSQliteOpenHelper.DB_ROWID },
+								LSGSQliteOpenHelper.DB_RAW_FACH + "=? AND "
+										+ LSGSQliteOpenHelper.DB_TYPE + "=?",
 								new String[] {
 										vplan.getString(vplan
-												.getColumnIndex(Functions.DB_RAW_FACH)),
+												.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)),
 										"oldstyle" }, null, null, null);
 				if (exclude.getCount() > 0) {
 					myDB.execSQL(
-							"UPDATE " + Functions.DB_VPLAN_TABLE + " SET "
-									+ Functions.DB_DISABLED + "=? WHERE "
-									+ Functions.DB_ROWID + "=?",
+							"UPDATE " + LSGSQliteOpenHelper.DB_VPLAN_TABLE
+									+ " SET " + LSGSQliteOpenHelper.DB_DISABLED
+									+ "=? WHERE "
+									+ LSGSQliteOpenHelper.DB_ROWID + "=?",
 							new String[] {
 									"1",
 									vplan.getString(vplan
-											.getColumnIndex(Functions.DB_ROWID)) });
+											.getColumnIndex(LSGSQliteOpenHelper.DB_ROWID)) });
 			}
 			exclude.close();
 		} while (vplan.moveToNext());
 		vplan.close();
-		myDB.close();
 	}
 	private static ServiceHandler hand;
 	@TargetApi(11)

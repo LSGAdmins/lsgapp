@@ -40,6 +40,7 @@ import com.lsg.app.SetupAssistant;
 import com.lsg.app.VPlan;
 import com.lsg.app.tasks.TasksOverView;
 import com.lsg.app.timetable.TimeTableFragment;
+import com.lsg.app.widget.CustomFrameLayout;
 
 public class SlideMenu implements OnTouchListener {
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
@@ -195,7 +196,12 @@ public class SlideMenu implements OnTouchListener {
 		if(menuShown)
 			this.show(false);
 	}
-	public void checkEnabled() {
+	public boolean handleBack() {
+		if(menuShown) {
+			hide();
+			return true;
+		}
+		return false;
 	}
 	public void setFragment(Class<?extends Fragment> fragment) {
 		this.fragment = fragment;
@@ -259,9 +265,6 @@ public class SlideMenu implements OnTouchListener {
 						act.startActivity(intent);
 
 					} else if (items[position].containerActivity != null) {
-						Log.d("container", items[position].containerActivity
-								.getCanonicalName());
-						Log.d("curAct", curAct.getCanonicalName());
 						if (!items[position].containerActivity.equals(curAct)) {
 							Intent intent = new Intent(act,
 									items[position].containerActivity);
@@ -269,9 +272,8 @@ public class SlideMenu implements OnTouchListener {
 									items[position].openFragment);
 							act.startActivity(intent);
 						} else {
-							// TODO change to a more general interface
 							Log.d("slide", "change fragment");
-							((MainActivity) act)
+							((FragmentActivityCallbacks) act)
 									.changeFragment(items[position].openFragment);
 							hide();
 						}

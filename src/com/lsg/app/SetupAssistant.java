@@ -37,6 +37,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 import com.lsg.app.timetable.TimeTableFragment;
 import com.lsg.app.timetable.TimeTableUpdater;
 
@@ -54,7 +56,7 @@ public class SetupAssistant extends Activity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			loading = ProgressDialog
-					.show(context, null, getString(R.string.check_login)); 
+					.show(context, null, getString(R.string.check_login));
 		}
 
 		@Override
@@ -209,7 +211,14 @@ public class SetupAssistant extends Activity {
 										+ "="
 										+ URLEncoder.encode(prefs.getString(
 												Functions.RELIGION, ""),
-												"UTF-8") + "&" + URLEncoder.encode("short", "UTF-8") + "=" + URLEncoder.encode(prefs.getString(Functions.TEACHER_SHORT, ""), "UTF-8"));
+												"UTF-8")
+										+ "&"
+										+ URLEncoder.encode("short", "UTF-8")
+										+ "="
+										+ URLEncoder.encode(
+												prefs.getString(
+														LSGSQliteOpenHelper.TEACHER_SHORT,
+														""), "UTF-8"));
 			} catch (Exception e) {
 			}
 			return res.equals("success");
@@ -253,22 +262,23 @@ public class SetupAssistant extends Activity {
 			upd.updatePupils();
 			if (teacher || admin)
 				upd.updateTeachers();
-			SQLiteDatabase myDB = context.openOrCreateDatabase(
-					Functions.DB_NAME, Context.MODE_PRIVATE, null);
-			SQLiteStatement stmt = myDB.compileStatement("DELETE FROM " + Functions.DB_EXCLUDE_TABLE + " WHERE " + Functions.DB_TYPE + "=?");
+			SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+			SQLiteStatement stmt = myDB.compileStatement("DELETE FROM "
+					+ LSGSQliteOpenHelper.DB_EXCLUDE_TABLE + " WHERE "
+					+ LSGSQliteOpenHelper.DB_TYPE + "=?");
 			stmt.bindString(1, "newstyle");
 			stmt.execute();
 			for (int day = 0; day < 7; day++) {
 				for (int hour = 0; hour < 12; hour++) {
 					stmt = myDB
 							.compileStatement("SELECT COUNT(*) FROM "
-									+ Functions.DB_TIME_TABLE + " WHERE "
-									+ Functions.DB_DAY + "=? AND "
-									+ Functions.DB_HOUR + "=? AND "
-									+ Functions.DB_RAW_FACH + "!=? AND "
-									+ Functions.DB_RAW_FACH + "!=? AND "
-									+ Functions.DB_RAW_FACH + "!=? AND "
-									+ Functions.DB_CLASS + " LIKE ?");
+									+ LSGSQliteOpenHelper.DB_TIME_TABLE + " WHERE "
+									+ LSGSQliteOpenHelper.DB_DAY + "=? AND "
+									+ LSGSQliteOpenHelper.DB_HOUR + "=? AND "
+									+ LSGSQliteOpenHelper.DB_RAW_FACH + "!=? AND "
+									+ LSGSQliteOpenHelper.DB_RAW_FACH + "!=? AND "
+									+ LSGSQliteOpenHelper.DB_RAW_FACH + "!=? AND "
+									+ LSGSQliteOpenHelper.DB_CLASS + " LIKE ?");
 					stmt.bindString(1, Integer.valueOf(day).toString());
 					stmt.bindString(2, Integer.valueOf(hour).toString());
 					stmt.bindString(3, prefs.getString(Functions.GENDER, "m")
@@ -317,39 +327,46 @@ public class SetupAssistant extends Activity {
 								+ "%"
 								+ prefs.getString(Functions.FULL_CLASS, "")
 										.substring(2, 3) + "%";
-						Cursor c = myDB.query(Functions.DB_TIME_TABLE,
-								new String[] { Functions.DB_RAW_FACH,
-										Functions.DB_ROWID, Functions.DB_FACH,
-										Functions.DB_LEHRER,
-										Functions.DB_RAW_LEHRER },
-								Functions.DB_DAY + "=? AND "
-										+ Functions.DB_HOUR + "=? AND "
-										+ Functions.DB_RAW_FACH + "!=? AND "
-										+ Functions.DB_RAW_FACH + "!=? AND "
-										+ Functions.DB_RAW_FACH + "!=? AND "
-										+ Functions.DB_CLASS + " LIKE ?",
-								selectionArgs, null, null, Functions.DB_FACH);
+						Cursor c = myDB.query(
+								LSGSQliteOpenHelper.DB_TIME_TABLE,
+								new String[] { LSGSQliteOpenHelper.DB_RAW_FACH,
+										LSGSQliteOpenHelper.DB_ROWID,
+										LSGSQliteOpenHelper.DB_FACH,
+										LSGSQliteOpenHelper.DB_LEHRER,
+										LSGSQliteOpenHelper.DB_RAW_LEHRER },
+								LSGSQliteOpenHelper.DB_DAY + "=? AND "
+										+ LSGSQliteOpenHelper.DB_HOUR
+										+ "=? AND "
+										+ LSGSQliteOpenHelper.DB_RAW_FACH
+										+ "!=? AND "
+										+ LSGSQliteOpenHelper.DB_RAW_FACH
+										+ "!=? AND "
+										+ LSGSQliteOpenHelper.DB_RAW_FACH
+										+ "!=? AND "
+										+ LSGSQliteOpenHelper.DB_CLASS
+										+ " LIKE ?", selectionArgs, null, null,
+								LSGSQliteOpenHelper.DB_FACH);
 						if (c.moveToFirst())
 							do {
 								Log.d("pos", Integer.valueOf(c.getPosition())
 										.toString());
 								stmt = myDB.compileStatement("INSERT INTO "
-										+ Functions.DB_EXCLUDE_TABLE + " ("
-										+ Functions.DB_TEACHER + ", "
-										+ Functions.DB_RAW_FACH + ", "
-										+ Functions.DB_FACH + ", "
-										+ Functions.DB_HOUR + ", "
-										+ Functions.DB_DAY + ", "
-										+ Functions.DB_TYPE
+										+ LSGSQliteOpenHelper.DB_EXCLUDE_TABLE + " ("
+										+ LSGSQliteOpenHelper.DB_TEACHER + ", "
+										+ LSGSQliteOpenHelper.DB_RAW_FACH + ", "
+										+ LSGSQliteOpenHelper.DB_FACH + ", "
+										+ LSGSQliteOpenHelper.DB_HOUR + ", "
+										+ LSGSQliteOpenHelper.DB_DAY + ", "
+										+ LSGSQliteOpenHelper.DB_TYPE
 										+ ") VALUES (?, ?, ?, ?, ?, ?)");
 								stmt.bindString(
 										1,
 										c.getString(c
-												.getColumnIndex(Functions.DB_RAW_LEHRER)));
+												.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_LEHRER)));
 								stmt.bindString(2, c.getString(c
-										.getColumnIndex(Functions.DB_RAW_FACH)));
+										.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)));
 								stmt.bindString(3, c.getString(c
-										.getColumnIndex(Functions.DB_FACH)));
+										.getColumnIndex(LSGSQliteOpenHelper.DB_FACH)));
 								stmt.bindLong(4, hour);
 								stmt.bindLong(5, day);
 								stmt.bindString(6, "newstyle");
@@ -357,14 +374,13 @@ public class SetupAssistant extends Activity {
 								Log.d("stmt", stmt.toString());
 								stmt.close();
 								Log.d("rawfach", c.getString(c
-										.getColumnIndex(Functions.DB_RAW_FACH)));
+										.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)));
 							} while (c.moveToNext());
 						c.close();
 						conflicts.add(new Integer[] { day, hour });
 					}
 				}
 			}
-			myDB.close();
 			return conflicts;
 		}
 
@@ -395,7 +411,6 @@ public class SetupAssistant extends Activity {
 		super.onCreate(savedInstanceState);
 		Functions.init(this);
 		Functions.setTheme(false, false, this);
-		Functions.setupDB(this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		edit = prefs.edit();
@@ -507,19 +522,24 @@ public class SetupAssistant extends Activity {
 	}
 
 	public void selectShort(View v) {
-		final SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
-		final Cursor allShorts = myDB.query(Functions.DB_TIME_TABLE_HEADERS_TEACHERS, new String[] {Functions.DB_SHORT, Functions.DB_ROWID}, null, null, null, null, null);
+		final SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+		final Cursor allShorts = myDB.query(
+				LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS,
+				new String[] { LSGSQliteOpenHelper.DB_SHORT,
+						LSGSQliteOpenHelper.DB_ROWID }, null, null, null, null,
+				null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.select_short);
 		builder.setCursor(allShorts, new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				allShorts.moveToPosition(which);
-				teacher_short = allShorts.getString(allShorts.getColumnIndex(Functions.DB_SHORT));
+				teacher_short = allShorts.getString(allShorts
+						.getColumnIndex(LSGSQliteOpenHelper.DB_SHORT));
 				allShorts.close();
-				myDB.close();
 				setVPlanTeacherData();
-			}}, Functions.DB_SHORT);
+			}
+		}, LSGSQliteOpenHelper.DB_SHORT);
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
@@ -588,8 +608,7 @@ public class SetupAssistant extends Activity {
 	public void setupTimeTableConflicts(ArrayList<Integer[]> conflicts) {
 		Integer[] conflict = new Integer[2];
 		timetable_conflicts_rg = new ArrayList<RadioGroup>();
-		SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME,
-				Context.MODE_PRIVATE, null);
+		SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
 		for (int i = 0; i < conflicts.size(); i++) {
 			conflict = conflicts.get(i);
 
@@ -615,13 +634,13 @@ public class SetupAssistant extends Activity {
 					+ "%"
 					+ prefs.getString(Functions.FULL_CLASS, "").substring(2, 3)
 					+ "%";
-			Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {
-					Functions.DB_RAW_FACH, Functions.DB_ROWID,
-					Functions.DB_FACH, Functions.DB_LEHRER }, Functions.DB_DAY
-					+ "=? AND " + Functions.DB_HOUR + "=? AND "
-					+ Functions.DB_RAW_FACH + "!=? AND "
-					+ Functions.DB_RAW_FACH + "!=? AND "
-					+ Functions.DB_RAW_FACH + "!=? AND " + Functions.DB_CLASS
+			Cursor c = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE, new String[] {
+					LSGSQliteOpenHelper.DB_RAW_FACH, LSGSQliteOpenHelper.DB_ROWID,
+					LSGSQliteOpenHelper.DB_FACH, LSGSQliteOpenHelper.DB_LEHRER }, LSGSQliteOpenHelper.DB_DAY
+					+ "=? AND " + LSGSQliteOpenHelper.DB_HOUR + "=? AND "
+					+ LSGSQliteOpenHelper.DB_RAW_FACH + "!=? AND "
+					+ LSGSQliteOpenHelper.DB_RAW_FACH + "!=? AND "
+					+ LSGSQliteOpenHelper.DB_RAW_FACH + "!=? AND " + LSGSQliteOpenHelper.DB_CLASS
 					+ " LIKE ?", selectionArgs, null, null, null);
 			c.moveToFirst();
 			RadioGroup rg = new RadioGroup(this);
@@ -641,7 +660,7 @@ public class SetupAssistant extends Activity {
 				if (showNone) {
 					try {
 						if (!c.getString(
-								c.getColumnIndex(Functions.DB_RAW_FACH))
+								c.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH))
 								.substring(0, 3).equals("INT"))
 							showNone = false;
 					} catch (IndexOutOfBoundsException e) {
@@ -649,10 +668,10 @@ public class SetupAssistant extends Activity {
 					}
 				}
 				RadioButton option = new RadioButton(this);
-				option.setText(c.getString(c.getColumnIndex(Functions.DB_FACH))
+				option.setText(c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_FACH))
 						+ " bei "
-						+ c.getString(c.getColumnIndex(Functions.DB_LEHRER)));
-				option.setId(c.getInt(c.getColumnIndex(Functions.DB_ROWID)));
+						+ c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_LEHRER)));
+				option.setId(c.getInt(c.getColumnIndex(LSGSQliteOpenHelper.DB_ROWID)));
 				if (ii == 0)
 					option.setChecked(true);
 				rg.addView(option);
@@ -669,7 +688,6 @@ public class SetupAssistant extends Activity {
 					.addView(rg);
 			timetable_conflicts_rg.add(rg);
 		}
-		myDB.close();
 	}
 
 	public void next(View v) {
@@ -717,7 +735,7 @@ public class SetupAssistant extends Activity {
 					edit.putString(Functions.FULL_CLASS, "null");
 				}
 			} else {
-				edit.putString(Functions.TEACHER_SHORT, teacher_short);
+				edit.putString(LSGSQliteOpenHelper.TEACHER_SHORT, teacher_short);
 			}
 			CheckBox chk = (CheckBox) findViewById(R.id.push_check);
 			edit.putBoolean("useac2dm", chk.isChecked());
@@ -731,47 +749,48 @@ public class SetupAssistant extends Activity {
 			sd.execute();
 			break;
 		case 2:
-			SQLiteDatabase myDB = openOrCreateDatabase(Functions.DB_NAME,
-					MODE_PRIVATE, null);
+			SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
 			for (int i = 0; i < timetable_conflicts_rg.size(); i++) {
 				RadioGroup rg = timetable_conflicts_rg.get(i);
 				Log.d("id", Integer.valueOf(rg.getCheckedRadioButtonId())
 						.toString());
 				if (rg.getCheckedRadioButtonId() != 0) {
-					Cursor c = myDB.query(Functions.DB_TIME_TABLE,
-							new String[] { Functions.DB_HOUR, Functions.DB_DAY,
-									Functions.DB_RAW_FACH,
-									Functions.DB_RAW_LEHRER },
-							Functions.DB_ROWID + "=?", new String[] { Integer
-									.valueOf(rg.getCheckedRadioButtonId())
-									.toString() }, null, null, null);
+					Cursor c = myDB.query(
+							LSGSQliteOpenHelper.DB_TIME_TABLE,
+							new String[] { LSGSQliteOpenHelper.DB_HOUR,
+									LSGSQliteOpenHelper.DB_DAY,
+									LSGSQliteOpenHelper.DB_RAW_FACH,
+									LSGSQliteOpenHelper.DB_RAW_LEHRER },
+							LSGSQliteOpenHelper.DB_ROWID + "=?",
+							new String[] { Integer.valueOf(
+									rg.getCheckedRadioButtonId()).toString() },
+							null, null, null);
 					c.moveToFirst();
 					Log.d("count", Integer.valueOf(c.getCount()).toString());
 					SQLiteStatement stmt = myDB.compileStatement("DELETE FROM "
-							+ Functions.DB_EXCLUDE_TABLE + " WHERE "
-							+ Functions.DB_HOUR + "=? AND " + Functions.DB_DAY
-							+ "=? AND " + Functions.DB_RAW_FACH + "=? AND "
-							+ Functions.DB_TEACHER + "=?");
+							+ LSGSQliteOpenHelper.DB_EXCLUDE_TABLE + " WHERE "
+							+ LSGSQliteOpenHelper.DB_HOUR + "=? AND " + LSGSQliteOpenHelper.DB_DAY
+							+ "=? AND " + LSGSQliteOpenHelper.DB_RAW_FACH + "=? AND "
+							+ LSGSQliteOpenHelper.DB_TEACHER + "=?");
 					stmt.bindString(1,
-							c.getString(c.getColumnIndex(Functions.DB_HOUR)));
+							c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_HOUR)));
 					stmt.bindString(2,
-							c.getString(c.getColumnIndex(Functions.DB_DAY)));
+							c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_DAY)));
 					stmt.bindString(3, c.getString(c
-							.getColumnIndex(Functions.DB_RAW_FACH)));
+							.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)));
 					stmt.bindString(4, c.getString(c
-							.getColumnIndex(Functions.DB_RAW_LEHRER)));
+							.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_LEHRER)));
 					stmt.execute();
 					Log.d("hour",
-							c.getString(c.getColumnIndex(Functions.DB_HOUR)));
+							c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_HOUR)));
 					Log.d("day",
-							c.getString(c.getColumnIndex(Functions.DB_DAY)));
+							c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_DAY)));
 					Log.d("subject", c.getString(c
-							.getColumnIndex(Functions.DB_RAW_FACH)));
+							.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)));
 					Log.d("teacher", c.getString(c
-							.getColumnIndex(Functions.DB_RAW_LEHRER)));
+							.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_LEHRER)));
 				}
 			}
-			myDB.close();
 			edit.putBoolean(Functions.IS_LOGGED_IN, true);
 			edit.commit();
 			startActivity(new Intent(this, MainActivity.class));

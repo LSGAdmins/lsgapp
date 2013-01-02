@@ -23,25 +23,38 @@ import com.lsg.app.PagerTitles;
 import com.lsg.app.R;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class TimeTableViewPagerAdapter extends PagerAdapter implements
 		PagerTitles, SQLlist {
+	private float pageWidth = 1.0F;
 	private TimeTableAdapter[] timeTableAdapters = new TimeTableAdapter[5];
 	private SQLiteDatabase myDB;
 	private TimeTableFragment timetableFragment;
-	
+
 	private TimeTable timeTable;
-	
+
+	public TimeTableViewPagerAdapter(TimeTableFragment timetableFragment,
+			float pageWidth) {
+		this.pageWidth = pageWidth;
+		init(timetableFragment);
+	}
+
 	public TimeTableViewPagerAdapter(TimeTableFragment timetableFragment) {
-		myDB = ((FragmentActivityCallbacks) timetableFragment.getActivity()).getDB();
+		init(timetableFragment);
+	}
+
+	public void init(TimeTableFragment timetableFragment) {
+		myDB = LSGApplication.getSqliteDatabase();
 		this.timetableFragment = timetableFragment;
 		for (int i = 0; i < 5; i++)
-			timeTableAdapters[i] = new TimeTableAdapter(timetableFragment.getActivity(),
-					null);
+			timeTableAdapters[i] = new TimeTableAdapter(
+					timetableFragment.getActivity(), null);
 
 		SQLiteStatement num_rows = myDB
 				.compileStatement("SELECT COUNT(*) FROM "
-						+ Functions.DB_TIME_TABLE);
+						+ LSGSQliteOpenHelper.DB_TIME_TABLE);
 		long count = num_rows.simpleQueryForLong();
 		if (count == 0)
 			timetableFragment.updateTimeTable();
@@ -49,7 +62,7 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 		timeTable = new TimeTable(timetableFragment.getActivity(), myDB);
 		timeTable.updateCursor();
 		changeCursors();
-		}
+	}
 
 	@Override
 	public int getCount() {
@@ -68,36 +81,37 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 
 	@Override
 	public Object instantiateItem(View pager, int position) {
-		LayoutInflater inflater = (LayoutInflater) timetableFragment.getActivity()
+		LayoutInflater inflater = (LayoutInflater) timetableFragment
+				.getActivity()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout lay = (LinearLayout) inflater.inflate(R.layout.list, null);
 		ListView lv = (ListView) lay.findViewById(android.R.id.list);
 		lv.setAdapter(timeTableAdapters[position]);
-		//vplan matching
+		// vplan matching
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Cursor c = myDB.query(Functions.DB_TIME_TABLE, new String[] {
-						Functions.DB_REMOTE_ID, Functions.DB_VERTRETUNG },
-						Functions.DB_ROWID + "=?",
+				Cursor c = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE, new String[] {
+						LSGSQliteOpenHelper.DB_REMOTE_ID, LSGSQliteOpenHelper.DB_VERTRETUNG },
+						LSGSQliteOpenHelper.DB_ROWID + "=?",
 						new String[] { Long.valueOf(id).toString() }, null,
 						null, null);
 				if (c.moveToFirst())
-					if (c.getString(c.getColumnIndex(Functions.DB_VERTRETUNG)) != null
+					if (c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG)) != null
 							&& c.getString(
-									c.getColumnIndex(Functions.DB_VERTRETUNG))
+									c.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG))
 									.equals("true")) {
 						Intent intent = new Intent(timetableFragment
 								.getActivity(), InfoActivity.class);
 						intent.putExtra("type", "timetable_popup");
 						intent.putExtra("id", c.getString(c
-								.getColumnIndex(Functions.DB_REMOTE_ID)));
+								.getColumnIndex(LSGSQliteOpenHelper.DB_REMOTE_ID)));
 						timetableFragment.getActivity().startActivity(intent);
 					}
 			}
 		});
-		
+
 		lv.setEmptyView(lay.findViewById(R.id.list_view_empty));
 		timetableFragment.registerForContextMenu(lv);
 		((TextView) lay.findViewById(R.id.list_view_empty))
@@ -105,7 +119,6 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 		((ViewPager) pager).addView(lay, 0);
 		return lay;
 	}
-
 
 	public void setClass(String klasse, boolean ownClass) {
 		timeTable.setClass(klasse, ownClass);
@@ -145,6 +158,7 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 		for (int i = 0; i < getCount(); i++)
 			timeTableAdapters[i].changeCursor(timeTable.getCursor(i));
 	}
+
 	public String getKlasse() {
 		return timeTable.getKlasse();
 	}
@@ -155,5 +169,10 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 
 	public boolean getOwnClass() {
 		return timeTable.isOwnClass();
+	}
+
+	@Override
+	public float getPageWidth(int position) {
+		return pageWidth;
 	}
 }

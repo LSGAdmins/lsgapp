@@ -7,8 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.lsg.app.interfaces.SQLlist;
-
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,6 +29,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	public static class SubjectListUpdater {
@@ -59,17 +61,16 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 				try {
 					JSONArray jArray = new JSONArray(get);
 					int i = 0;
-					SQLiteDatabase myDB = context.openOrCreateDatabase(
-							Functions.DB_NAME, Context.MODE_PRIVATE, null);
-					myDB.delete(Functions.DB_SUBJECT_TABLE, null, null); // clear
+					SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+					myDB.delete(LSGSQliteOpenHelper.DB_SUBJECT_TABLE, null, null); // clear
 																			// subjectlist
 					while (i < jArray.length() - 1) {
 						JSONObject jObject = jArray.getJSONObject(i);
 						ContentValues values = new ContentValues();
-						values.put(Functions.DB_RAW_FACH,
+						values.put(LSGSQliteOpenHelper.DB_RAW_FACH,
 								jObject.getString("kuerzel"));
-						values.put(Functions.DB_FACH, jObject.getString("name"));
-						myDB.insert(Functions.DB_SUBJECT_TABLE, null, values);
+						values.put(LSGSQliteOpenHelper.DB_FACH, jObject.getString("name"));
+						myDB.insert(LSGSQliteOpenHelper.DB_SUBJECT_TABLE, null, values);
 						i++;
 					}
 					JSONObject jObject = jArray.getJSONObject(i);
@@ -77,7 +78,6 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 					SharedPreferences.Editor edit = prefs.edit();
 					edit.putString("subject_update_time", update_time);
 					edit.commit();
-					myDB.close();
 				} catch (JSONException e) {
 					Log.d("json", e.getMessage());
 					return new String[] { "json",
@@ -113,10 +113,10 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 			getListView().addHeaderView(search);
 		}
 		
-		myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
+		myDB = LSGApplication.getSqliteDatabase();
 		
 		updateCursor();
-		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
+		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {LSGSQliteOpenHelper.DB_FACH},
 				new int[] {R.id.main_textview}, 0);
 		setListAdapter(adap);
 		
@@ -127,7 +127,7 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
         TextView textv = (TextView) findViewById(R.id.list_view_empty);
         textv.setText(R.string.subjectlist_empty);
         
-        where_cond = Functions.DB_FACH + " LIKE ?";
+        where_cond = LSGSQliteOpenHelper.DB_FACH + " LIKE ?";
         where_conds = new String[1];
         where_conds[0] = "%";
 	}
@@ -152,8 +152,9 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	    	return true;
         case android.R.id.home:
             // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, VPlan.class);
+            Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("fragment", VPlan.class);
             startActivity(intent);
             return true;
 	    default:
@@ -163,14 +164,14 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, this, Functions.DB_SUBJECT_TABLE);
+		Functions.createContextMenu(menu, v, menuInfo, this, LSGSQliteOpenHelper.DB_SUBJECT_TABLE);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, this, this, Functions.DB_SUBJECT_TABLE);
+		return Functions.contextMenuSelect(item, this, this, LSGSQliteOpenHelper.DB_SUBJECT_TABLE);
 	}
 	public void updateCursor() {
-		c = myDB.query(Functions.DB_SUBJECT_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_FACH}, where_cond, where_conds, null, null, null);
+		c = myDB.query(LSGSQliteOpenHelper.DB_SUBJECT_TABLE, new String [] {LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_FACH}, where_cond, where_conds, null, null, null);
 	}
 	public void updateList() {
 		updateCursor();
@@ -191,10 +192,5 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	public void onTextChanged (CharSequence s, int start, int before, int count) {
 		String search = s + "";
 		updateWhereCond(search);
-	}
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		myDB.close();
 	}
 }

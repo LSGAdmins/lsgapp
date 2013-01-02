@@ -7,5 +7,4 @@ public interface FragmentActivityCallbacks {
 	public TitleCompat getTitlebar();
 	public SlideMenu getSlideMenu();
 	public void changeFragment(Class<?extends Fragment> frag);
-	public SQLiteDatabase getDB();
 }

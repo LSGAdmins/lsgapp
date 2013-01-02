@@ -29,7 +29,9 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 @TargetApi(11)
 public class SettingsAdvanced extends PreferenceActivity {
@@ -39,8 +41,12 @@ public class SettingsAdvanced extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.homeUp(this);
+	}
+
+	@Override
+	protected void onResume() {
 		slidemenu = new SlideMenu(this, SettingsAdvanced.class);
-		slidemenu.checkEnabled();
+		super.onResume();
 	}
 
 	@Override
@@ -142,24 +148,24 @@ public class SettingsAdvanced extends PreferenceActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 
-			myDB = getActivity().openOrCreateDatabase(Functions.DB_NAME,
-					MODE_PRIVATE, null);
+			myDB = LSGApplication.getSqliteDatabase();
 
 			Bundle data = getArguments();
 			String type = data.getString("list");
 			if (type.equals("blacklist")) {
-				table = new String(Functions.DB_EXCLUDE_TABLE);
-				wherecond = Functions.DB_TYPE + "='oldstyle'";
+				table = new String(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE);
+				wherecond = LSGSQliteOpenHelper.DB_TYPE + "='oldstyle'";
 			} else {
-				table = new String(Functions.INCLUDE_TABLE);
+				table = new String(LSGSQliteOpenHelper.INCLUDE_TABLE);
 			}
 
-			c = myDB.query(table, new String[] { Functions.DB_ROWID,
-					Functions.DB_FACH }, wherecond, null, null, null, null);
+			c = myDB.query(table, new String[] { LSGSQliteOpenHelper.DB_ROWID,
+					LSGSQliteOpenHelper.DB_FACH }, wherecond, null, null, null,
+					null);
 
 			adap = new SimpleCursorAdapter(getActivity(),
 					R.layout.main_listitem, c,
-					new String[] { Functions.DB_FACH },
+					new String[] { LSGSQliteOpenHelper.DB_FACH },
 					new int[] { R.id.main_textview }, 0);
 			setListAdapter(adap);
 		}
@@ -178,7 +184,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 			// info if listview empty
 			TextView textv = (TextView) getActivity().findViewById(
 					R.id.list_view_empty);
-			if (table.equals(Functions.DB_EXCLUDE_TABLE))
+			if (table.equals(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE))
 				textv.setText(R.string.exclude_empty);
 			else
 				textv.setText(R.string.include_empty);
@@ -193,8 +199,9 @@ public class SettingsAdvanced extends PreferenceActivity {
 		}
 
 		public void updateList() {
-			c = myDB.query(table, new String[] { Functions.DB_ROWID,
-					Functions.DB_FACH }, wherecond, null, null, null, null);
+			c = myDB.query(table, new String[] { LSGSQliteOpenHelper.DB_ROWID,
+					LSGSQliteOpenHelper.DB_FACH }, wherecond, null, null, null,
+					null);
 			Log.d("where", wherecond);
 			adap.changeCursor(c);
 		}
@@ -219,13 +226,13 @@ public class SettingsAdvanced extends PreferenceActivity {
 			long _id = info.id;
 			int menuItemIndex = item.getItemId();
 			if (menuItemIndex == 0) {
-				myDB.delete(table, Functions.DB_ROWID + " = ?",
+				myDB.delete(table, LSGSQliteOpenHelper.DB_ROWID + " = ?",
 						new String[] { Long.valueOf(_id).toString() });
 				updateList();
 			}
 			return true;
 		}
-		
+
 		@Override
 		public void onDestroy() {
 			super.onDestroy();

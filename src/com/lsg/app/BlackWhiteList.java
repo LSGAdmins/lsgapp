@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -12,8 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class BlackWhiteList extends ListActivity {
 	private SQLiteDatabase myDB;
@@ -29,7 +32,7 @@ public class BlackWhiteList extends ListActivity {
 		Functions.styleListView(getListView(), this);
 		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
-		myDB = openOrCreateDatabase(Functions.DB_NAME, MODE_PRIVATE, null);
+		myDB = LSGApplication.getSqliteDatabase();
 		
 		Bundle data = getIntent().getExtras();
 		String type = data.getString(Functions.BLACKWHITELIST);
@@ -37,18 +40,18 @@ public class BlackWhiteList extends ListActivity {
 		String wherecond = "";
 		if(type.equals(Functions.BLACKLIST)) {
 			setTitle(getString(R.string.blacklist));
-			table = new String(Functions.DB_EXCLUDE_TABLE);
-			wherecond = Functions.DB_TYPE + "='oldstyle'";
+			table = new String(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE);
+			wherecond = LSGSQliteOpenHelper.DB_TYPE + "='oldstyle'";
 		}
 		else {
 			setTitle(getString(R.string.whitelist));
-			table = new String(Functions.INCLUDE_TABLE);
+			table = new String(LSGSQliteOpenHelper.INCLUDE_TABLE);
 		}
 		
-		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
+		c = myDB.query(table, new String[] {LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_FACH},
 				wherecond, null, null, null, null);
 		
-		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {Functions.DB_FACH},
+		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {LSGSQliteOpenHelper.DB_FACH},
 				new int[] {R.id.main_textview}, 0);
 		setListAdapter(adap);
 		
@@ -57,13 +60,13 @@ public class BlackWhiteList extends ListActivity {
 		//info if listview empty
         getListView().setEmptyView(findViewById(R.id.list_view_empty));
         TextView textv = (TextView) findViewById(R.id.list_view_empty);
-        if(table.equals(Functions.DB_EXCLUDE_TABLE))
+        if(table.equals(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE))
         	textv.setText(R.string.exclude_empty);
         else
         	textv.setText(R.string.include_empty);
 	}
 	public void updateList() {
-		c = myDB.query(table, new String[] {Functions.DB_ROWID, Functions.DB_FACH},
+		c = myDB.query(table, new String[] {LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_FACH},
 				null, null, null, null, null);
 		adap.changeCursor(c);
 	}
@@ -82,7 +85,7 @@ public class BlackWhiteList extends ListActivity {
 		long _id          = info.id;
 		int menuItemIndex = item.getItemId();
 		if(menuItemIndex == 0) {
-			myDB.delete(table, Functions.DB_ROWID + " = ?", new String[] {Long.valueOf(_id).toString()});
+			myDB.delete(table, LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] {Long.valueOf(_id).toString()});
 			updateList();
 		}
 		return true;
@@ -105,6 +108,5 @@ public class BlackWhiteList extends ListActivity {
 	public void onDestroy() {
 		super.onDestroy();
 		c.close();
-		myDB.close();
 	}
 }

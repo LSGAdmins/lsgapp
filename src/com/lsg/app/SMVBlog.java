@@ -49,7 +49,7 @@ public class SMVBlog extends Fragment implements HomeCall, RefreshCall {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		slidemenu = ((MainActivity) getActivity()).getSlideMenu();
-		slidemenu.checkEnabled();
+		slidemenu.setFragment(SMVBlog.class);
 		titlebar = ((MainActivity) getActivity()).getTitlebar();
 		titlebar.init(this);
 		titlebar.addRefresh(this);

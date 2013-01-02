@@ -35,8 +35,10 @@ import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class Events extends ListFragment implements SQLlist, RefreshCall, TextWatcher, WorkerService.WorkerClass {
 	public static class EventAdapter extends CursorAdapter implements SectionIndexer {
@@ -65,15 +67,15 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 		public void updateHeaders() {
 			for (cursor.moveToFirst(); cursor.getPosition() < cursor.getCount(); cursor.moveToNext()) {
 				String date = cursor.getString(cursor
-						.getColumnIndex(Functions.DB_DATES));
+						.getColumnIndex(LSGSQliteOpenHelper.DB_DATES));
 				String olddate = "e.e";
 				if (cursor.getPosition() > 0) {
 					cursor.moveToPosition(cursor.getPosition() - 1);
 					olddate = cursor.getString(cursor
-							.getColumnIndex(Functions.DB_DATES));
+							.getColumnIndex(LSGSQliteOpenHelper.DB_DATES));
 					cursor.moveToNext();
 				}
-				String datebeginning = cursor.getString(cursor.getColumnIndex(Functions.DB_DATES));
+				String datebeginning = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_DATES));
 				String[] oldmonth = olddate.split("\\.");
 				String[] month = datebeginning.split("\\.");
 				String[] monthsshort = context.getResources().getStringArray(R.array.monthsshort);
@@ -107,16 +109,16 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 			int position = cursor.getPosition();
 			if(position > 0) {
 				cursor.moveToPosition(position-1);
-				olddate = cursor.getString(cursor.getColumnIndex(Functions.DB_DATES));
+				olddate = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_DATES));
 				cursor.moveToNext();
 			}
 			Standard holder = (Standard) view.getTag();	
-			String title = cursor.getString(cursor.getColumnIndex(Functions.DB_TITLE));
+			String title = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_TITLE));
 			holder.title.setText(title);
-			String datebeginning = cursor.getString(cursor.getColumnIndex(Functions.DB_DATES));
-			String timebeginning = cursor.getString(cursor.getColumnIndex(Functions.DB_TIMES));
-			String dateending = cursor.getString(cursor.getColumnIndex(Functions.DB_ENDDATES));
-			String timeending = cursor.getString(cursor.getColumnIndex(Functions.DB_ENDTIMES));
+			String datebeginning = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_DATES));
+			String timebeginning = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_TIMES));
+			String dateending = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_ENDDATES));
+			String timeending = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_ENDTIMES));
 			if (datebeginning.equals("null") && timebeginning.equals("null") && dateending.equals("null") && timeending.equals("null"))
 				holder.date.setText("Keine Zeit angegeben");
 			else if (timebeginning.equals("null") && dateending.equals("null") && timeending.equals("null"))
@@ -129,7 +131,7 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 				holder.date.setText("am " + datebeginning + " von " + timebeginning + " bis " + timeending);
 			else
 				holder.date.setText("von " + datebeginning + " " + timebeginning + " bis " + dateending + " " + timeending);
-			String place = cursor.getString(cursor.getColumnIndex(Functions.DB_VENUE));
+			String place = cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VENUE));
 			if (place.equals("null")) {
 				holder.place.setText("");
 				holder.place.setVisibility(View.GONE);
@@ -186,21 +188,20 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 				try {
 					JSONArray jArray = new JSONArray(get);
 					int i = 0;
-					SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-					myDB.delete(Functions.DB_EVENTS_TABLE, null, null); //clear termine
+					SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+					myDB.delete(LSGSQliteOpenHelper.DB_EVENTS_TABLE, null, null); //clear termine
 					while(i < jArray.length()) {
 						JSONObject jObject = jArray.getJSONObject(i);
 						ContentValues values = new ContentValues();
-						values.put(Functions.DB_DATES, jObject.getString("dates"));
-						values.put(Functions.DB_ENDDATES, jObject.getString("enddates"));
-						values.put(Functions.DB_TIMES, jObject.getString("times"));
-						values.put(Functions.DB_ENDTIMES, jObject.getString("endtimes"));
-						values.put(Functions.DB_TITLE, jObject.getString("title"));
-						values.put(Functions.DB_VENUE, jObject.getString("venue"));
-						myDB.insert(Functions.DB_EVENTS_TABLE, null, values);
+						values.put(LSGSQliteOpenHelper.DB_DATES, jObject.getString("dates"));
+						values.put(LSGSQliteOpenHelper.DB_ENDDATES, jObject.getString("enddates"));
+						values.put(LSGSQliteOpenHelper.DB_TIMES, jObject.getString("times"));
+						values.put(LSGSQliteOpenHelper.DB_ENDTIMES, jObject.getString("endtimes"));
+						values.put(LSGSQliteOpenHelper.DB_TITLE, jObject.getString("title"));
+						values.put(LSGSQliteOpenHelper.DB_VENUE, jObject.getString("venue"));
+						myDB.insert(LSGSQliteOpenHelper.DB_EVENTS_TABLE, null, values);
 						i++;
 						}
-					myDB.close();
 					} catch(JSONException e) {
 						Log.d("json", e.getMessage());
 						return new String[] {"json", context.getString(R.string.jsonerror)};
@@ -214,9 +215,12 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 		}
 	private ProgressDialog loading;
 	private EventAdapter evadap;
-	private String where_cond = " " + Functions.DB_DATES + " LIKE ? OR " + Functions.DB_ENDDATES + " LIKE ? OR "
-			+ Functions.DB_TIMES + " LIKE ? OR " + Functions.DB_ENDTIMES + " LIKE ? OR " + Functions.DB_TITLE + " LIKE ? OR "
-			+ Functions.DB_VENUE + " LIKE ? ";
+	private String where_cond = " " + LSGSQliteOpenHelper.DB_DATES
+			+ " LIKE ? OR " + LSGSQliteOpenHelper.DB_ENDDATES + " LIKE ? OR "
+			+ LSGSQliteOpenHelper.DB_TIMES + " LIKE ? OR "
+			+ LSGSQliteOpenHelper.DB_ENDTIMES + " LIKE ? OR "
+			+ LSGSQliteOpenHelper.DB_TITLE + " LIKE ? OR "
+			+ LSGSQliteOpenHelper.DB_VENUE + " LIKE ? ";
 	private String[] where_conds_events = new String[6];
 	private Cursor events;
 	private SQLiteDatabase myDB;
@@ -240,10 +244,10 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		myDB = getActivity().openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
+		myDB = LSGApplication.getSqliteDatabase();
 		updateWhereCond("%");
-		events = myDB.query(Functions.DB_EVENTS_TABLE, new String [] {Functions.DB_ROWID, Functions.DB_DATES, Functions.DB_ENDDATES,
-				Functions.DB_TIMES,	Functions.DB_ENDTIMES, Functions.DB_TITLE, Functions.DB_VENUE}, where_cond,
+		events = myDB.query(LSGSQliteOpenHelper.DB_EVENTS_TABLE, new String [] {LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_DATES, LSGSQliteOpenHelper.DB_ENDDATES,
+				LSGSQliteOpenHelper.DB_TIMES,	LSGSQliteOpenHelper.DB_ENDTIMES, LSGSQliteOpenHelper.DB_TITLE, LSGSQliteOpenHelper.DB_VENUE}, where_cond,
 				where_conds_events, null, null, null);
 		evadap = new EventAdapter(getActivity(), events);
 		//setContentView(R.layout.list);
@@ -254,7 +258,7 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 		((TextView) getActivity().findViewById(R.id.list_view_empty)).setText(R.string.events_empty);
 		getListView().setFastScrollEnabled(true);
 		
-		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + Functions.DB_EVENTS_TABLE);
+		SQLiteStatement num_rows = myDB.compileStatement("SELECT COUNT(*) FROM " + LSGSQliteOpenHelper.DB_EVENTS_TABLE);
 		long count = num_rows.simpleQueryForLong();
 		if(count == 0)
 			updateEvents();
@@ -358,11 +362,11 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 	@Override
 	public void updateList() {
 		if (myDB.isOpen()) {
-			events = myDB.query(Functions.DB_EVENTS_TABLE, new String[] {
-					Functions.DB_ROWID, Functions.DB_DATES,
-					Functions.DB_ENDDATES, Functions.DB_TIMES,
-					Functions.DB_ENDTIMES, Functions.DB_TITLE,
-					Functions.DB_VENUE }, where_cond, where_conds_events, null,
+			events = myDB.query(LSGSQliteOpenHelper.DB_EVENTS_TABLE, new String[] {
+					LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_DATES,
+					LSGSQliteOpenHelper.DB_ENDDATES, LSGSQliteOpenHelper.DB_TIMES,
+					LSGSQliteOpenHelper.DB_ENDTIMES, LSGSQliteOpenHelper.DB_TITLE,
+					LSGSQliteOpenHelper.DB_VENUE }, where_cond, where_conds_events, null,
 					null, null);
 			evadap.changeCursor(events);
 		}
@@ -371,7 +375,6 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 	public void onDestroy() {
 		super.onDestroy();
 		events.close();
-		myDB.close();
 	}
 
 	@Override

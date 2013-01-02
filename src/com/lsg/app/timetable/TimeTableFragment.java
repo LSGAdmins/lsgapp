@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,8 +39,10 @@ import com.lsg.app.ServiceHandler;
 import com.lsg.app.WorkerService;
 import com.lsg.app.interfaces.SelectedCallback;
 import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class TimeTableFragment extends Fragment implements SelectedCallback, RefreshCall, WorkerService.WorkerClass {
 	private ProgressDialog loading;
@@ -62,7 +66,14 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		super.onCreate(savedInstanceState);
 		getActivity().setTitle(R.string.timetable);
 		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TimeTableFragment.class);
-		viewpageradap = new TimeTableViewPagerAdapter(this);
+		
+		float pageWidth = 1.0F;
+		Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+//		if(display.getOrientation() == Configuration.ORIENTATION_LANDSCAPE)
+//			pageWidth = (1.0F - Functions.percentWidth(Functions.dpToPx(40, getActivity()), getActivity())) / 2;
+		
+		viewpageradap = new TimeTableViewPagerAdapter(this, pageWidth);
+		
 		pager = (ViewPager) getActivity().findViewById(R.id.viewpager);
 		pager.setAdapter(viewpageradap);
 		pager.setPageMargin(Functions.dpToPx(40, getActivity()));
@@ -142,7 +153,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		((TextView) getActivity().findViewById(R.id.footer_text)).setVisibility(View.GONE);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
-			viewpageradap.setTeacher(prefs.getString(Functions.TEACHER_SHORT, ""));
+			viewpageradap.setTeacher(prefs.getString(LSGSQliteOpenHelper.TEACHER_SHORT, ""));
 			viewpageradap.updateList();
 		} else {
 			viewpageradap.setClass("", true);
@@ -152,10 +163,9 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 
 	public void showClasses() {
 		footer.setVisibility(View.VISIBLE);
-		final SQLiteDatabase myDB = getActivity().openOrCreateDatabase(Functions.DB_NAME,
-				Context.MODE_PRIVATE, null);
-		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_PUPILS,
-				new String[] { Functions.DB_ROWID, Functions.DB_KLASSE }, null,
+		final SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+		final Cursor c = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS,
+				new String[] { LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_KLASSE }, null,
 				null, null, null, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.select_class);
@@ -163,15 +173,14 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			public void onClick(DialogInterface dialog, int item) {
 				c.moveToPosition(item);
 				viewpageradap.setClass(
-						c.getString(c.getColumnIndex(Functions.DB_KLASSE)),
+						c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE)),
 						false);
 				((TextView) getActivity().findViewById(R.id.footer_text)).setText(c
-						.getString(c.getColumnIndex(Functions.DB_KLASSE)));
+						.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE)));
 				viewpageradap.updateList();
 				c.close();
-				myDB.close();
 			}
-		}, Functions.DB_KLASSE);
+		}, LSGSQliteOpenHelper.DB_KLASSE);
 		builder.setCancelable(false);
 		AlertDialog alert = builder.create();
 		alert.show();
@@ -179,25 +188,23 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 
 	public void showTeachers() {
 		footer.setVisibility(View.VISIBLE);
-		final SQLiteDatabase myDB = getActivity().openOrCreateDatabase(Functions.DB_NAME,
-				Context.MODE_PRIVATE, null);
-		final Cursor c = myDB.query(Functions.DB_TIME_TABLE_HEADERS_TEACHERS,
-				new String[] { Functions.DB_ROWID, Functions.DB_TEACHER,
-						Functions.DB_SHORT }, null, null, null, null, null);
+		final SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+		final Cursor c = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS,
+				new String[] { LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_TEACHER,
+				LSGSQliteOpenHelper.DB_SHORT }, null, null, null, null, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.select_teacher);
 		builder.setCursor(c, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				c.moveToPosition(item);
 				viewpageradap.setTeacher(c.getString(c
-						.getColumnIndex(Functions.DB_SHORT)));
+						.getColumnIndex(LSGSQliteOpenHelper.DB_SHORT)));
 				((TextView) getActivity().findViewById(R.id.footer_text)).setText(c
-						.getString(c.getColumnIndex(Functions.DB_TEACHER)));
+						.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_TEACHER)));
 				viewpageradap.updateList();
 				c.close();
-				myDB.close();
 			}
-		}, Functions.DB_TEACHER);
+		}, LSGSQliteOpenHelper.DB_TEACHER);
 		builder.setCancelable(false);
 		AlertDialog alert = builder.create();
 		alert.show();
@@ -353,11 +360,11 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, getActivity(), Functions.DB_TIME_TABLE);
+		Functions.createContextMenu(menu, v, menuInfo, getActivity(), LSGSQliteOpenHelper.DB_TIME_TABLE);
 	}
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, getActivity(), viewpageradap, Functions.DB_TIME_TABLE);
+		return Functions.contextMenuSelect(item, getActivity(), viewpageradap, LSGSQliteOpenHelper.DB_TIME_TABLE);
 	}
 	public void update(int what, Context c) {
 		TimeTableUpdater udp = new TimeTableUpdater(c);

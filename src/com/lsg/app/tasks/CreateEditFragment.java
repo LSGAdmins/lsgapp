@@ -31,6 +31,8 @@ import com.lsg.app.AdvancedWrapper;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
 import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 import com.lsg.app.timetable.TimeTable;
 import com.lsg.app.widget.DateButton;
 
@@ -88,7 +90,7 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 		types[2] = getActivity().getString(R.string.other_test);
 		ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, types);
 		((Spinner) getActivity().findViewById(R.id.type)).setAdapter(typeAdapter);
-		myDB = ((FragmentActivityCallbacks) getActivity()).getDB();
+		myDB = LSGApplication.getSqliteDatabase();
 		if(savedInstanceState != null) {
 			if(savedInstanceState.getSerializable("date") != null) {
 				//get DateButton & set date
@@ -122,7 +124,7 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
                         Calendar date = dateButton.getCalendar();
                         
                         subjectsCursor.moveToPosition(((Spinner) getActivity().findViewById(R.id.subject)).getSelectedItemPosition());
-                        String subject =  subjectsCursor.getString(subjectsCursor.getColumnIndex(Functions.DB_RAW_FACH));
+                        String subject =  subjectsCursor.getString(subjectsCursor.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH));
                         String type;
                         switch(((Spinner) getActivity().findViewById(R.id.type)).getSelectedItemPosition()) {
                         case 0:
@@ -189,7 +191,7 @@ public class CreateEditFragment extends Fragment implements DatePickerDialog.OnD
 			for (subjectsCursor.moveToFirst(); !subjectsCursor
 					.isAfterLast(); subjectsCursor.moveToNext()) {
 				subjects.add(subjectsCursor.getString(subjectsCursor
-						.getColumnIndex(Functions.DB_FACH)));
+						.getColumnIndex(LSGSQliteOpenHelper.DB_FACH)));
 			}
 		}
 		subjects.add(getActivity().getString(R.string.other_subject));

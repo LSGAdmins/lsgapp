@@ -16,7 +16,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -27,6 +26,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +40,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -51,6 +50,8 @@ import android.widget.ListView;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class Functions {
 	public static final String   TAG            = "LSGäpp";
@@ -88,72 +89,6 @@ public class Functions {
 	public static final String NEWS_PUPILS = "news_pupils";
 	public static final String NEWS_TEACHERS = "news_teachers";
 	
-	public static final String DB_ROWID           = "_id";
-	public static final String DB_NAME            = "lsgapp";
-	public static final String DB_REMOTE_ID           = "remote_id";
-	//VPlan
-	public static final String DB_VPLAN_TABLE     = "vertretungen";
-	public static final String DB_VPLAN_TEACHER   = "lehrervertretungen";
-	public static final String DB_CLASS_LEVEL    = "klassenstufe";
-	public static final String DB_KLASSE          = "klasse";
-	public static final String DB_STUNDE          = "stunde";
-	public static final String DB_VERTRETER       = "vertreter";
-	public static final String DB_RAW_VERTRETER   = "rawvertreter";
-	public static final String DB_LEHRER          = "lehrer";
-	public static final String DB_RAW_LEHRER      = "rawlehrer";
-	public static final String DB_ROOM            = "raum";
-	public static final String DB_TYPE             = "art";
-	public static final String DB_VERTRETUNGSTEXT = "vertretungstext";
-	public static final String DB_FACH            = "fach";
-	public static final String DB_RAW_FACH        = "rawfach";
-	public static final String DB_DATE            = "date";
-	public static final String DB_LENGTH          = "length";
-	public static final String DB_DAY_OF_WEEK     = "dayofweek";
-	// Termine
-	public static final String DB_EVENTS_TABLE = "events";
-	public static final String DB_DATES = "dates";
-	public static final String DB_ENDDATES = "enddates";
-	public static final String DB_TIMES = "times";
-	public static final String DB_ENDTIMES = "endtimes";
-	public static final String DB_TITLE = "title";
-	public static final String DB_VENUE = "venue";
-	// exclude & include
-	public static final String DB_EXCLUDE_TABLE = "exclude";
-	public static final String INCLUDE_TABLE = "include";
-	public static final String DB_NEEDS_SYNC = "needssync";
-	// subjects
-	public static final String DB_SUBJECT_TABLE = "subjects";
-	// timetable
-	public static final String DB_TIME_TABLE = "timetable";
-	public static final String DB_DAY = "day";
-	public static final String DB_HOUR = "hour";
-	public static final String DB_DISABLED = "disabled";
-	public static final String DB_VERTRETUNG = "vertretung";
-	// for teachers
-	public static final String DB_TIME_TABLE_TEACHERS = "timetable_teachers";
-	public static final String DB_BREAK_SURVEILLANCE = "pausenaufsicht";
-	// timetable headers
-	public static final String DB_TIME_TABLE_HEADERS_PUPILS = "tt_headers";
-	public static final String DB_TEACHER = "teacher";
-	public static final String DB_SECOND_TEACHER = "secteacher";
-	// for teachers
-	public static final String DB_TIME_TABLE_HEADERS_TEACHERS = "tt_headers_teacher";
-	public static final String DB_SHORT = "short";
-	public static final String TEACHER_SHORT = DB_SHORT;
-	//Exams & Homework
-	public static final String DB_EXAMS_TABLE = "exams";
-	public static final String DB_HOMEWORK_TABLE = "homework";
-	public static final String DB_YEAR = "year";
-	public static final String DB_MONTH = "month";
-	public static final String DB_DAYOFMONTH = "dayofmonth";
-	public static final String DB_LEARNING_MATTER = "learning_matter";
-	public static final String DB_NOTES = "notes";
-	public static final String DB_CONTENT = "content";
-	public static final String DB_LOCKED = "locked";
-	// classes
-	public static final String DB_CLASS_TABLE = "classes";
-	public static final String DB_CLASS = "class";
-
 	public static final String RELIGION = "religion";
 	public static final String KATHOLISCH = "K";
 	public static final String EVANGELISCH = "Ev";
@@ -315,21 +250,21 @@ public class Functions {
 	}
 	/**
 	 * Clean database of vplan - used when the vplan is one day old, but there's no new version
-	 * @param context the app context to access the database
+	 * @param act the app context to access the database
 	 */
-	public static void cleanVPlanTable(Context context, String table) {
+	public static void cleanVPlanTable(String table) {
 		Calendar now  = Calendar.getInstance();
 		int year_now  = now.get(Calendar.YEAR);
 		int month_now = now.get(Calendar.MONTH)+1;
 		int day_now   = now.get(Calendar.DAY_OF_MONTH);
 		SQLiteDatabase myDB;
-		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+		myDB = LSGApplication.getSqliteDatabase();
 		
-		Cursor result = myDB.query(table, new String[] {Functions.DB_DATE}, null, null, null, null, null);
+		Cursor result = myDB.query(table, new String[] {LSGSQliteOpenHelper.DB_DATE}, null, null, null, null, null);
 		result.moveToFirst();
 		int i = 0;
 		while(i < result.getCount()) {
-			String date = result.getString(result.getColumnIndex(Functions.DB_DATE));
+			String date = result.getString(result.getColumnIndex(LSGSQliteOpenHelper.DB_DATE));
 			String[] splitdate = date.split("\\.");
 			int year  = Integer.valueOf(splitdate[2]);
 			int month = Integer.valueOf(splitdate[1]);
@@ -350,304 +285,92 @@ public class Functions {
 					}
 				}
 			if(!isvalid) {
-				myDB.execSQL("DELETE FROM " + table + " WHERE " + Functions.DB_DATE + " = '" + date + "'");
+				myDB.execSQL("DELETE FROM " + table + " WHERE " + LSGSQliteOpenHelper.DB_DATE + " = '" + date + "'");
 				}
 			i++;
 		}
 		result.close();
-		myDB.close();
 		try {
-		matchVPlanTimeTable(context);
+		matchVPlanTimeTable();
 		} catch(Exception e) {
 			Log.e("LSGäpp", "exception in matching vplan");
 			e.printStackTrace();
 		}
 	}
-	public static void matchVPlanTimeTable(Context context) {
-		SQLiteDatabase myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+	public static void matchVPlanTimeTable() {
+		SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
 		ContentValues vals = new ContentValues();
-		vals.put(Functions.DB_VERTRETUNG, "false");
-		myDB.update(Functions.DB_TIME_TABLE, vals, null, null);
-		vals.put(Functions.DB_VERTRETUNG, "true");
-		
-		Cursor c = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_ROWID, Functions.DB_DAY_OF_WEEK, Functions.DB_STUNDE, Functions.DB_RAW_LEHRER, Functions.DB_RAW_FACH}, null, null, null, null, null);
+		vals.put(LSGSQliteOpenHelper.DB_VERTRETUNG, "false");
+		myDB.update(LSGSQliteOpenHelper.DB_TIME_TABLE, vals, null, null);
+		vals.put(LSGSQliteOpenHelper.DB_VERTRETUNG, "true");
+
+		Cursor c = myDB
+				.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE, new String[] {
+						LSGSQliteOpenHelper.DB_ROWID,
+						LSGSQliteOpenHelper.DB_DAY_OF_WEEK,
+						LSGSQliteOpenHelper.DB_STUNDE,
+						LSGSQliteOpenHelper.DB_RAW_LEHRER,
+						LSGSQliteOpenHelper.DB_RAW_FACH }, null, null, null,
+						null, null);
 		c.moveToFirst();
 		if (c.getCount() > 0)
 			do {
-				vals.put(Functions.DB_REMOTE_ID,
-						c.getString(c.getColumnIndex(Functions.DB_ROWID)));
+				vals.put(LSGSQliteOpenHelper.DB_REMOTE_ID,
+						c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_ROWID)));
 				long num_rows = myDB
-						.update(Functions.DB_TIME_TABLE,
+						.update(LSGSQliteOpenHelper.DB_TIME_TABLE,
 								vals,
-								Functions.DB_DAY + "=? AND "
-										+ Functions.DB_HOUR + "=? AND "
-										+ Functions.DB_RAW_LEHRER
+								LSGSQliteOpenHelper.DB_DAY + "=? AND "
+										+ LSGSQliteOpenHelper.DB_HOUR + "=? AND "
+										+ LSGSQliteOpenHelper.DB_RAW_LEHRER
 										+ " LIKE ? AND "
-										+ Functions.DB_RAW_FACH + "=?",
+										+ LSGSQliteOpenHelper.DB_RAW_FACH + "=?",
 								new String[] {
 										c.getString(c
-												.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
+												.getColumnIndex(LSGSQliteOpenHelper.DB_DAY_OF_WEEK)),
 										Integer.valueOf(
 												c.getInt(c
-														.getColumnIndex(Functions.DB_STUNDE)) - 1)
+														.getColumnIndex(LSGSQliteOpenHelper.DB_STUNDE)) - 1)
 												.toString(),
 										"%"
 												+ c.getString(c
-														.getColumnIndex(Functions.DB_RAW_LEHRER))
+														.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_LEHRER))
 												+ "%",
 										c.getString(c
-												.getColumnIndex(Functions.DB_RAW_FACH)) });
+												.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)) });
 				int ii = 1;
 
 				while (num_rows == 0
-						&& c.getInt(c.getColumnIndex(Functions.DB_STUNDE)) - ii >= 0) {
+						&& c.getInt(c.getColumnIndex(LSGSQliteOpenHelper.DB_STUNDE)) - ii >= 0) {
 					num_rows = myDB
-							.update(Functions.DB_TIME_TABLE,
+							.update(LSGSQliteOpenHelper.DB_TIME_TABLE,
 									vals,
-									Functions.DB_DAY + "=? AND "
-											+ Functions.DB_HOUR + "=? AND "
-											+ Functions.DB_RAW_LEHRER
+									LSGSQliteOpenHelper.DB_DAY + "=? AND "
+											+ LSGSQliteOpenHelper.DB_HOUR + "=? AND "
+											+ LSGSQliteOpenHelper.DB_RAW_LEHRER
 											+ " LIKE ? AND "
-											+ Functions.DB_RAW_FACH + "=? AND "
-											+ Functions.DB_LENGTH + "=?",
+											+ LSGSQliteOpenHelper.DB_RAW_FACH + "=? AND "
+											+ LSGSQliteOpenHelper.DB_LENGTH + "=?",
 									new String[] {
 											c.getString(c
-													.getColumnIndex(Functions.DB_DAY_OF_WEEK)),
+													.getColumnIndex(LSGSQliteOpenHelper.DB_DAY_OF_WEEK)),
 											Integer.valueOf(
 													c.getInt(c
-															.getColumnIndex(Functions.DB_STUNDE))
+															.getColumnIndex(LSGSQliteOpenHelper.DB_STUNDE))
 															- 1 - ii)
 													.toString(),
 											"%"
 													+ c.getString(c
-															.getColumnIndex(Functions.DB_RAW_LEHRER))
+															.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_LEHRER))
 													+ "%",
 											c.getString(c
-													.getColumnIndex(Functions.DB_RAW_FACH)),
+													.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)),
 											Integer.valueOf(1 + ii).toString() });
 					ii++;
 				}
 			} while (c.moveToNext());
-		myDB.close();
 	}
-	/**
-	 * Set up database
-	 * @param context the context of the app, to open the database
-	 */
-	public static void setupDB(Context context) {
-		SQLiteDatabase myDB;
-		myDB = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
-    	try {
-    		//vertretungen
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TABLE
-    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
-    	    		+ Functions.DB_CLASS_LEVEL       + " INTEGER,"
-    	    	    + Functions.DB_KLASSE	          + " TEXT,"
-    	    	    + Functions.DB_STUNDE             + " INTEGER,"
-    	    	    + Functions.DB_VERTRETER          + " TEXT,"
-    	     	    + Functions.DB_LEHRER             + " TEXT,"
-    	    	    + Functions.DB_ROOM               + " TEXT,"
-    	    	    + Functions.DB_TYPE                + " TEXT,"
-    	    	    + Functions.DB_VERTRETUNGSTEXT    + " TEXT,"
-    	    	    + Functions.DB_FACH               + " TEXT,"
-    	    	    + Functions.DB_DATE               + " TEXT"
-    				+");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_VPLAN_TEACHER
-    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
-    	    		+ Functions.DB_CLASS_LEVEL       + " INTEGER,"
-    	    	    + Functions.DB_KLASSE	          + " TEXT,"
-    	    	    + Functions.DB_STUNDE             + " INTEGER,"
-    	    	    + Functions.DB_VERTRETER          + " TEXT,"
-    	     	    + Functions.DB_LEHRER             + " TEXT,"
-    	    	    + Functions.DB_ROOM               + " TEXT,"
-    	    	    + Functions.DB_TYPE                + " TEXT,"
-    	    	    + Functions.DB_VERTRETUNGSTEXT    + " TEXT,"
-    	    	    + Functions.DB_FACH               + " TEXT,"
-    	    	    + Functions.DB_DATE               + " TEXT,"
-    	    	    + Functions.DB_RAW_FACH           + " TEXT,"
-    	    	    + Functions.DB_LENGTH             + " INTEGER"
-    				+");");
-    		//blacklist
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EXCLUDE_TABLE + " ("
-    				+ Functions.DB_ROWID + " INTEGER primary key autoincrement,"
-    				+ Functions.DB_FACH + " TEXT,"
-    				+ Functions.DB_NEEDS_SYNC + " TEXT"
-    				+ ");");
-    		//whitelist
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.INCLUDE_TABLE + " ("
-    				+ Functions.DB_ROWID + " INTEGER primary key autoincrement,"
-    				+ Functions.DB_FACH + " TEXT,"
-    				+ Functions.DB_NEEDS_SYNC + " TEXT"
-    				+ ");");
-    		//subjects
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_SUBJECT_TABLE
-    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
-    	    		+ Functions.DB_RAW_FACH + " TEXT,"
-    	    	    + Functions.DB_FACH + " TEXT"
-    				+");");
-    		//events
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EVENTS_TABLE
-    				+ " (" + Functions.DB_ROWID       + " INTEGER primary key autoincrement,"
-    	    	    + Functions.DB_DATES              + " TEXT,"
-    	     	    + Functions.DB_ENDDATES           + " TEXT,"
-    	    	    + Functions.DB_TIMES              + " TEXT,"
-    	    	    + Functions.DB_ENDTIMES           + " TEXT,"
-    	    	    + Functions.DB_TITLE              + " TEXT,"
-    	    	    + Functions.DB_VENUE              + " TEXT"
-    				+");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE
-    				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
-    	    	    + Functions.DB_LEHRER              + " TEXT,"
-    	     	    + Functions.DB_FACH                + " TEXT,"
-    	    	    + Functions.DB_ROOM                + " TEXT,"
-    	    	    + Functions.DB_LENGTH              + " INTEGER,"
-    	    	    + Functions.DB_DAY                 + " INTEGER,"
-    	    	    + Functions.DB_HOUR                + " INTEGER"
-    				+");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_HEADERS_PUPILS
-    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
-    				+ Functions.DB_TEACHER + " TEXT,"
-    				+ Functions.DB_SECOND_TEACHER + " TEXT,"
-    				+ Functions.DB_KLASSE + " TEXT"
-    				+ ");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_TEACHERS
-    				+ " (" + Functions.DB_ROWID        + " INTEGER primary key autoincrement,"
-    				+ Functions.DB_SHORT               + " TEXT,"
-    	    	    + Functions.DB_BREAK_SURVEILLANCE  + " TEXT,"
-    	    	    + Functions.DB_RAW_FACH            + " TEXT,"
-    	     	    + Functions.DB_FACH                + " TEXT,"
-    	    	    + Functions.DB_ROOM                + " TEXT,"
-    	    	    + Functions.DB_CLASS               + " TEXT,"
-    	    	    + Functions.DB_LENGTH              + " INTEGER,"
-    	    	    + Functions.DB_DAY                 + " INTEGER,"
-    	    	    + Functions.DB_HOUR                + " INTEGER"
-    				+");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_TIME_TABLE_HEADERS_TEACHERS
-    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
-    				+ Functions.DB_SHORT + " TEXT,"
-    				+ Functions.DB_TEACHER + " TEXT"
-    				+ ");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_EXAMS_TABLE
-    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
-    				+ Functions.DB_DATE + " STRING,"
-    				+ Functions.DB_YEAR + " INTEGER,"
-    				+ Functions.DB_MONTH + " INTEGER,"
-    				+ Functions.DB_DAYOFMONTH + " INTEGER,"
-    				+ Functions.DB_TYPE + " STRING,"
-    				+ Functions.DB_RAW_FACH + " STRING,"
-    				+ Functions.DB_FACH + " STRING,"
-    				+ Functions.DB_TITLE + " STRING,"
-    				+ Functions.DB_LEARNING_MATTER + " STRING,"
-    	    		+ Functions.DB_NOTES + " STRING,"
-    	    		+ Functions.DB_LOCKED + " INTEGER"
-    				+ ");");
-    		myDB.execSQL("CREATE TABLE IF NOT EXISTS " + Functions.DB_HOMEWORK_TABLE
-    				+ " (" + Functions.DB_ROWID + " INTEGER primary key autoincrement,"
-    	    		+ Functions.DB_DATE + " STRING,"
-    				+ Functions.DB_YEAR + " INTEGER,"
-    				+ Functions.DB_MONTH + " INTEGER,"
-    				+ Functions.DB_DAYOFMONTH + " INTEGER,"
-    				+ Functions.DB_RAW_FACH + " STRING,"
-    				+ Functions.DB_FACH + " STRING,"
-    				+ Functions.DB_TITLE + " STRING,"
-    				+ Functions.DB_CONTENT + " CONTENT"
-    				+ ");");
-    		//upgrades for table
-    		if(myDB.getVersion() == 0) {
-    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
-    			myDB.setVersion(1);
-    		}
-    		if(myDB.getVersion() == 1) {
-    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
-    			Log.d(Functions.INCLUDE_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.INCLUDE_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
-    			myDB.setVersion(2);
-    		}
-    		if(myDB.getVersion() == 2) {
-    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_LENGTH);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_LENGTH + " INTEGER");
-    			myDB.setVersion(3);
-    		}
-    		if(myDB.getVersion() == 3) {
-    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_RAW_FACH);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_RAW_FACH + " TEXT");
-    			myDB.setVersion(4);
-    		}
-    		if(myDB.getVersion() == 4) {
-    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_LEHRER);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_VERTRETER + " TEXT");
-    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_RAW_LEHRER);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
-    			myDB.setVersion(5);
-    		}
-    		if(myDB.getVersion() == 5) {
-    			Log.d(Functions.DB_VPLAN_TEACHER, "adding column " + Functions.DB_RAW_LEHRER);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TEACHER + " ADD COLUMN " + Functions.DB_RAW_VERTRETER + " TEXT");
-    			Log.d(Functions.DB_VPLAN_TEACHER, "adding column " + Functions.DB_RAW_LEHRER);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TEACHER + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
-    			myDB.setVersion(6);
-    		}
-    		if(myDB.getVersion() == 6) {
-    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_DISABLED);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_DISABLED + " INT");
-    			myDB.setVersion(7);
-    		}
-    		if(myDB.getVersion() == 7) {
-    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_CLASS);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_CLASS + " TEXT");
-    			myDB.setVersion(8);
-    		}
-    		if(myDB.getVersion() == 8) {
-    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_TEACHER);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_TEACHER + " TEXT");
-    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_HOUR);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_HOUR + " TEXT");
-    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_DAY);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_DAY + " TEXT");
-    			myDB.setVersion(9);
-    		}
-    		if(myDB.getVersion() == 9) {
-    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_RAW_LEHRER);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_RAW_LEHRER + " TEXT");
-    			myDB.setVersion(10);
-    		}
-    		if(myDB.getVersion() == 10) {
-    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_VERTRETUNG);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_VERTRETUNG + " TEXT");
-    			Log.d(Functions.DB_TIME_TABLE_TEACHERS, "adding column " + Functions.DB_VERTRETUNG);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE_TEACHERS + " ADD COLUMN " + Functions.DB_VERTRETUNG + " TEXT");
-    			myDB.setVersion(11);
-    		}
-    		if(myDB.getVersion() == 11) {
-    			Log.d(Functions.DB_EXCLUDE_TABLE, "adding column " + Functions.DB_TYPE);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_EXCLUDE_TABLE + " ADD COLUMN " + Functions.DB_TYPE + " TEXT");
-    			myDB.setVersion(12);
-    		}
-    		if(myDB.getVersion() == 12) {
-    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_DISABLED);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_DISABLED + " INTEGER");
-    			myDB.setVersion(13);
-    		}
-    		if(myDB.getVersion() == 13) {
-    			Log.d(Functions.DB_TIME_TABLE, "adding column " + Functions.DB_REMOTE_ID);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_TIME_TABLE + " ADD COLUMN " + Functions.DB_REMOTE_ID + " INTEGER");
-    			myDB.setVersion(14);
-    		}
-    		if(myDB.getVersion() == 14) {
-    			Log.d(Functions.DB_VPLAN_TABLE, "adding column " + Functions.DB_DAY_OF_WEEK);
-    			myDB.execSQL("ALTER TABLE " + Functions.DB_VPLAN_TABLE + " ADD COLUMN " + Functions.DB_DAY_OF_WEEK + " INTEGER");
-    			myDB.setVersion(15);
-    		}
-    		myDB.close();
-        } catch (Exception e) {
-        	myDB.close();
-        	Log.d("db", e.getMessage());
-        	}
-    	Functions.cleanVPlanTable(context, DB_VPLAN_TABLE);
-    	Functions.cleanVPlanTable(context, DB_VPLAN_TEACHER);
-	}
+
 	/**
 	 * add items to blacklist / remove items from blacklist
 	 * @param menu the menu to show
@@ -662,15 +385,19 @@ public class Functions {
 		String rawfach = "";
 		String fach    = "";
 		int conmenu = 0;
-		SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		if(table.equals(Functions.DB_VPLAN_TABLE)) {
-			Cursor cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_KLASSE, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					new String[] {Long.valueOf(info.id).toString()}, null, null, null);
+		SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+		if (table.equals(LSGSQliteOpenHelper.DB_VPLAN_TABLE)) {
+			Cursor cur = myDB.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE,
+					new String[] { LSGSQliteOpenHelper.DB_KLASSE,
+							LSGSQliteOpenHelper.DB_FACH,
+							LSGSQliteOpenHelper.DB_RAW_FACH },
+					LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] { Long
+							.valueOf(info.id).toString() }, null, null, null);
 			cur.moveToFirst();
 			
-			klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
-			rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-			fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+			klasse  = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE));
+			rawfach = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH));
+			fach    = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_FACH));
 			cur.close();
 			
 			int i = 0;
@@ -681,15 +408,19 @@ public class Functions {
 				}
 			if(klasse.equals("null"))
 				conmenu = 1;
-			} else if(table.equals(Functions.DB_TIME_TABLE)) {
-				Log.d("create", "context4timetable");
-				Cursor cur = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_CLASS, Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-						new String[] {Long.valueOf(info.id).toString()}, null, null, null);
+			} else if(table.equals(LSGSQliteOpenHelper.DB_TIME_TABLE)) {
+			Log.d("create", "context4timetable");
+			Cursor cur = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE,
+					new String[] { LSGSQliteOpenHelper.DB_CLASS,
+							LSGSQliteOpenHelper.DB_FACH,
+							LSGSQliteOpenHelper.DB_RAW_FACH },
+					LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] { Long
+							.valueOf(info.id).toString() }, null, null, null);
 				cur.moveToFirst();
 				
-				klasse  = cur.getString(cur.getColumnIndex(Functions.DB_CLASS));
-				rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-				fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+				klasse  = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_CLASS));
+				rawfach = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH));
+				fach    = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_FACH));
 				cur.close();
 				
 				int i = 0;
@@ -700,27 +431,34 @@ public class Functions {
 					}
 				if(klasse.equals("null"))
 					conmenu = 1;
-			} else if(table.equals(Functions.DB_SUBJECT_TABLE)) {
-				Cursor cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-						new String[] {Long.valueOf(info.id).toString()}, null, null, null);
+		} else if (table.equals(LSGSQliteOpenHelper.DB_SUBJECT_TABLE)) {
+			Cursor cur = myDB.query(LSGSQliteOpenHelper.DB_SUBJECT_TABLE,
+					new String[] { LSGSQliteOpenHelper.DB_FACH,
+							LSGSQliteOpenHelper.DB_RAW_FACH },
+					LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] { Long
+							.valueOf(info.id).toString() }, null, null, null);
 				cur.moveToFirst();
 				
-				rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-				fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+				rawfach = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH));
+				fach    = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_FACH));
 				cur.close();
-				conmenu = 1;
-				}
-		
-		Cursor exclude = myDB.query(Functions.DB_EXCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_RAW_FACH + " LIKE ?",
-				new String[] {rawfach}, null, null, null);
-		if(exclude.getCount() > 0)
+			conmenu = 1;
+		}
+
+		Cursor exclude = myDB.query(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE,
+				new String[] { LSGSQliteOpenHelper.DB_FACH },
+				LSGSQliteOpenHelper.DB_RAW_FACH + " LIKE ?",
+				new String[] { rawfach }, null, null, null);
+		if (exclude.getCount() > 0)
 			conmenu = 2;
 
-		Cursor include = myDB.query(Functions.INCLUDE_TABLE, new String[] {Functions.DB_FACH}, Functions.DB_RAW_FACH + " LIKE ?",
-				new String[] {rawfach}, null, null, null);
-		if(include.getCount() > 0)
+		Cursor include = myDB.query(LSGSQliteOpenHelper.INCLUDE_TABLE,
+				new String[] { LSGSQliteOpenHelper.DB_FACH },
+				LSGSQliteOpenHelper.DB_RAW_FACH + " LIKE ?",
+				new String[] { rawfach }, null, null, null);
+		if (include.getCount() > 0)
 			conmenu = 3;
-		
+
 		if(conmenu == 1) {
 			menu.setHeaderTitle(fach + " (" + rawfach + ")");
 			menu.add(Menu.NONE, 0, 0, context.getString(R.string.excludesubject));
@@ -743,26 +481,37 @@ public class Functions {
 	 * @param table the table
 	 * @return always true
 	 */
-	public static boolean contextMenuSelect(MenuItem item, final Context context, final SQLlist list, String table) {
-		final SQLiteDatabase myDB = context.openOrCreateDatabase(Functions.DB_NAME, Context.MODE_PRIVATE, null);
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-		  
-		  Cursor cur;
-		  if(table.equals(Functions.DB_VPLAN_TABLE)) {
-			  cur = myDB.query(Functions.DB_VPLAN_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
-		  } else if(table.equals(Functions.DB_TIME_TABLE)) {
-			  cur = myDB.query(Functions.DB_TIME_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
-		  } else { //table.equals(Functions.DB_SUBJECT_TABLE)
-			  cur = myDB.query(Functions.DB_SUBJECT_TABLE, new String[] {Functions.DB_FACH, Functions.DB_RAW_FACH}, Functions.DB_ROWID + " = ?",
-					  new String[] {Long.valueOf(info.id).toString()}, null, null, null);
-		  }
-		  cur.moveToFirst();
+	public static boolean contextMenuSelect(MenuItem item, final Context context,
+			final SQLlist list, String table) {
+		final SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+				.getMenuInfo();
+
+		Cursor cur;
+		if (table.equals(LSGSQliteOpenHelper.DB_VPLAN_TABLE)) {
+			cur = myDB.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE, new String[] {
+					LSGSQliteOpenHelper.DB_FACH,
+					LSGSQliteOpenHelper.DB_RAW_FACH },
+					LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] { Long
+							.valueOf(info.id).toString() }, null, null, null);
+		} else if (table.equals(LSGSQliteOpenHelper.DB_TIME_TABLE)) {
+			cur = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE, new String[] {
+					LSGSQliteOpenHelper.DB_FACH,
+					LSGSQliteOpenHelper.DB_RAW_FACH },
+					LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] { Long
+							.valueOf(info.id).toString() }, null, null, null);
+		} else { // table.equals(Functions.DB_SUBJECT_TABLE)
+			cur = myDB.query(LSGSQliteOpenHelper.DB_SUBJECT_TABLE,
+					new String[] { LSGSQliteOpenHelper.DB_FACH,
+							LSGSQliteOpenHelper.DB_RAW_FACH },
+					LSGSQliteOpenHelper.DB_ROWID + " = ?", new String[] { Long
+							.valueOf(info.id).toString() }, null, null, null);
+		}
+		cur.moveToFirst();
 		  
 		  //final String klasse  = cur.getString(cur.getColumnIndex(Functions.DB_KLASSE));
-		  final String rawfach = cur.getString(cur.getColumnIndex(Functions.DB_RAW_FACH));
-		  final String fach    = cur.getString(cur.getColumnIndex(Functions.DB_FACH));
+		  final String rawfach = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH));
+		  final String fach    = cur.getString(cur.getColumnIndex(LSGSQliteOpenHelper.DB_FACH));
 		  cur.close();
 		  final String prompt;
 		  final String listtable;
@@ -771,11 +520,11 @@ public class Functions {
 		  int menuItemIndex = item.getItemId();
 		  if(menuItemIndex == 0) {
 			  prompt = context.getString(R.string.really_exclude);
-			  listtable  = Functions.DB_EXCLUDE_TABLE;
+			  listtable  = LSGSQliteOpenHelper.DB_EXCLUDE_TABLE;
 		  }
 		  else if(menuItemIndex == 1) {
 			  prompt = context.getString(R.string.really_include);
-			  listtable  = Functions.INCLUDE_TABLE;
+			  listtable  = LSGSQliteOpenHelper.INCLUDE_TABLE;
 		  }
 		  else {
 			  //this code should never be executed, its just for the compiler not to complain :-)
@@ -789,10 +538,10 @@ public class Functions {
 				        switch (which){
 				        case DialogInterface.BUTTON_POSITIVE:
 				        	ContentValues vals = new ContentValues();
-				        	vals.put(Functions.DB_FACH, fach);
-				        	vals.put(Functions.DB_RAW_FACH, rawfach);
-				        	vals.put(Functions.DB_NEEDS_SYNC, "true");
-				        	vals.put(Functions.DB_TYPE, "oldstyle");
+				        	vals.put(LSGSQliteOpenHelper.DB_FACH, fach);
+				        	vals.put(LSGSQliteOpenHelper.DB_RAW_FACH, rawfach);
+				        	vals.put(LSGSQliteOpenHelper.DB_NEEDS_SYNC, "true");
+				        	vals.put(LSGSQliteOpenHelper.DB_TYPE, "oldstyle");
 				        	myDB.insert(listtable, null, vals);
 //				        	VPlan.blacklistVPlan(context);
 //				        	TimeTable.blacklistTimeTable(context);
@@ -804,16 +553,21 @@ public class Functions {
 			  AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setMessage(prompt)
 				.setPositiveButton(context.getString(R.string.yes), dialogClickListener)
-				.setNegativeButton(context.getString(R.string.no), dialogClickListener).show();
-		  }
-		  if(menuItemIndex == 2) {
-			  myDB.delete(Functions.DB_EXCLUDE_TABLE, Functions.DB_RAW_FACH + " = ?", new String[] {rawfach});
-			  list.updateList();
-		  }
-		  if(menuItemIndex == 3) {
-			  myDB.delete(Functions.INCLUDE_TABLE, Functions.DB_RAW_FACH + " = ?", new String[] {rawfach});
-			  list.updateList();
-		  }
+					.setNegativeButton(context.getString(R.string.no),
+							dialogClickListener).show();
+		}
+		if (menuItemIndex == 2) {
+			myDB.delete(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE,
+					LSGSQliteOpenHelper.DB_RAW_FACH + " = ?",
+					new String[] { rawfach });
+			list.updateList();
+		}
+		if (menuItemIndex == 3) {
+			myDB.delete(LSGSQliteOpenHelper.INCLUDE_TABLE,
+					LSGSQliteOpenHelper.DB_RAW_FACH + " = ?",
+					new String[] { rawfach });
+			list.updateList();
+		}
 		  return true;
 	}
 	public static void sendClientId(String id, Context context) {
@@ -873,6 +627,10 @@ public class Functions {
 	public static int dpToPx(int dp, Context ctx) {
 	    Resources r = ctx.getResources();
 	    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+	}
+	public static float percentWidth(int px, Activity ctx) {
+		Display display = ctx.getWindowManager().getDefaultDisplay();
+		return (float) px / display.getWidth();
 	}
 	/**
 	 * lock the rotation for asynctask

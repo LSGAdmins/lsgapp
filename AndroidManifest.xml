@@ -41,7 +41,7 @@
         android:xlargeScreens="true" />
 
     <application
-        android:name="com.lsg.app.LSGapp"
+        android:name=".lib.LSGApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"

@@ -95,7 +95,6 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	prefCat.removePreference(ac2dm);
         }
         slidemenu = new SlideMenu(this, Settings.class);
-        slidemenu.checkEnabled();
         titlebar.init(this);
         titlebar.setTitle(getTitle());
 	}

@@ -2,7 +2,6 @@ package com.lsg.app.tasks;
 
 import java.util.Calendar;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -14,11 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.lsg.app.Functions;
 import com.lsg.app.R;
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class Exams extends ListFragment {
-	
+
 	public static class Descriptor {
 		public String title;
 		public Calendar date;
@@ -28,10 +28,11 @@ public class Exams extends ListFragment {
 		public boolean isLocked;
 		public boolean notes;
 	}
-	
+
 	public static final String BIG_TEST = "big_test";
 	public static final String SMALL_TEST = "small_test";
 	public static final String OTHER_TEST = "other_test";
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup root,
 			Bundle bundle) {
@@ -52,21 +53,24 @@ public class Exams extends ListFragment {
 		getListView().addHeaderView(addItem);
 
 		// open the database
-		myDB = getActivity().getApplicationContext().openOrCreateDatabase(
-				Functions.DB_NAME, Context.MODE_PRIVATE, null);
+		myDB = LSGApplication.getSqliteDatabase();
 		// TODO select only those with valid date
-		Cursor c = myDB.query(Functions.DB_EXAMS_TABLE, new String[] {
-				Functions.DB_ROWID, Functions.DB_DATE, Functions.DB_TYPE,
-				Functions.DB_TITLE, Functions.DB_LEARNING_MATTER, Functions.DB_FACH },
-				"", new String[] {}, null, null, null);
+		Cursor c = myDB.query(LSGSQliteOpenHelper.DB_EXAMS_TABLE, new String[] {
+				LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_DATE,
+				LSGSQliteOpenHelper.DB_TYPE, LSGSQliteOpenHelper.DB_TITLE,
+				LSGSQliteOpenHelper.DB_LEARNING_MATTER,
+				LSGSQliteOpenHelper.DB_FACH }, "", new String[] {}, null, null,
+				null);
 		getListView().setAdapter(
 				new SimpleCursorAdapter(getActivity().getApplicationContext(),
 						R.layout.exams_listitem, c, new String[] {
-								Functions.DB_TITLE, Functions.DB_TYPE,
-								Functions.DB_DATE, Functions.DB_FACH,
-								Functions.DB_LEARNING_MATTER }, new int[] { R.id.title,
-								R.id.type, R.id.date, R.id.subjects,
-								R.id.content }, 0));
+								LSGSQliteOpenHelper.DB_TITLE,
+								LSGSQliteOpenHelper.DB_TYPE,
+								LSGSQliteOpenHelper.DB_DATE,
+								LSGSQliteOpenHelper.DB_FACH,
+								LSGSQliteOpenHelper.DB_LEARNING_MATTER },
+						new int[] { R.id.title, R.id.type, R.id.date,
+								R.id.subjects, R.id.content }, 0));
 	}
 
 	@Override
