@@ -176,8 +176,10 @@ public class SlideMenu implements OnTouchListener {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				motionStartX = event.getX();
+				//check if menu is opened, and the user is dragging to close the menu
 				if (event.getAction() == MotionEvent.ACTION_DOWN
 						&& event.getX() > menuSize && menuShown) {
+					//prepare for slidein
 					contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer
 							.getLayoutParams();
 					contentContainerLayoutParams.setMargins(0, 0, 0, 0);
@@ -221,7 +223,7 @@ public class SlideMenu implements OnTouchListener {
 	}
 
 	public void setFragment(Class<? extends Fragment> fragment) {
-		this.fragment = fragment;
+		SlideMenu.fragment = fragment;
 	}
 
 	public void show() {
