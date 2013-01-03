@@ -1,4 +1,4 @@
-package com.lsg.app;
+package com.lsg.app.settings;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,9 +13,12 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
+import com.lsg.app.Functions;
+import com.lsg.app.R;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.setup.SetupAssistant;
 
 //code for old devices -> deprecated
 @SuppressWarnings("deprecation")

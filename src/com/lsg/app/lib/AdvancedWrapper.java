@@ -1,4 +1,4 @@
-package com.lsg.app;
+package com.lsg.app.lib;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

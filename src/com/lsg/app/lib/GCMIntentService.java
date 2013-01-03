@@ -1,4 +1,4 @@
-package com.lsg.app;
+package com.lsg.app.lib;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
+import com.lsg.app.Events;
+import com.lsg.app.Functions;
+import com.lsg.app.VPlan;
+import com.lsg.app.WorkerService;
 import com.lsg.app.timetable.TimeTableFragment;
 
 public class GCMIntentService extends GCMBaseIntentService {

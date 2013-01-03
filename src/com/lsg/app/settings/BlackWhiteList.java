@@ -1,4 +1,4 @@
-package com.lsg.app;
+package com.lsg.app.settings;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -15,6 +15,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.TextView;
 
+import com.lsg.app.Functions;
+import com.lsg.app.R;
+import com.lsg.app.R.id;
+import com.lsg.app.R.layout;
+import com.lsg.app.R.string;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 

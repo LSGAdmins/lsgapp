@@ -1,4 +1,4 @@
-package com.lsg.app;
+package com.lsg.app.lib;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -13,6 +13,9 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SpinnerAdapter;
 
+import com.lsg.app.R;
+import com.lsg.app.R.id;
+import com.lsg.app.R.layout;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.interfaces.SelectedCallback;
 

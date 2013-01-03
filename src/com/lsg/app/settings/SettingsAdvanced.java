@@ -1,4 +1,4 @@
-package com.lsg.app;
+package com.lsg.app.settings;
 
 import java.util.List;
 
@@ -29,6 +29,8 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.lsg.app.Functions;
+import com.lsg.app.R;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;

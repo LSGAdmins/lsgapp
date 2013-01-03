@@ -31,13 +31,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	public static class SubjectListUpdater {
 		Context context;
-		SubjectListUpdater(Context c) {
+		public SubjectListUpdater(Context c) {
 			context = c;
 		}
 		public String[] updateSubjectList() {

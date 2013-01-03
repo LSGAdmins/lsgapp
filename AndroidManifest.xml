@@ -48,11 +48,11 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".SetupAssistant"
+            android:name=".setup.SetupAssistant"
             android:label="@string/app_name"
             android:screenOrientation="portrait" android:noHistory="true"/>
         <activity
-            android:name="Settings"
+            android:name=".settings.Settings"
             android:label="@string/settings" >
         </activity>
         <activity android:name="HelpAbout" >
@@ -61,10 +61,10 @@
             android:name="SubjectList"
             android:label="@string/subjectlist" >
         </activity>
-        <activity android:name="BlackWhiteList" >
+        <activity android:name=".settings.BlackWhiteList" >
         </activity>
         <activity
-            android:name="SettingsAdvanced"
+            android:name=".settings.SettingsAdvanced"
             android:label="@string/settings"
             android:theme="@android:style/Theme.Holo.Light" >
         </activity>
@@ -80,7 +80,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".GCMIntentService" />
+        <service android:name=".lib.GCMIntentService" />
         <service
             android:name=".ExceptionSender"
             android:exported="false" />

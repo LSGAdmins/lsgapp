@@ -27,9 +27,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lsg.app.AdvancedWrapper;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
+import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;

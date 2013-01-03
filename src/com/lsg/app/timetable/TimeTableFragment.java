@@ -32,12 +32,12 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.lsg.app.AdvancedWrapper;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
 import com.lsg.app.ServiceHandler;
 import com.lsg.app.WorkerService;
 import com.lsg.app.interfaces.SelectedCallback;
+import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;

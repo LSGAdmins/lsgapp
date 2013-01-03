@@ -15,6 +15,7 @@ import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.setup.SetupAssistant;
 import com.lsg.app.tasks.CreateEditFragment;
 import com.lsg.app.tasks.Exams;
 import com.lsg.app.tasks.TaskSelected;
@@ -86,6 +87,11 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 		//show slidemenu help overlay
 		Functions.checkMessage(this, new String[] {
 			Functions.OVERLAY_HOMEBUTTON});
+	}
+	@Override
+	protected void onResume() {
+		slidemenu.checkShown();
+		super.onResume();
 	}
 	@Override
 	public void onHomePress() {

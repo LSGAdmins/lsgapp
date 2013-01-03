@@ -5,7 +5,7 @@
         android:title="@string/change_user"
         android:summary="@string/change_user_summary" >
         <intent
-            android:targetClass="com.lsg.app.SetupAssistant"
+            android:targetClass="com.lsg.app.setup.SetupAssistant"
             android:targetPackage="com.lsg.app"
             android:action="changeUser" />
     </header>
@@ -14,7 +14,7 @@
         android:title="@string/change_time_table"
         android:summary="@string/change_time_table_summary" >
         <intent
-            android:targetClass="com.lsg.app.SetupAssistant"
+            android:targetClass="com.lsg.app.setup.SetupAssistant"
             android:targetPackage="com.lsg.app"
             android:action="changeTimeTable" />
     </header>

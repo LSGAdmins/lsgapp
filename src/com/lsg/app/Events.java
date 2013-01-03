@@ -34,6 +34,7 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;

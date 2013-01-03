@@ -46,6 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lsg.app.interfaces.SQLlist;
+import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
@@ -54,7 +55,7 @@ import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerService.WorkerClass {
-	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher, PagerTitles {
+	public class VPlanPagerAdapter extends PagerAdapter implements SQLlist, TextWatcher {
 		private String[] where_conds = new String[4];
 		private String[] where_conds_events = new String[6];
 		private String[] exclude_subjects = new String[4];

@@ -2,11 +2,9 @@ package com.lsg.app.timetable;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -17,17 +15,14 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.lsg.app.Functions;
 import com.lsg.app.InfoActivity;
-import com.lsg.app.PagerTitles;
 import com.lsg.app.R;
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class TimeTableViewPagerAdapter extends PagerAdapter implements
-		PagerTitles, SQLlist {
+		SQLlist {
 	private float pageWidth = 1.0F;
 	private TimeTableAdapter[] timeTableAdapters = new TimeTableAdapter[5];
 	private SQLiteDatabase myDB;
@@ -69,7 +64,6 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 		return 5;
 	}
 
-	@Override
 	public String getTitle(int pos) {
 		return timeTable.getDay(pos);
 	}
