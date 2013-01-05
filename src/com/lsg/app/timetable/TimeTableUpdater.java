@@ -25,10 +25,15 @@ public class TimeTableUpdater {
 
 	public TimeTableUpdater(Context c) {
 		context = c;
-	    TimeTableUpdater.blacklistTimeTable(context);
+		TimeTableUpdater.blacklistTimeTable(context);
 	}
 
 	public String[] updatePupils() {
+		return updatePupils(false);
+	}
+
+	public String[] updatePupils(boolean force) {
+		Log.d("asdf", "updatepupils");
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		String add = "";
@@ -48,11 +53,15 @@ public class TimeTableUpdater {
 					+ "="
 					+ URLEncoder.encode(
 							prefs.getString(Functions.FULL_CLASS, ""), "UTF-8");
+			if (force)
+				add += "&" + URLEncoder.encode("force", "UTF-8") + "="
+						+ URLEncoder.encode("true", "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.d("encoding", e.getMessage());
 		}
 		String get = Functions.getData(Functions.TIMETABLE_URL, context, true,
 				add);
+		Log.d("get", get);
 		if (!get.equals("networkerror") && !get.equals("loginerror")
 				&& !get.equals("noact")) {
 			try {
@@ -61,7 +70,8 @@ public class TimeTableUpdater {
 				// clear timetable
 				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE, null, null);
 				// clear headers
-				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS, null, null);
+				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS,
+						null, null);
 				for (int i = 0; i < classes.length(); i++) {
 					JSONArray one_class = classes.getJSONArray(i);
 					JSONObject class_info = one_class.getJSONObject(0);
@@ -77,8 +87,9 @@ public class TimeTableUpdater {
 					headerval.put(LSGSQliteOpenHelper.DB_TEACHER, one);
 					headerval.put(LSGSQliteOpenHelper.DB_SECOND_TEACHER, two);
 					headerval.put(LSGSQliteOpenHelper.DB_KLASSE, klasse);
-					myDB.insert(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS, null,
-							headerval);
+					myDB.insert(
+							LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS,
+							null, headerval);
 					edit.commit();
 					for (int ii = 1; ii < one_class.length(); ii++) {
 						JSONObject jObject = one_class.getJSONObject(ii);
@@ -143,6 +154,10 @@ public class TimeTableUpdater {
 	}
 
 	public String[] updateTeachers() {
+		return updatePupils(false);
+	}
+
+	public String[] updateTeachers(boolean force) {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		String add = "";
@@ -159,21 +174,26 @@ public class TimeTableUpdater {
 					+ URLEncoder.encode(
 							prefs.getString("timetable_teachers_time", ""),
 							"UTF-8");
+			if (force)
+				add += "&" + URLEncoder.encode("force", "UTF-8") + "="
+						+ URLEncoder.encode("true", "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.d("encoding", e.getMessage());
 		}
 		String get = Functions.getData(Functions.TIMETABLE_TEACHERS_URL,
 				context, true, add);
+		
 		if (!get.equals("networkerror") && !get.equals("loginerror")
 				&& !get.equals("noact")) {
 			try {
 				JSONArray classes = new JSONArray(get);
 				SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
 				// clear timetable
-				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE_TEACHERS, null, null);
-				// clear headers
-				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS, null,
+				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE_TEACHERS, null,
 						null);
+				// clear headers
+				myDB.delete(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS,
+						null, null);
 				for (int i = 0; i < classes.length(); i++) {
 					JSONArray one_teacher = classes.getJSONArray(i);
 					JSONObject teacher_info = one_teacher.getJSONObject(0);
@@ -187,8 +207,9 @@ public class TimeTableUpdater {
 					ContentValues headerval = new ContentValues();
 					headerval.put(LSGSQliteOpenHelper.DB_TEACHER, name);
 					headerval.put(LSGSQliteOpenHelper.DB_SHORT, short_);
-					myDB.insert(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS, null,
-							headerval);
+					myDB.insert(
+							LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS,
+							null, headerval);
 					edit.commit();
 					for (int ii = 1; ii < one_teacher.length(); ii++) {
 						JSONObject jObject = one_teacher.getJSONObject(ii);
@@ -198,16 +219,20 @@ public class TimeTableUpdater {
 								jObject.getString("pausenaufsicht"));
 						values.put(LSGSQliteOpenHelper.DB_RAW_FACH,
 								jObject.getString("rawfach"));
-						values.put(LSGSQliteOpenHelper.DB_FACH, jObject.getString("fach"));
-						values.put(LSGSQliteOpenHelper.DB_ROOM, jObject.getString("room"));
+						values.put(LSGSQliteOpenHelper.DB_FACH,
+								jObject.getString("fach"));
+						values.put(LSGSQliteOpenHelper.DB_ROOM,
+								jObject.getString("room"));
 						values.put(LSGSQliteOpenHelper.DB_CLASS,
 								jObject.getString("class"));
 						values.put(LSGSQliteOpenHelper.DB_LENGTH,
 								jObject.getInt("length"));
-						values.put(LSGSQliteOpenHelper.DB_DAY, jObject.getInt("day"));
-						values.put(LSGSQliteOpenHelper.DB_HOUR, jObject.getInt("hour"));
-						myDB.insert(LSGSQliteOpenHelper.DB_TIME_TABLE_TEACHERS, null,
-								values);
+						values.put(LSGSQliteOpenHelper.DB_DAY,
+								jObject.getInt("day"));
+						values.put(LSGSQliteOpenHelper.DB_HOUR,
+								jObject.getInt("hour"));
+						myDB.insert(LSGSQliteOpenHelper.DB_TIME_TABLE_TEACHERS,
+								null, values);
 					}
 				}
 			} catch (JSONException e) {

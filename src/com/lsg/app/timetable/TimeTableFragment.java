@@ -68,7 +68,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TimeTableFragment.class);
 		
 		float pageWidth = 1.0F;
-		Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+//		Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 //		if(display.getOrientation() == Configuration.ORIENTATION_LANDSCAPE)
 //			pageWidth = (1.0F - Functions.percentWidth(Functions.dpToPx(40, getActivity()), getActivity())) / 2;
 		
@@ -113,10 +113,11 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		// add actions for teachers & admins
 		if ((prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs
 				.getBoolean(Functions.RIGHTS_ADMIN, false))) {
-			titlebar.addSpinnerNavigation(this, (prefs.getBoolean(
+			titlebar.addSpinnerNavigation(this, ((prefs.getBoolean(
 					Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions
-					: R.array.timetable_actions_teachers);
+					: R.array.timetable_actions_teachers));
 		}
+		Log.d("admin", Boolean.valueOf(prefs.getBoolean(Functions.RIGHTS_ADMIN, false)).toString());
 		//something to restore...
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getString("selclass") != null) {
@@ -239,8 +240,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	private boolean isRefreshing = false;
 	private static ServiceHandler hand;
 	private View actionView;
-	@TargetApi(11)
 	public void updateTimeTable() {
+		updateTimeTable(false);
+	}
+	public void updateTimeTable(boolean force) {
 		isRefreshing = true;
 		View v;
 		if (Functions.getSDK() >= 11) {
@@ -287,7 +290,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
 	    intent.putExtra(WorkerService.WORKER_CLASS, TimeTableFragment.class.getCanonicalName());
-	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
+		if (force)
+			intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL_FORCE);
+		else
+			intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
 	    getActivity().startService(intent);
 	}
 	private int selectedPos;
@@ -372,6 +378,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	public void update(int what, Context c) {
 		TimeTableUpdater udp = new TimeTableUpdater(c);
 		switch(what) {
+		case WorkerService.UPDATE_ALL_FORCE:
+			udp.updatePupils(true);
+			udp.updateTeachers(true);
+			break;
 		case WorkerService.UPDATE_ALL:
 			udp.updatePupils();
 			udp.updateTeachers();

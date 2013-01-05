@@ -6,7 +6,8 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
    	    android:background="@layout/background"
-   	    android:orientation="vertical" >
+   	    android:orientation="vertical"
+   	    android:layout_margin="10dp" >
         <TextView
             android:text="@string/help_setupassistant_head"
     	    android:layout_width="fill_parent"

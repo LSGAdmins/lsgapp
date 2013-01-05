@@ -26,7 +26,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -103,9 +102,9 @@ public class Functions {
 	public static final int TYPE_INFO             = 1;
 	public static final String IS_LOGGED_IN       = "isloggedin";
 	//rights
-	public static final String RIGHTS_PUPIL = "pupil";
+	public static final String RIGHTS_PUPIL   = "pupil";
 	public static final String RIGHTS_TEACHER = "teacher";
-	public static final String RIGHTS_ADMIN = "admin";
+	public static final String RIGHTS_ADMIN   = "admin";
 	
 	//overlay
 	public static final String SHOWN              = "_shown";
@@ -453,7 +452,7 @@ public class Functions {
 		if (exclude.getCount() > 0)
 			conmenu = 2;
 
-		Cursor include = myDB.query(LSGSQliteOpenHelper.INCLUDE_TABLE,
+		Cursor include = myDB.query(LSGSQliteOpenHelper.DB_INCLUDE_TABLE,
 				new String[] { LSGSQliteOpenHelper.DB_FACH },
 				LSGSQliteOpenHelper.DB_RAW_FACH + " LIKE ?",
 				new String[] { rawfach }, null, null, null);
@@ -525,7 +524,7 @@ public class Functions {
 		  }
 		  else if(menuItemIndex == 1) {
 			  prompt = context.getString(R.string.really_include);
-			  listtable  = LSGSQliteOpenHelper.INCLUDE_TABLE;
+			  listtable  = LSGSQliteOpenHelper.DB_INCLUDE_TABLE;
 		  }
 		  else {
 			  //this code should never be executed, its just for the compiler not to complain :-)
@@ -564,7 +563,7 @@ public class Functions {
 			list.updateList();
 		}
 		if (menuItemIndex == 3) {
-			myDB.delete(LSGSQliteOpenHelper.INCLUDE_TABLE,
+			myDB.delete(LSGSQliteOpenHelper.DB_INCLUDE_TABLE,
 					LSGSQliteOpenHelper.DB_RAW_FACH + " = ?",
 					new String[] { rawfach });
 			list.updateList();

@@ -33,6 +33,7 @@ public class WorkerService extends IntentService {
 	public static final int UPDATE_ALL = 0;
 	public static final int UPDATE_PUPILS = 1;
 	public static final int UPDATE_TEACHERS = 2;
+	public static final int UPDATE_ALL_FORCE = 3;
 	public static String WHAT = "what";
 	public static String WORKER_CLASS = "workerclass";
 	public static String ACTION = "action";
@@ -45,12 +46,13 @@ public class WorkerService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		Log.d("worker", "loading class");
 		Bundle extras = intent.getExtras();
 		if (extras.getInt(WHAT) == 100) {
 			checkUpdate();
 			loadNews();
 		} else if (extras.getInt(WHAT) == 200) {
-			Log.d("except", "sending exception");
+			Log.d(WorkerService.class.getName(), "sending exception");
 			try {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			
@@ -80,6 +82,7 @@ public class WorkerService extends IntentService {
 				e.printStackTrace();
 			}
 		} else {
+			Log.d("worker", "loading class");
 			ClassLoader loader = WorkerClass.class.getClassLoader();
 			try {
 				Class<?> class_ = loader.loadClass(extras

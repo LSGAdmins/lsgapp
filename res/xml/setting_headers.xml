@@ -10,7 +10,7 @@
         android:summary="@string/general_summary"
         android:title="@string/general_settings" />
     <header
-        android:fragment="com.lsg.app.settings.BlackWhiteListFragment"
+        android:fragment="com.lsg.app.settings.BlackWhiteListFragmentAdvanced"
         android:icon="@drawable/ic_blacklist"
         android:summary="@string/blacklist_summary"
         android:title="@string/blacklist" >
@@ -19,7 +19,7 @@
             android:value="blacklist" />
     </header>
     <header
-        android:fragment="com.lsg.app.settings.BlackWhiteListFragment"
+        android:fragment="com.lsg.app.settings.BlackWhiteListFragmentAdvanced"
         android:icon="@drawable/ic_whitelist"
         android:summary="@string/whitelist_summary"
         android:title="@string/whitelist" >

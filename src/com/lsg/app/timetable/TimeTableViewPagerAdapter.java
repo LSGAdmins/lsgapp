@@ -52,7 +52,7 @@ public class TimeTableViewPagerAdapter extends PagerAdapter implements
 						+ LSGSQliteOpenHelper.DB_TIME_TABLE);
 		long count = num_rows.simpleQueryForLong();
 		if (count == 0)
-			timetableFragment.updateTimeTable();
+			timetableFragment.updateTimeTable(true);
 		num_rows.close();
 		timeTable = new TimeTable(timetableFragment.getActivity(), myDB);
 		timeTable.updateCursor();

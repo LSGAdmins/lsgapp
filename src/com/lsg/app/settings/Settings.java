@@ -136,6 +136,6 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	}
 	@Override
 	public void onHomePress() {
-		slidemenu.show();
+		finish();
 	}
 }

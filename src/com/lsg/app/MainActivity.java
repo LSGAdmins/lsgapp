@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
@@ -15,6 +17,8 @@ import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.settings.Settings;
+import com.lsg.app.settings.SettingsAdvanced;
 import com.lsg.app.setup.SetupAssistant;
 import com.lsg.app.tasks.CreateEditFragment;
 import com.lsg.app.tasks.Exams;
@@ -99,11 +103,30 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 		slidemenu.show();
 	}
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.base_menu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
 		// Handle item selection
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			onHomePress();
+			return true;
+		case R.id.settings:
+			if (Functions.getSDK() < 11)
+				intent = new Intent(this, Settings.class);
+			else
+				intent = new Intent(this, SettingsAdvanced.class);
+			startActivity(intent);
+			return true;
+		case R.id.help:
+			intent = new Intent(this, HelpAbout.class);
+			intent.putExtra(Functions.HELPABOUT, Functions.help);
+			startActivity(intent);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

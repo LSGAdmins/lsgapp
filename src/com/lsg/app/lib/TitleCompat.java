@@ -105,7 +105,7 @@ public class TitleCompat {
 			});
 		} else {
 			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.dropDownNav(activity, R.array.timetable_actions, callback, 0);
+			adv.dropDownNav(activity, listId, callback, 0);
 		}
 	}
 	public void removeSpinnerNavigation() {

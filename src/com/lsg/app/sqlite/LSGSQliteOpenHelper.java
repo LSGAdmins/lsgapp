@@ -39,7 +39,7 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_VENUE = "venue";
 	// exclude & include
 	public static final String DB_EXCLUDE_TABLE = "exclude";
-	public static final String INCLUDE_TABLE = "include";
+	public static final String DB_INCLUDE_TABLE = "include";
 	public static final String DB_NEEDS_SYNC = "needssync";
 	// subjects
 	public static final String DB_SUBJECT_TABLE = "subjects";
@@ -74,7 +74,7 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
 	
-	public static final int DB_VERSION = 16;
+	public static final int DB_VERSION = 17;
 
 	public LSGSQliteOpenHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -122,7 +122,7 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 				+ DB_NEEDS_SYNC + " TEXT"
 				+ ");");
 		//whitelist
-		database.execSQL("CREATE TABLE IF NOT EXISTS " + INCLUDE_TABLE + " ("
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_INCLUDE_TABLE + " ("
 				+ DB_ROWID + " INTEGER primary key autoincrement,"
 				+ DB_FACH + " TEXT,"
 				+ DB_NEEDS_SYNC + " TEXT"
@@ -215,8 +215,8 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 		 case 1:
 			Log.d(DB_EXCLUDE_TABLE, "adding column " + DB_RAW_FACH);
 			database.execSQL("ALTER TABLE " + DB_EXCLUDE_TABLE + " ADD COLUMN " + DB_RAW_FACH + " TEXT");
-			Log.d(INCLUDE_TABLE, "adding column " + DB_RAW_FACH);
-			database.execSQL("ALTER TABLE " + INCLUDE_TABLE + " ADD COLUMN " + DB_RAW_FACH + " TEXT");
+			Log.d(DB_INCLUDE_TABLE, "adding column " + DB_RAW_FACH);
+			database.execSQL("ALTER TABLE " + DB_INCLUDE_TABLE + " ADD COLUMN " + DB_RAW_FACH + " TEXT");
 		 case 2:
 			Log.d(DB_VPLAN_TABLE, "adding column " + DB_LENGTH);
 			database.execSQL("ALTER TABLE " + DB_VPLAN_TABLE + " ADD COLUMN " + DB_LENGTH + " INTEGER");
@@ -269,6 +269,9 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 		 case 15:
 			 Log.d(DB_EXAMS_TABLE, "adding column " + DB_NEEDS_SYNC);
 			 database.execSQL("ALTER TABLE " + DB_EXAMS_TABLE + " ADD COLUMN " + DB_NEEDS_SYNC + " INTEGER");
+		 case 16:
+			 Log.d(DB_INCLUDE_TABLE, "adding column " + DB_TYPE);
+			 database.execSQL("ALTER TABLE " + DB_INCLUDE_TABLE + " ADD COLUMN " + DB_TYPE + " TEXT");
 		}
 		}
 	}

@@ -17,22 +17,14 @@ import android.view.MenuItem;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
-import com.lsg.app.lib.SlideMenu;
 
 @TargetApi(11)
 public class SettingsAdvanced extends PreferenceActivity {
-	private SlideMenu slidemenu;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.homeUp(this);
-	}
-
-	@Override
-	protected void onResume() {
-		slidemenu = new SlideMenu(this, SettingsAdvanced.class);
-		super.onResume();
 	}
 
 	@Override
@@ -47,20 +39,17 @@ public class SettingsAdvanced extends PreferenceActivity {
 			addPreferencesFromResource(R.xml.login_settings);
 		}
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			slidemenu.show();
+			finish();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	@Override
-	public void onBackPressed() {
-		if (!slidemenu.handleBack())
-			super.onBackPressed();
-	}
+
 	public static class VPlanFragment extends PreferenceFragment implements
 			OnSharedPreferenceChangeListener {
 		@Override

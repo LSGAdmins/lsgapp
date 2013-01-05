@@ -37,8 +37,6 @@ import com.lsg.app.R;
 import com.lsg.app.SMVBlog;
 import com.lsg.app.VPlan;
 import com.lsg.app.interfaces.FragmentActivityCallbacks;
-import com.lsg.app.settings.Settings;
-import com.lsg.app.settings.SettingsAdvanced;
 import com.lsg.app.setup.SetupAssistant;
 import com.lsg.app.tasks.TasksOverView;
 import com.lsg.app.timetable.TimeTableFragment;
@@ -178,10 +176,11 @@ public class SlideMenu implements OnTouchListener {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				motionStartX = event.getX();
-				//check if menu is opened, and the user is dragging to close the menu
+				// check if menu is opened, and the user is dragging to close
+				// the menu
 				if (event.getAction() == MotionEvent.ACTION_DOWN
 						&& event.getX() > menuSize && menuShown) {
-					//prepare for slidein
+					// prepare for slidein
 					contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer
 							.getLayoutParams();
 					contentContainerLayoutParams.setMargins(0, 0, 0, 0);
@@ -381,9 +380,9 @@ public class SlideMenu implements OnTouchListener {
 		if (prefs.getBoolean(Functions.IS_LOGGED_IN, false)) {
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
 					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
-				items = new SlideMenuAdapter.MenuDesc[10];
+				items = new SlideMenuAdapter.MenuDesc[7];
 			else
-				items = new SlideMenuAdapter.MenuDesc[9];
+				items = new SlideMenuAdapter.MenuDesc[6];
 			for (int i = 0; i < items.length; i++) {
 				items[i] = new SlideMenuAdapter.MenuDesc();
 			}
@@ -412,52 +411,33 @@ public class SlideMenu implements OnTouchListener {
 			items[4].label = "SMVBlog";
 			items[4].openFragment = SMVBlog.class;
 			items[4].containerActivity = MainActivity.class;
-			// Settings
-			items[5].icon = R.drawable.ic_settings;
-			items[5].label = "Einstellungen";
-			items[5].openActivity = (Functions.getSDK() >= 11) ? SettingsAdvanced.class
-					: Settings.class;
-			// Help
-			items[6].icon = R.drawable.ic_help;
-			items[6].label = "Hilfe";
-			items[6].openActivity = null;
-			items[6].openIntent = new Intent(act, HelpAbout.class);
-			items[6].openIntent.putExtra(Functions.HELPABOUT, Functions.help);
-			items[6].useSlideMenu = false;
-			// About
-			items[7].icon = R.drawable.ic_about;
-			items[7].label = "Über";
-			items[7].openActivity = null;
-			items[7].openIntent = new Intent(act, HelpAbout.class);
-			items[7].openIntent.putExtra(Functions.HELPABOUT, Functions.about);
-			items[7].useSlideMenu = false;
 			// News 4 Pupils
 			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, "");
-			items[8].type = Functions.TYPE_INFO;
-			items[8].title = "Aktuell";
-			items[8].icon = R.drawable.ic_launcher;
-			items[8].label = news_pupils.substring(0,
+			items[5].type = Functions.TYPE_INFO;
+			items[5].title = "Aktuell";
+			items[5].icon = R.drawable.ic_launcher;
+			items[5].label = news_pupils.substring(0,
 					((news_pupils.length() > 60) ? 60 : news_pupils.length()))
 					+ ((news_pupils.length() > 60) ? "..." : "");
-			items[8].openActivity = null;
-			items[8].openIntent = new Intent(act, InfoActivity.class);
-			items[8].openIntent.putExtra("type", "info");
-			items[8].openIntent.putExtra("info_type", "pupils");
-			items[8].useSlideMenu = false;
+			items[5].openActivity = null;
+			items[5].openIntent = new Intent(act, InfoActivity.class);
+			items[5].openIntent.putExtra("type", "info");
+			items[5].openIntent.putExtra("info_type", "pupils");
+			items[5].useSlideMenu = false;
 			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
 					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) {
 				String news_teachers = prefs.getString(Functions.NEWS_TEACHERS,
 						"");
-				items[9].type = Functions.TYPE_INFO;
-				items[9].title = "Lehrerinfo";
-				items[9].icon = R.drawable.ic_launcher;
-				items[9].label = news_teachers.substring(0, ((news_teachers
+				items[6].type = Functions.TYPE_INFO;
+				items[6].title = "Lehrerinfo";
+				items[6].icon = R.drawable.ic_launcher;
+				items[6].label = news_teachers.substring(0, ((news_teachers
 						.length() > 60) ? 60 : news_teachers.length()))
 						+ ((news_teachers.length() > 60) ? "..." : "");
-				items[9].openIntent = new Intent(act, InfoActivity.class);
-				items[9].openIntent.putExtra("type", "info");
-				items[9].openIntent.putExtra("info_type", "teachers");
-				items[9].useSlideMenu = false;
+				items[6].openIntent = new Intent(act, InfoActivity.class);
+				items[6].openIntent.putExtra("type", "info");
+				items[6].openIntent.putExtra("info_type", "teachers");
+				items[6].useSlideMenu = false;
 			}
 		} else {
 

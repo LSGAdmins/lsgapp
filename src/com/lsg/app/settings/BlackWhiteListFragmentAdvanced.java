@@ -1,11 +1,10 @@
 package com.lsg.app.settings;
 
 
+import android.app.ListFragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -16,15 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.lsg.app.R;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
-public class BlackWhiteListFragment extends ListFragment {
-	// exactly the same as BlackWhiteListFragmentAdvanced, only importing
-	// support*Fragment
+public class BlackWhiteListFragmentAdvanced extends ListFragment {
 	private SQLiteDatabase myDB;
 	private String table;
 	private SimpleCursorAdapter adap;

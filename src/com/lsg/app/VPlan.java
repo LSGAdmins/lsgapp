@@ -181,7 +181,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			}
 			exclude.close();
 			include_cond = new String();
-			Cursor include = myDB.query(LSGSQliteOpenHelper.INCLUDE_TABLE, new String[] {LSGSQliteOpenHelper.DB_FACH},
+			Cursor include = myDB.query(LSGSQliteOpenHelper.DB_INCLUDE_TABLE, new String[] {LSGSQliteOpenHelper.DB_FACH},
 					null, null, null, null, null);
 			include.moveToFirst();
 			i = 0;
