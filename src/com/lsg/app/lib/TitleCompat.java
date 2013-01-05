@@ -32,7 +32,8 @@ public class TitleCompat {
 			act.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 					R.layout.window_title);
 		} else if (homeasup) {
-			Advanced.homeasup(act);
+			AdvancedWrapper adv = new AdvancedWrapper();
+			adv.homeasup(act);
 		}
 	}
 
@@ -40,7 +41,7 @@ public class TitleCompat {
 		if (Functions.getSDK() < 11) {
 			activity.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 					R.layout.window_title);
-			(activity.findViewById(R.id.header))
+			(activity.findViewById(R.id.logo))
 					.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -57,11 +58,14 @@ public class TitleCompat {
 		setTitle((String) title);
 	}
 
+	public void setTitle(int title) {
+		setTitle(activity.getString(title));
+	}
+
 	public void setTitle(String title) {
+		activity.setTitle(title);
 		if (Functions.getSDK() < 11)
 			((TextView) activity.findViewById(R.id.title)).setText(title);
-		else
-			activity.setTitle(title);
 	}
 
 	public void addRefresh(final RefreshCall sc) {

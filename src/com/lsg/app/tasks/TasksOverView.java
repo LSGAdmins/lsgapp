@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lsg.app.R;
-import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
 
 public class TasksOverView extends ListFragment {
 	class TasksOverViewAdapter extends CursorAdapter {
@@ -59,6 +59,7 @@ public class TasksOverView extends ListFragment {
 		setListAdapter(new TasksOverViewAdapter(getActivity().getApplicationContext(), mergedCursor));
 		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TasksOverView.class);
 		getActivity().setTitle(R.string.tasks);
+		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
 		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
 	}
 	@Override

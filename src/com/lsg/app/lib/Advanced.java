@@ -3,19 +3,20 @@ package com.lsg.app.lib;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SpinnerAdapter;
 
 import com.lsg.app.R;
-import com.lsg.app.R.id;
-import com.lsg.app.R.layout;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.interfaces.SelectedCallback;
 
@@ -78,5 +79,11 @@ public class Advanced implements SearchView.OnQueryTextListener {
 	public static void removeActionBarCustomView(Activity act) {
 		act.getActionBar().setDisplayOptions(0, ActionBar.DISPLAY_SHOW_CUSTOM);
 		act.getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
+	}
+	public static View setMenuActionView(MenuItem item, View actionView) {
+		View v = item.getActionView();
+		item.setActionView(actionView);
+		item.getActionView().setSaveEnabled(false);
+		return v;
 	}
 }

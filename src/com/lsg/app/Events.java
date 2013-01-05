@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuItemCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,9 +34,9 @@ import android.widget.ProgressBar;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.AdvancedWrapper;
-import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
@@ -229,12 +230,6 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		if(Functions.getSDK() < 11) {
-			View search = inflater.inflate(R.layout.search, null);
-			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
-			searchEdit.addTextChangedListener(this);
-			getListView().addHeaderView(search);
-			}
 		return inflater.inflate(R.layout.list, null);
 	}
 	@Override
@@ -244,6 +239,12 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 	}
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
+		if(Functions.getSDK() < 11) {
+			View search = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.search, null);
+			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
+			searchEdit.addTextChangedListener(this);
+			getListView().addHeaderView(search);
+			}
 		super.onCreate(savedInstanceState);
 		myDB = LSGApplication.getSqliteDatabase();
 		updateWhereCond("%");
@@ -308,9 +309,8 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 		View v;
 		if (Functions.getSDK() >= 11) {
 			try {
-				v = refresh.getActionView();
-				refresh.setActionView(new ProgressBar(getActivity()));
-				refresh.getActionView().setSaveEnabled(false);
+				AdvancedWrapper adv = new AdvancedWrapper();
+				v = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
 			} catch (NullPointerException e) {
 				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_events));
 				v = null;
@@ -331,8 +331,10 @@ public class Events extends ListFragment implements SQLlist, RefreshCall, TextWa
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
 				try {
-					if (Functions.getSDK() >= 11 && actionView != null)
-						refresh.setActionView(actionView);
+					if (Functions.getSDK() >= 11 && actionView != null) {
+						AdvancedWrapper adv = new AdvancedWrapper();
+						adv.setMenuActionView(refresh, actionView);
+						}
 					else
 						loading.cancel();
 				} catch (Exception e) {

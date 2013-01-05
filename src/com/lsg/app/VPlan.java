@@ -45,9 +45,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.AdvancedWrapper;
-import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -676,10 +676,8 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 		
 
 		titlebar = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
-	    titlebar.init(this);
 	    titlebar.addRefresh(this);
-	    titlebar.setTitle(getActivity().getTitle());
-	    getActivity().setTitle(R.string.vplan);
+		getActivity().setTitle(R.string.vplan);
 	    titlebar.setTitle(getActivity().getTitle());
 		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(VPlan
 				.class);
@@ -793,9 +791,8 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 		View v;
 		if (Functions.getSDK() >= 11) {
 			try {
-				v = refresh.getActionView();
-				refresh.setActionView(new ProgressBar(getActivity()));
-				refresh.getActionView().setSaveEnabled(false);
+				AdvancedWrapper adv = new AdvancedWrapper();
+				v = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
 			} catch (NullPointerException e) {
 				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_vplan));
 				v = null;
@@ -815,8 +812,10 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			@Override
 			public void onFinishedService() {
 				try {
-				if (Functions.getSDK() >= 11 && actionView != null)
-					refresh.setActionView(actionView);
+				if (Functions.getSDK() >= 11 && actionView != null) {
+					AdvancedWrapper adv = new AdvancedWrapper();
+					adv.setMenuActionView(refresh, actionView);
+				}
 				else
 					loading.cancel();
 				} catch(Exception e) {

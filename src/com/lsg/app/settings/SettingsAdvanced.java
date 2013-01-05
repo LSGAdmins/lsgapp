@@ -3,11 +3,8 @@ package com.lsg.app.settings;
 import java.util.List;
 
 import android.annotation.TargetApi;
-import android.app.ListFragment;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -16,24 +13,11 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
-import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.SlideMenu;
-import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 @TargetApi(11)
 public class SettingsAdvanced extends PreferenceActivity {
@@ -63,7 +47,20 @@ public class SettingsAdvanced extends PreferenceActivity {
 			addPreferencesFromResource(R.xml.login_settings);
 		}
 	}
-
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			slidemenu.show();
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	@Override
+	public void onBackPressed() {
+		if (!slidemenu.handleBack())
+			super.onBackPressed();
+	}
 	public static class VPlanFragment extends PreferenceFragment implements
 			OnSharedPreferenceChangeListener {
 		@Override

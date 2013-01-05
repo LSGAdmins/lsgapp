@@ -36,9 +36,9 @@ import com.lsg.app.Functions;
 import com.lsg.app.R;
 import com.lsg.app.ServiceHandler;
 import com.lsg.app.WorkerService;
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SelectedCallback;
 import com.lsg.app.lib.AdvancedWrapper;
-import com.lsg.app.lib.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
@@ -217,8 +217,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			menu.removeItem(R.id.refresh);
 		else
 			refresh = menu.findItem(R.id.refresh);
-		if(isRefreshing && Functions.getSDK() >= 11)
-				refresh.setActionView(new ProgressBar(getActivity()));
+		if(isRefreshing && Functions.getSDK() >= 11) {
+			AdvancedWrapper adv = new AdvancedWrapper();
+			actionView = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
+		}
 		else if(isRefreshing)
 			loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_timetable));
 		super.onCreateOptionsMenu(menu, inflater);
@@ -243,9 +245,8 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		View v;
 		if (Functions.getSDK() >= 11) {
 			try {
-				v = refresh.getActionView();
-				refresh.setActionView(new ProgressBar(getActivity()));
-				refresh.getActionView().setSaveEnabled(false);
+				AdvancedWrapper adv = new AdvancedWrapper();
+				v = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
 			} catch (NullPointerException e) {
 				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_timetable));
 				v = null;
@@ -266,8 +267,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
 				try {
-				if (Functions.getSDK() >= 11 && actionView != null)
-					refresh.setActionView(actionView);
+				if (Functions.getSDK() >= 11 && actionView != null) {
+					AdvancedWrapper adv = new AdvancedWrapper();
+					adv.setMenuActionView(refresh, actionView);
+				}
 				else
 					loading.cancel();
 				} catch(Exception e) {

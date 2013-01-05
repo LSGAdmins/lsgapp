@@ -28,7 +28,6 @@ public class Tasks extends FragmentActivity implements TaskSelected, HomeCall {
 		super.onCreate(savedInstanceState);
 		titlebar = new TitleCompat(this, true);
 		titlebar.init(this);
-		titlebar.setTitle(getTitle());
 		setContentView(R.layout.fragment_main);
 		slidemenu = new SlideMenu(this, Tasks.class);
 		if (savedInstanceState == null) {

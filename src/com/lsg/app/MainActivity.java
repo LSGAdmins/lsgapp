@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.lsg.app.lib.FragmentActivityCallbacks;
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
@@ -31,14 +31,15 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 			task = savedInstanceState.getInt("task");
 			id = savedInstanceState.getInt("id");
 		}
-		requestWindowFeature(Window.FEATURE_PROGRESS);
-		
+		if (Functions.getSDK() > 11)
+			requestWindowFeature(Window.FEATURE_PROGRESS);
+
 		super.onCreate(savedInstanceState);
 		titlebar = new TitleCompat(this, true);
+		setContentView(R.layout.fragment_main);
 		titlebar.init(this);
 		titlebar.setTitle(getTitle());
 		slidemenu = new SlideMenu(this, MainActivity.class);
-		setContentView(R.layout.fragment_main);
 		
 		Class<?extends Fragment> frag = null;
 		// usually open TimeTable

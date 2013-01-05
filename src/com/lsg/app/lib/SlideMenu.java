@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,6 +36,7 @@ import com.lsg.app.MainActivity;
 import com.lsg.app.R;
 import com.lsg.app.SMVBlog;
 import com.lsg.app.VPlan;
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.settings.Settings;
 import com.lsg.app.settings.SettingsAdvanced;
 import com.lsg.app.setup.SetupAssistant;
@@ -251,6 +253,7 @@ public class SlideMenu implements OnTouchListener {
 	private int lastDiff;
 
 	public void show(boolean animate, int offset) {
+		Log.d("menuSize", Integer.valueOf(menuSize).toString());
 		menuSize = Functions.dpToPx(250, act);
 		if (offset == 0)
 			offset = menuSize;
@@ -259,6 +262,7 @@ public class SlideMenu implements OnTouchListener {
 		contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer
 				.getLayoutParams();
 		contentContainerLayoutParams.setMargins(menuSize, 0, -menuSize, 0);
+		contentContainerLayoutParams.gravity = Gravity.TOP;
 		contentContainer.setLayoutParams(contentContainerLayoutParams);
 
 		// set menu to left side

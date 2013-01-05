@@ -1,23 +1,4 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
-    
-    <header
-        android:icon="@drawable/ic_login"
-        android:title="@string/change_user"
-        android:summary="@string/change_user_summary" >
-        <intent
-            android:targetClass="com.lsg.app.setup.SetupAssistant"
-            android:targetPackage="com.lsg.app"
-            android:action="changeUser" />
-    </header>
-    <header
-        android:icon="@drawable/ic_timetable_black"
-        android:title="@string/change_time_table"
-        android:summary="@string/change_time_table_summary" >
-        <intent
-            android:targetClass="com.lsg.app.setup.SetupAssistant"
-            android:targetPackage="com.lsg.app"
-            android:action="changeTimeTable" />
-    </header>
     <header
         android:fragment="com.lsg.app.settings.SettingsAdvanced$VPlanFragment"
         android:icon="@drawable/ic_vplan_black"
@@ -45,5 +26,23 @@
         <extra
             android:name="list"
             android:value="whitelist" />
+    </header>
+    <header
+        android:icon="@drawable/ic_login"
+        android:title="@string/change_user"
+        android:summary="@string/change_user_summary" >
+        <intent
+            android:targetClass="com.lsg.app.setup.SetupAssistant"
+            android:targetPackage="com.lsg.app"
+            android:action="changeUser" />
+    </header>
+    <header
+        android:icon="@drawable/ic_timetable_black"
+        android:title="@string/change_time_table"
+        android:summary="@string/change_time_table_summary" >
+        <intent
+            android:targetClass="com.lsg.app.setup.SetupAssistant"
+            android:targetPackage="com.lsg.app"
+            android:action="changeTimeTable" />
     </header>
 </preference-headers>

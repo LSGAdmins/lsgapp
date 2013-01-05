@@ -21,11 +21,7 @@ public class LSGApplication extends Application {
 		Context context = getApplicationContext();
 
 		sqliteOpenHelper = new LSGSQliteOpenHelper(context);
-		if (sqliteOpenHelper != null) {
-			sqliteDatabase = sqliteOpenHelper.getWritableDatabase();
-			if (sqliteDatabase != null) {
-			}
-		}
+		sqliteDatabase = sqliteOpenHelper.getWritableDatabase();
     	Functions.cleanVPlanTable(LSGSQliteOpenHelper.DB_VPLAN_TABLE);
     	Functions.cleanVPlanTable(LSGSQliteOpenHelper.DB_VPLAN_TEACHER);
 	}

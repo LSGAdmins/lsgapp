@@ -74,7 +74,7 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
 	
-	public static final int DB_VERSION = 15;
+	public static final int DB_VERSION = 16;
 
 	public LSGSQliteOpenHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -82,124 +82,129 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase database) {
-	    		//vertretungen
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_VPLAN_TABLE
-	    				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
-	    	    		+ DB_CLASS_LEVEL       + " INTEGER,"
-	    	    	    + DB_KLASSE	          + " TEXT,"
-	    	    	    + DB_STUNDE             + " INTEGER,"
-	    	    	    + DB_VERTRETER          + " TEXT,"
-	    	     	    + DB_LEHRER             + " TEXT,"
-	    	    	    + DB_ROOM               + " TEXT,"
-	    	    	    + DB_TYPE                + " TEXT,"
-	    	    	    + DB_VERTRETUNGSTEXT    + " TEXT,"
-	    	    	    + DB_FACH               + " TEXT,"
-	    	    	    + DB_DATE               + " TEXT"
-	    				+");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_VPLAN_TEACHER
-	    				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
-	    	    		+ DB_CLASS_LEVEL       + " INTEGER,"
-	    	    	    + DB_KLASSE	          + " TEXT,"
-	    	    	    + DB_STUNDE             + " INTEGER,"
-	    	    	    + DB_VERTRETER          + " TEXT,"
-	    	     	    + DB_LEHRER             + " TEXT,"
-	    	    	    + DB_ROOM               + " TEXT,"
-	    	    	    + DB_TYPE                + " TEXT,"
-	    	    	    + DB_VERTRETUNGSTEXT    + " TEXT,"
-	    	    	    + DB_FACH               + " TEXT,"
-	    	    	    + DB_DATE               + " TEXT,"
-	    	    	    + DB_RAW_FACH           + " TEXT,"
-	    	    	    + DB_LENGTH             + " INTEGER"
-	    				+");");
-	    		//blacklist
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_EXCLUDE_TABLE + " ("
-	    				+ DB_ROWID + " INTEGER primary key autoincrement,"
-	    				+ DB_FACH + " TEXT,"
-	    				+ DB_NEEDS_SYNC + " TEXT"
-	    				+ ");");
-	    		//whitelist
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + INCLUDE_TABLE + " ("
-	    				+ DB_ROWID + " INTEGER primary key autoincrement,"
-	    				+ DB_FACH + " TEXT,"
-	    				+ DB_NEEDS_SYNC + " TEXT"
-	    				+ ");");
-	    		//subjects
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_SUBJECT_TABLE
-	    				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
-	    	    		+ DB_RAW_FACH + " TEXT,"
-	    	    	    + DB_FACH + " TEXT"
-	    				+");");
-	    		//events
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_EVENTS_TABLE
-	    				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
-	    	    	    + DB_DATES              + " TEXT,"
-	    	     	    + DB_ENDDATES           + " TEXT,"
-	    	    	    + DB_TIMES              + " TEXT,"
-	    	    	    + DB_ENDTIMES           + " TEXT,"
-	    	    	    + DB_TITLE              + " TEXT,"
-	    	    	    + DB_VENUE              + " TEXT"
-	    				+");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE
-	    				+ " (" + DB_ROWID        + " INTEGER primary key autoincrement,"
-	    	    	    + DB_LEHRER              + " TEXT,"
-	    	     	    + DB_FACH                + " TEXT,"
-	    	    	    + DB_ROOM                + " TEXT,"
-	    	    	    + DB_LENGTH              + " INTEGER,"
-	    	    	    + DB_DAY                 + " INTEGER,"
-	    	    	    + DB_HOUR                + " INTEGER"
-	    				+");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE_HEADERS_PUPILS
-	    				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
-	    				+ DB_TEACHER + " TEXT,"
-	    				+ DB_SECOND_TEACHER + " TEXT,"
-	    				+ DB_KLASSE + " TEXT"
-	    				+ ");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE_TEACHERS
-	    				+ " (" + DB_ROWID        + " INTEGER primary key autoincrement,"
-	    				+ DB_SHORT               + " TEXT,"
-	    	    	    + DB_BREAK_SURVEILLANCE  + " TEXT,"
-	    	    	    + DB_RAW_FACH            + " TEXT,"
-	    	     	    + DB_FACH                + " TEXT,"
-	    	    	    + DB_ROOM                + " TEXT,"
-	    	    	    + DB_CLASS               + " TEXT,"
-	    	    	    + DB_LENGTH              + " INTEGER,"
-	    	    	    + DB_DAY                 + " INTEGER,"
-	    	    	    + DB_HOUR                + " INTEGER"
-	    				+");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE_HEADERS_TEACHERS
-	    				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
-	    				+ DB_SHORT + " TEXT,"
-	    				+ DB_TEACHER + " TEXT"
-	    				+ ");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_EXAMS_TABLE
-	    				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
-	    				+ DB_DATE + " STRING,"
-	    				+ DB_YEAR + " INTEGER,"
-	    				+ DB_MONTH + " INTEGER,"
-	    				+ DB_DAYOFMONTH + " INTEGER,"
-	    				+ DB_TYPE + " STRING,"
-	    				+ DB_RAW_FACH + " STRING,"
-	    				+ DB_FACH + " STRING,"
-	    				+ DB_TITLE + " STRING,"
-	    				+ DB_LEARNING_MATTER + " STRING,"
-	    	    		+ DB_NOTES + " STRING,"
-	    	    		+ DB_LOCKED + " INTEGER"
-	    				+ ");");
-	    		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_HOMEWORK_TABLE
-	    				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
-	    	    		+ DB_DATE + " STRING,"
-	    				+ DB_YEAR + " INTEGER,"
-	    				+ DB_MONTH + " INTEGER,"
-	    				+ DB_DAYOFMONTH + " INTEGER,"
-	    				+ DB_RAW_FACH + " STRING,"
-	    				+ DB_FACH + " STRING,"
-	    				+ DB_TITLE + " STRING,"
-	    				+ DB_CONTENT + " CONTENT"
-	    				+ ");");
+		createCommands(database);
+		onUpgrade(database, 0, DB_VERSION);
 		}
+	private void createCommands(SQLiteDatabase database) {
+		//vertretungen
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_VPLAN_TABLE
+				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
+	    		+ DB_CLASS_LEVEL       + " INTEGER,"
+	    	    + DB_KLASSE	          + " TEXT,"
+	    	    + DB_STUNDE             + " INTEGER,"
+	    	    + DB_VERTRETER          + " TEXT,"
+	     	    + DB_LEHRER             + " TEXT,"
+	    	    + DB_ROOM               + " TEXT,"
+	    	    + DB_TYPE                + " TEXT,"
+	    	    + DB_VERTRETUNGSTEXT    + " TEXT,"
+	    	    + DB_FACH               + " TEXT,"
+	    	    + DB_DATE               + " TEXT"
+				+");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_VPLAN_TEACHER
+				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
+	    		+ DB_CLASS_LEVEL       + " INTEGER,"
+	    	    + DB_KLASSE	          + " TEXT,"
+	    	    + DB_STUNDE             + " INTEGER,"
+	    	    + DB_VERTRETER          + " TEXT,"
+	     	    + DB_LEHRER             + " TEXT,"
+	    	    + DB_ROOM               + " TEXT,"
+	    	    + DB_TYPE                + " TEXT,"
+	    	    + DB_VERTRETUNGSTEXT    + " TEXT,"
+	    	    + DB_FACH               + " TEXT,"
+	    	    + DB_DATE               + " TEXT,"
+	    	    + DB_RAW_FACH           + " TEXT,"
+	    	    + DB_LENGTH             + " INTEGER"
+				+");");
+		//blacklist
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_EXCLUDE_TABLE + " ("
+				+ DB_ROWID + " INTEGER primary key autoincrement,"
+				+ DB_FACH + " TEXT,"
+				+ DB_NEEDS_SYNC + " TEXT"
+				+ ");");
+		//whitelist
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + INCLUDE_TABLE + " ("
+				+ DB_ROWID + " INTEGER primary key autoincrement,"
+				+ DB_FACH + " TEXT,"
+				+ DB_NEEDS_SYNC + " TEXT"
+				+ ");");
+		//subjects
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_SUBJECT_TABLE
+				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
+	    		+ DB_RAW_FACH + " TEXT,"
+	    	    + DB_FACH + " TEXT"
+				+");");
+		//events
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_EVENTS_TABLE
+				+ " (" + DB_ROWID       + " INTEGER primary key autoincrement,"
+	    	    + DB_DATES              + " TEXT,"
+	     	    + DB_ENDDATES           + " TEXT,"
+	    	    + DB_TIMES              + " TEXT,"
+	    	    + DB_ENDTIMES           + " TEXT,"
+	    	    + DB_TITLE              + " TEXT,"
+	    	    + DB_VENUE              + " TEXT"
+				+");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE
+				+ " (" + DB_ROWID        + " INTEGER primary key autoincrement,"
+	    	    + DB_LEHRER              + " TEXT,"
+	     	    + DB_FACH                + " TEXT,"
+	    	    + DB_ROOM                + " TEXT,"
+	    	    + DB_LENGTH              + " INTEGER,"
+	    	    + DB_DAY                 + " INTEGER,"
+	    	    + DB_HOUR                + " INTEGER"
+				+");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE_HEADERS_PUPILS
+				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
+				+ DB_TEACHER + " TEXT,"
+				+ DB_SECOND_TEACHER + " TEXT,"
+				+ DB_KLASSE + " TEXT"
+				+ ");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE_TEACHERS
+				+ " (" + DB_ROWID        + " INTEGER primary key autoincrement,"
+				+ DB_SHORT               + " TEXT,"
+	    	    + DB_BREAK_SURVEILLANCE  + " TEXT,"
+	    	    + DB_RAW_FACH            + " TEXT,"
+	     	    + DB_FACH                + " TEXT,"
+	    	    + DB_ROOM                + " TEXT,"
+	    	    + DB_CLASS               + " TEXT,"
+	    	    + DB_LENGTH              + " INTEGER,"
+	    	    + DB_DAY                 + " INTEGER,"
+	    	    + DB_HOUR                + " INTEGER"
+				+");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_TIME_TABLE_HEADERS_TEACHERS
+				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
+				+ DB_SHORT + " TEXT,"
+				+ DB_TEACHER + " TEXT"
+				+ ");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_EXAMS_TABLE
+				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
+				+ DB_DATE + " STRING,"
+				+ DB_YEAR + " INTEGER,"
+				+ DB_MONTH + " INTEGER,"
+				+ DB_DAYOFMONTH + " INTEGER,"
+				+ DB_TYPE + " STRING,"
+				+ DB_RAW_FACH + " STRING,"
+				+ DB_FACH + " STRING,"
+				+ DB_TITLE + " STRING,"
+				+ DB_LEARNING_MATTER + " STRING,"
+	    		+ DB_NOTES + " STRING,"
+	    		+ DB_LOCKED + " INTEGER"
+				+ ");");
+		database.execSQL("CREATE TABLE IF NOT EXISTS " + DB_HOMEWORK_TABLE
+				+ " (" + DB_ROWID + " INTEGER primary key autoincrement,"
+	    		+ DB_DATE + " STRING,"
+				+ DB_YEAR + " INTEGER,"
+				+ DB_MONTH + " INTEGER,"
+				+ DB_DAYOFMONTH + " INTEGER,"
+				+ DB_RAW_FACH + " STRING,"
+				+ DB_FACH + " STRING,"
+				+ DB_TITLE + " STRING,"
+				+ DB_CONTENT + " CONTENT"
+				+ ");");
+	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+		createCommands(database);
 		//upgrades for table
 		switch (newVersion) {
 	 case DB_VERSION:
@@ -261,6 +266,9 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 		 case 14:
 			Log.d(DB_VPLAN_TABLE, "adding column " + DB_DAY_OF_WEEK);
 			database.execSQL("ALTER TABLE " + DB_VPLAN_TABLE + " ADD COLUMN " + DB_DAY_OF_WEEK + " INTEGER");
+		 case 15:
+			 Log.d(DB_EXAMS_TABLE, "adding column " + DB_NEEDS_SYNC);
+			 database.execSQL("ALTER TABLE " + DB_EXAMS_TABLE + " ADD COLUMN " + DB_NEEDS_SYNC + " INTEGER");
 		}
 		}
 	}

@@ -1,4 +1,7 @@
-package com.lsg.app.lib;
+package com.lsg.app.interfaces;
+
+import com.lsg.app.lib.SlideMenu;
+import com.lsg.app.lib.TitleCompat;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
