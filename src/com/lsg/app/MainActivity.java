@@ -2,6 +2,7 @@ package com.lsg.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -39,8 +40,15 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 			requestWindowFeature(Window.FEATURE_PROGRESS);
 
 		super.onCreate(savedInstanceState);
-		titlebar = new TitleCompat(this, true);
-		setContentView(R.layout.fragment_main);
+		boolean homeAsUp = true;
+		if(getResources().getBoolean(R.bool.isTablet))
+			homeAsUp = false;
+		titlebar = new TitleCompat(this, homeAsUp);
+		
+		if (getResources().getBoolean(R.bool.isTablet))
+			setContentView(R.layout.fragment_main_tablet);
+		else
+			setContentView(R.layout.fragment_main);
 		titlebar.init(this);
 		titlebar.setTitle(getTitle());
 		slidemenu = new SlideMenu(this, MainActivity.class);
@@ -106,6 +114,8 @@ public class MainActivity extends FragmentActivity implements HomeCall, Fragment
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.base_menu, menu);
+		if(!((SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this)).getBoolean(Functions.IS_LOGGED_IN, false))
+			menu.removeItem(R.id.settings);
 		return super.onCreateOptionsMenu(menu);
 	}
 	@Override

@@ -173,4 +173,5 @@
     <string name="help_settings_content">Hier könnt ihr das Verhalten der LSGäpp verändern. Die Änderung von Login-Daten und Details für den Stundenplan ruft automatisch die entsprechende
         Seite im Setup-Assistenten auf. Es gibt hier auch Einträge für die Black- und Whitelist.</string>
     <string name="help_bottom">	    Bei weiteren Fragen könnt ihr eine E-Mail an lsgadmins@googlegroups.com senden</string>
+
 </resources>

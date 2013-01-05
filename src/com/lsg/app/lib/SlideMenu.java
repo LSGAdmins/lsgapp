@@ -2,144 +2,43 @@ package com.lsg.app.lib;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.lsg.app.Events;
 import com.lsg.app.Functions;
-import com.lsg.app.HelpAbout;
-import com.lsg.app.InfoActivity;
-import com.lsg.app.MainActivity;
 import com.lsg.app.R;
-import com.lsg.app.SMVBlog;
-import com.lsg.app.VPlan;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
-import com.lsg.app.setup.SetupAssistant;
-import com.lsg.app.tasks.TasksOverView;
-import com.lsg.app.timetable.TimeTableFragment;
 import com.lsg.app.widget.CustomFrameLayout;
 
 public class SlideMenu implements OnTouchListener {
-	public static class SlideMenuAdapter extends
-			ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
-		Activity act;
-		SlideMenu.SlideMenuAdapter.MenuDesc[] items;
-
-		class MenuItem {
-			public TextView label;
-			public TextView title;
-			public ImageView icon;
-		}
-
-		static class MenuDesc {
-			public boolean useSlideMenu = true;
-			public int type = Functions.TYPE_PAGE;
-			public int icon;
-			public String label;
-			public String title;
-			public Class<? extends Activity> openActivity;
-			public Class<? extends Fragment> openFragment;
-			public Class<? extends Activity> containerActivity;
-			public Intent openIntent;
-		}
-
-		public SlideMenuAdapter(Activity act,
-				SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
-			super(act, R.id.menu_label, items);
-			this.act = act;
-			this.items = items;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			return items[position].type;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View rowView = convertView;
-			if (rowView == null
-					|| (items[position].type == Functions.TYPE_INFO && rowView
-							.findViewById(R.id.title) == null)
-					|| (items[position].type == Functions.TYPE_PAGE && rowView
-							.findViewById(R.id.title) != null)) {
-				LayoutInflater inflater = act.getLayoutInflater();
-				MenuItem viewHolder = new MenuItem();
-				switch (getItemViewType(position)) {
-				case Functions.TYPE_PAGE:
-					rowView = inflater.inflate(R.layout.menu_listitem, null);
-					viewHolder.title = null;
-					break;
-				case Functions.TYPE_INFO:
-					rowView = inflater.inflate(R.layout.menu_info, null);
-					viewHolder.title = (TextView) rowView
-							.findViewById(R.id.title);
-					break;
-				}
-				viewHolder.icon = (ImageView) rowView
-						.findViewById(R.id.menu_icon);
-				viewHolder.label = (TextView) rowView
-						.findViewById(R.id.menu_label);
-				rowView.setTag(viewHolder);
-			}
-
-			MenuItem holder = (MenuItem) rowView.getTag();
-			String s = items[position].label;
-			holder.label.setText(s);
-			holder.icon.setImageResource(items[position].icon);
-
-			if (holder.title != null) {
-				if (items[position].title != null) {
-					holder.title.setText(items[position].title);
-					holder.title.setVisibility(View.VISIBLE);
-				} else
-					holder.title.setVisibility(View.GONE);
-			}
-
-			return rowView;
-		}
-	}
 
 	private static boolean menuShown = false;
-	private static boolean menuToHide = false;
+	public static boolean menuToHide = false;
 	private static View menu;
 	private static LinearLayout contentContainer;
 	private static FrameLayout decorView;
 	private static int menuSize;
 	private static int statusBarHeight = 0;
 	private Activity act;
-	private static Class<? extends Activity> curAct;
 	private static Class<? extends Fragment> fragment;
-	private SharedPreferences prefs;
-	SlideMenuAdapter.MenuDesc[] items;
 
 	public SlideMenu(Activity act, Class<? extends Activity> curAct) {
 		this.act = act;
-		SlideMenu.curAct = curAct;
-		prefs = PreferenceManager.getDefaultSharedPreferences(act);
 		contentContainer = ((LinearLayout) act.findViewById(
 				android.R.id.content).getParent());
 		(act.findViewById(android.R.id.content))
@@ -148,13 +47,27 @@ public class SlideMenu implements OnTouchListener {
 		decorView = (FrameLayout) contentContainer.getParent();
 		LayoutInflater inflater = (LayoutInflater) act
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		menu = inflater.inflate(R.layout.menu, null);
-		menuLayoutParams = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				FrameLayout.LayoutParams.MATCH_PARENT, 3);
-		menuLayoutParams.setMargins(20000, 20000, 0, 0);
-		menu.setLayoutParams(menuLayoutParams);
+		
+		if (!act.getResources().getBoolean(R.bool.isTablet)) {
+			menu = inflater.inflate(R.layout.slidemenu_layout, null);
+			menuLayoutParams = new FrameLayout.LayoutParams(
+					FrameLayout.LayoutParams.WRAP_CONTENT,
+					FrameLayout.LayoutParams.MATCH_PARENT, 3);
+			menuLayoutParams.setMargins(20000, 20000, 0, 0);
+			menu.setLayoutParams(menuLayoutParams);menu.getViewTreeObserver().addOnGlobalLayoutListener(
+					new ViewTreeObserver.OnGlobalLayoutListener() {
+						@SuppressWarnings("deprecation")
+						@Override
+						public void onGlobalLayout() {
+							menu.getViewTreeObserver()
+									.removeGlobalOnLayoutListener(this);
+							if (menuToHide) {
+								hide();
+								menuToHide = false;
+							}
+						}
+					});
+		}
 
 		decorView.removeAllViews();
 		FrameLayout.LayoutParams parentLays = new FrameLayout.LayoutParams(
@@ -169,8 +82,15 @@ public class SlideMenu implements OnTouchListener {
 				FrameLayout.LayoutParams.MATCH_PARENT);
 		contentContainer.setLayoutParams(contentLays);
 		// menu added before content, to have in back
-		parent.addView(menu);
+		if (!act.getResources().getBoolean(R.bool.isTablet))
+			parent.addView(menu);
 		parent.addView(contentContainer);
+		
+		Fragment menuFrag = new SlideMenuFragment();
+		FragmentTransaction fragmentTransaction = ((FragmentActivity) act).getSupportFragmentManager().beginTransaction();
+		fragmentTransaction.add(R.id.slideMenuContainer, menuFrag);
+		fragmentTransaction.commit();
+		
 		parent.setOnTouchListener(this);
 		parent.setOnTouchIntercept(new View.OnTouchListener() {
 			@Override
@@ -192,21 +112,6 @@ public class SlideMenu implements OnTouchListener {
 					return false;
 			}
 		});
-
-		menu.getViewTreeObserver().addOnGlobalLayoutListener(
-				new ViewTreeObserver.OnGlobalLayoutListener() {
-					@SuppressWarnings("deprecation")
-					@Override
-					public void onGlobalLayout() {
-						menu.getViewTreeObserver()
-								.removeGlobalOnLayoutListener(this);
-						if (menuToHide) {
-							hide();
-							menuToHide = false;
-						}
-					}
-				});
-		fill();
 		checkShown();
 	}
 
@@ -252,6 +157,8 @@ public class SlideMenu implements OnTouchListener {
 	private int lastDiff;
 
 	public void show(boolean animate, int offset) {
+		if(act.getResources().getBoolean(R.bool.isTablet))
+			return;
 		Log.d("menuSize", Integer.valueOf(menuSize).toString());
 		menuSize = Functions.dpToPx(250, act);
 		if (offset == 0)
@@ -268,49 +175,6 @@ public class SlideMenu implements OnTouchListener {
 		menuLayoutParams = new FrameLayout.LayoutParams(-1, -1, 3);
 		menuLayoutParams.setMargins(0, statusBarHeight, 0, 0);
 		menu.setLayoutParams(menuLayoutParams);
-
-		// onClick management for menu ListView
-		ListView list = (ListView) act.findViewById(R.id.menu_listview);
-		list.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// if not clicked item for current Activity
-				if (fragment != null
-						&& fragment.equals(items[position].openFragment))
-					hide();
-				else if ((items[position].openActivity == null || !items[position].openActivity
-						.equals(curAct))) {
-					// mark this menu to be hidden
-					if (items[position].useSlideMenu)
-						menuToHide = true;
-					// start new activity / intent
-					if (items[position].openActivity != null) {
-						Intent intent = new Intent(act,
-								items[position].openActivity);
-						intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-						act.startActivity(intent);
-
-					} else if (items[position].containerActivity != null) {
-						if (!items[position].containerActivity.equals(curAct)) {
-							Intent intent = new Intent(act,
-									items[position].containerActivity);
-							intent.putExtra("fragment",
-									items[position].openFragment);
-							act.startActivity(intent);
-						} else {
-							Log.d("slide", "change fragment");
-							((FragmentActivityCallbacks) act)
-									.changeFragment(items[position].openFragment);
-							hide();
-						}
-					} else
-						act.startActivity(items[position].openIntent);
-				} else {
-					hide();
-				}
-			}
-		});
 
 		if (animate) {
 			// slide out content
@@ -333,6 +197,8 @@ public class SlideMenu implements OnTouchListener {
 	}
 
 	public void hide(int offset) {
+		if(act.getResources().getBoolean(R.bool.isTablet))
+			return;
 		// slide out menu to left
 		TranslateAnimation menuSlideOut = new TranslateAnimation(
 				-((offset) / 2), -((menuSize) / 2), 0, 0);
@@ -374,105 +240,7 @@ public class SlideMenu implements OnTouchListener {
 			}
 		});
 	}
-
-	public void fill() {
-		ListView list = (ListView) act.findViewById(R.id.menu_listview);
-		if (prefs.getBoolean(Functions.IS_LOGGED_IN, false)) {
-			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
-					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
-				items = new SlideMenuAdapter.MenuDesc[7];
-			else
-				items = new SlideMenuAdapter.MenuDesc[6];
-			for (int i = 0; i < items.length; i++) {
-				items[i] = new SlideMenuAdapter.MenuDesc();
-			}
-			// TimeTable
-			items[0].icon = R.drawable.ic_timetable;
-			items[0].label = "Stundenplan";
-			items[0].openFragment = TimeTableFragment.class;
-			items[0].containerActivity = MainActivity.class;
-			// VPlan
-			items[1].icon = R.drawable.ic_vplan_green;
-			items[1].label = "Vertretungsplan";
-			items[1].openFragment = VPlan.class;
-			items[1].containerActivity = MainActivity.class;
-			// Tasks
-			items[2].icon = R.drawable.ic_tasks;
-			items[2].label = "Aufgaben";
-			items[2].containerActivity = MainActivity.class;
-			items[2].openFragment = TasksOverView.class;
-			// Events
-			items[3].icon = R.drawable.ic_events;
-			items[3].label = "Termine";
-			items[3].openFragment = Events.class;
-			items[3].containerActivity = MainActivity.class;
-			// SMVBlog
-			items[4].icon = R.drawable.ic_smv;
-			items[4].label = "SMVBlog";
-			items[4].openFragment = SMVBlog.class;
-			items[4].containerActivity = MainActivity.class;
-			// News 4 Pupils
-			String news_pupils = prefs.getString(Functions.NEWS_PUPILS, "");
-			items[5].type = Functions.TYPE_INFO;
-			items[5].title = "Aktuell";
-			items[5].icon = R.drawable.ic_launcher;
-			items[5].label = news_pupils.substring(0,
-					((news_pupils.length() > 60) ? 60 : news_pupils.length()))
-					+ ((news_pupils.length() > 60) ? "..." : "");
-			items[5].openActivity = null;
-			items[5].openIntent = new Intent(act, InfoActivity.class);
-			items[5].openIntent.putExtra("type", "info");
-			items[5].openIntent.putExtra("info_type", "pupils");
-			items[5].useSlideMenu = false;
-			if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)
-					|| prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) {
-				String news_teachers = prefs.getString(Functions.NEWS_TEACHERS,
-						"");
-				items[6].type = Functions.TYPE_INFO;
-				items[6].title = "Lehrerinfo";
-				items[6].icon = R.drawable.ic_launcher;
-				items[6].label = news_teachers.substring(0, ((news_teachers
-						.length() > 60) ? 60 : news_teachers.length()))
-						+ ((news_teachers.length() > 60) ? "..." : "");
-				items[6].openIntent = new Intent(act, InfoActivity.class);
-				items[6].openIntent.putExtra("type", "info");
-				items[6].openIntent.putExtra("info_type", "teachers");
-				items[6].useSlideMenu = false;
-			}
-		} else {
-
-			items = new SlideMenuAdapter.MenuDesc[5];
-			for (int i = 0; i < items.length; i++) {
-				items[i] = new SlideMenuAdapter.MenuDesc();
-			}
-			items[0].icon = R.drawable.ic_settings;
-			items[0].label = "Setup-Assistent";
-			items[0].openActivity = SetupAssistant.class;
-			items[1].icon = R.drawable.ic_events;
-			items[1].label = "Termine";
-			items[1].openFragment = Events.class;
-			items[1].containerActivity = MainActivity.class;
-			items[2].icon = R.drawable.ic_smv;
-			items[2].label = "SMVBlog";
-			items[2].openFragment = SMVBlog.class;
-			items[2].containerActivity = MainActivity.class;
-			items[3].icon = R.drawable.ic_help;
-			items[3].label = "Hilfe";
-			items[3].openActivity = null;
-			items[3].openIntent = new Intent(act, HelpAbout.class);
-			items[3].openIntent.putExtra(Functions.HELPABOUT, Functions.help);
-			items[3].useSlideMenu = false;
-			items[4].icon = R.drawable.ic_about;
-			items[4].label = "Über";
-			items[4].openActivity = null;
-			items[4].openIntent = new Intent(act, HelpAbout.class);
-			items[4].openIntent.putExtra(Functions.HELPABOUT, Functions.about);
-			items[4].useSlideMenu = false;
-		}
-		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
-		list.setAdapter(adap);
-	}
-
+	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
@@ -502,5 +270,8 @@ public class SlideMenu implements OnTouchListener {
 			break;
 		}
 		return true;
+	}
+	public Class<? extends Fragment> getFragment() {
+		return fragment;
 	}
 }
