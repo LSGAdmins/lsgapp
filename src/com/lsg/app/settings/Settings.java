@@ -15,15 +15,14 @@ import android.view.KeyEvent;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
-import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.setup.SetupAssistant;
+import com.lsg.lib.slidemenu.SlideMenu;
 
 //code for old devices -> deprecated
 @SuppressWarnings("deprecation")
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener, HomeCall {
-	private SlideMenu slidemenu;
 	private TitleCompat titlebar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,7 +96,6 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	Preference ac2dm = (Preference) findPreference("useac2dm");
         	prefCat.removePreference(ac2dm);
         }
-        slidemenu = new SlideMenu(this, Settings.class);
         titlebar.init(this);
         titlebar.setTitle(getTitle());
 	}

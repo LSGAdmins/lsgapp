@@ -1,13 +1,13 @@
-package com.lsg.app.lib;
+package com.lsg.lib.slidemenu;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,9 +35,10 @@ public class SlideMenu implements OnTouchListener {
 	private static int menuSize;
 	private static int statusBarHeight = 0;
 	private Activity act;
+	private int slideRightMargin;
 	private static Class<? extends Fragment> fragment;
 
-	public SlideMenu(Activity act, Class<? extends Activity> curAct) {
+	public SlideMenu(Activity act) {
 		this.act = act;
 		contentContainer = ((LinearLayout) act.findViewById(
 				android.R.id.content).getParent());
@@ -47,14 +48,15 @@ public class SlideMenu implements OnTouchListener {
 		decorView = (FrameLayout) contentContainer.getParent();
 		LayoutInflater inflater = (LayoutInflater) act
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		
+
 		if (!act.getResources().getBoolean(R.bool.isTablet)) {
 			menu = inflater.inflate(R.layout.slidemenu_layout, null);
 			menuLayoutParams = new FrameLayout.LayoutParams(
 					FrameLayout.LayoutParams.WRAP_CONTENT,
 					FrameLayout.LayoutParams.MATCH_PARENT, 3);
 			menuLayoutParams.setMargins(20000, 20000, 0, 0);
-			menu.setLayoutParams(menuLayoutParams);menu.getViewTreeObserver().addOnGlobalLayoutListener(
+			menu.setLayoutParams(menuLayoutParams);
+			menu.getViewTreeObserver().addOnGlobalLayoutListener(
 					new ViewTreeObserver.OnGlobalLayoutListener() {
 						@SuppressWarnings("deprecation")
 						@Override
@@ -67,6 +69,9 @@ public class SlideMenu implements OnTouchListener {
 							}
 						}
 					});
+			menuSize = Functions.dpToPx(250, act);
+			Display display = act.getWindowManager().getDefaultDisplay(); 
+			slideRightMargin = display.getWidth() - menuSize;  // deprecated
 		}
 
 		decorView.removeAllViews();
@@ -85,33 +90,38 @@ public class SlideMenu implements OnTouchListener {
 		if (!act.getResources().getBoolean(R.bool.isTablet))
 			parent.addView(menu);
 		parent.addView(contentContainer);
-		
+
 		Fragment menuFrag = new SlideMenuFragment();
-		FragmentTransaction fragmentTransaction = ((FragmentActivity) act).getSupportFragmentManager().beginTransaction();
+		FragmentTransaction fragmentTransaction = ((FragmentActivity) act)
+				.getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.add(R.id.slideMenuContainer, menuFrag);
 		fragmentTransaction.commit();
-		
-		parent.setOnTouchListener(this);
-		parent.setOnTouchIntercept(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				motionStartX = event.getX();
-				// check if menu is opened, and the user is dragging to close
-				// the menu
-				if (event.getAction() == MotionEvent.ACTION_DOWN
-						&& event.getX() > menuSize && menuShown) {
-					// prepare for slidein
-					contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer
-							.getLayoutParams();
-					contentContainerLayoutParams.setMargins(0, 0, 0, 0);
-					contentContainer
-							.setLayoutParams(contentContainerLayoutParams);
-					contentContainer.scrollTo(-menuSize, 0);
-					return true;
-				} else
-					return false;
-			}
-		});
+
+		if (!act.getResources().getBoolean(R.bool.isTablet)) {
+			parent.setOnTouchListener(this);
+			parent.setOnTouchIntercept(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					motionStartX = event.getX();
+					// check if menu is opened, and the user is dragging to
+					// close
+					// the menu
+					if (event.getAction() == MotionEvent.ACTION_DOWN
+							&& event.getX() > menuSize
+							&& menuShown) {
+						// prepare for slidein
+						contentContainerLayoutParams = (FrameLayout.LayoutParams) contentContainer
+								.getLayoutParams();
+						contentContainerLayoutParams.setMargins(0, 0, 0, 0);
+						contentContainer
+								.setLayoutParams(contentContainerLayoutParams);
+						contentContainer.scrollTo(-menuSize, 0);
+						return true;
+					} else
+						return false;
+				}
+			});
+		}
 		checkShown();
 	}
 
@@ -130,6 +140,7 @@ public class SlideMenu implements OnTouchListener {
 
 	public void setFragment(Class<? extends Fragment> fragment) {
 		SlideMenu.fragment = fragment;
+		
 	}
 
 	public void show() {
@@ -157,10 +168,8 @@ public class SlideMenu implements OnTouchListener {
 	private int lastDiff;
 
 	public void show(boolean animate, int offset) {
-		if(act.getResources().getBoolean(R.bool.isTablet))
+		if (act.getResources().getBoolean(R.bool.isTablet))
 			return;
-		Log.d("menuSize", Integer.valueOf(menuSize).toString());
-		menuSize = Functions.dpToPx(250, act);
 		if (offset == 0)
 			offset = menuSize;
 
@@ -173,7 +182,7 @@ public class SlideMenu implements OnTouchListener {
 
 		// set menu to left side
 		menuLayoutParams = new FrameLayout.LayoutParams(-1, -1, 3);
-		menuLayoutParams.setMargins(0, statusBarHeight, 0, 0);
+		menuLayoutParams.setMargins(0, statusBarHeight, slideRightMargin, 0);
 		menu.setLayoutParams(menuLayoutParams);
 
 		if (animate) {
@@ -197,7 +206,7 @@ public class SlideMenu implements OnTouchListener {
 	}
 
 	public void hide(int offset) {
-		if(act.getResources().getBoolean(R.bool.isTablet))
+		if (act.getResources().getBoolean(R.bool.isTablet))
 			return;
 		// slide out menu to left
 		TranslateAnimation menuSlideOut = new TranslateAnimation(
@@ -240,7 +249,7 @@ public class SlideMenu implements OnTouchListener {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
@@ -271,7 +280,21 @@ public class SlideMenu implements OnTouchListener {
 		}
 		return true;
 	}
+
 	public Class<? extends Fragment> getFragment() {
 		return fragment;
+	}
+
+	public void tabletHide() {
+		if (act.getResources().getBoolean(R.bool.isTablet)) {
+			act.findViewById(R.id.slideMenuContainer).setVisibility(View.GONE);
+		}
+	}
+
+	public void tabletShow() {
+		if (act.getResources().getBoolean(R.bool.isTablet)) {
+			act.findViewById(R.id.slideMenuContainer).setVisibility(
+					View.VISIBLE);
+		}
 	}
 }

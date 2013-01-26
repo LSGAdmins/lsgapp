@@ -7,15 +7,9 @@
 
     <uses-sdk
         android:minSdkVersion="4"
-        android:targetSdkVersion="15" />
+        android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <permission
-        android:name="com.lsg.app.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="com.lsg.app.permission.C2D_MESSAGE" />
 
     <!-- Only this application can receive the messages and registration result -->
     <permission
@@ -50,7 +44,8 @@
         <activity
             android:name=".setup.SetupAssistant"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" android:noHistory="true"/>
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".settings.Settings"
             android:label="@string/settings" >
@@ -82,9 +77,6 @@
 
         <service android:name=".lib.GCMIntentService" />
         <service
-            android:name=".ExceptionSender"
-            android:exported="false" />
-        <service
             android:name=".WorkerService"
             android:exported="false" />
         <service
@@ -103,10 +95,6 @@
             android:name="OverlayHelp"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.Transparent" >
-        </activity>
-        <activity
-            android:name=".tasks.Tasks"
-            android:label="@string/tasks" >
         </activity>
         <activity android:name="MainActivity" >
             <intent-filter>

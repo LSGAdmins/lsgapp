@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:shape="rectangle" >
+
     <gradient
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:angle="90"
-        android:startColor="#dedbde"
         android:endColor="#cecfce"
-        android:type="linear"/>
+        android:startColor="#dedbde"
+        android:type="linear" />
+
 </shape>

@@ -33,7 +33,6 @@ public class TimeTableUpdater {
 	}
 
 	public String[] updatePupils(boolean force) {
-		Log.d("asdf", "updatepupils");
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		String add = "";
@@ -61,7 +60,6 @@ public class TimeTableUpdater {
 		}
 		String get = Functions.getData(Functions.TIMETABLE_URL, context, true,
 				add);
-		Log.d("get", get);
 		if (!get.equals("networkerror") && !get.equals("loginerror")
 				&& !get.equals("noact")) {
 			try {
@@ -154,7 +152,7 @@ public class TimeTableUpdater {
 	}
 
 	public String[] updateTeachers() {
-		return updatePupils(false);
+		return updateTeachers(false);
 	}
 
 	public String[] updateTeachers(boolean force) {

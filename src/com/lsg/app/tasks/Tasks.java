@@ -7,9 +7,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.MenuItem;
 
 import com.lsg.app.R;
-import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.lib.slidemenu.SlideMenu;
 
 public class Tasks extends FragmentActivity implements TaskSelected, HomeCall {
 	class HomeWork extends Fragment {
@@ -29,7 +29,6 @@ public class Tasks extends FragmentActivity implements TaskSelected, HomeCall {
 		titlebar = new TitleCompat(this, true);
 		titlebar.init(this);
 		setContentView(R.layout.fragment_main);
-		slidemenu = new SlideMenu(this, Tasks.class);
 		if (savedInstanceState == null) {
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager()
 					.beginTransaction();

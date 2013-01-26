@@ -46,7 +46,6 @@ public class WorkerService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.d("worker", "loading class");
 		Bundle extras = intent.getExtras();
 		if (extras.getInt(WHAT) == 100) {
 			checkUpdate();

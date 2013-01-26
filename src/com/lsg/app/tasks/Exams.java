@@ -38,7 +38,7 @@ public class Exams extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup root,
 			Bundle bundle) {
-		return inflater.inflate(android.R.layout.list_content, null);
+		return inflater.inflate(R.layout.list_fragment, null);
 	}
 
 	private SQLiteDatabase myDB;

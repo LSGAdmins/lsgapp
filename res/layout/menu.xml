@@ -1,21 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="250dp"
+    android:layout_height="fill_parent"
+    android:background="@color/slideblack"
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:layout_width="250dp"
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@color/slideblack"
-        android:orientation="vertical" >
-
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:cacheColorHint="@color/slideblack"
-        android:background="@color/slideblack"
+        android:cacheColorHint="@color/slideblack" />
+    <!--
             android:divider="@color/darkblack"
-            android:dividerHeight="1dp" />
-    </LinearLayout>
+            android:dividerHeight="1dp"
+    -->
 
 </LinearLayout>

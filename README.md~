@@ -14,8 +14,3 @@ Fehler
 Fehler bitte hier auf github melden. Anregungen und Wünsche sind natürlich immer willkommen.
 
 Viel Spaß!
-
-Developers
-----------
-
-Problems with compiling - you may have to change the severity of the Lint 'NewApi' from error to warning.

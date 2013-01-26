@@ -4,7 +4,6 @@
     <string name="hello">Hello World, lsgapp!</string>
     <string name="versionname">beta1fixed</string>
     <string name="app_name">LSGäpp</string>
-    <string name="dark_actionbar">Dunkle ActionBar</string>
     <string name="showwithoutclass_off">Vertretungen ohne Klassen nicht angezeigt</string>
     <string name="showwithoutclass_on">Vertretungen ohne Klassen angezeigt</string>
     <string name="showonlywhitelist_off">Alle Vertretungen angezeigt</string>
@@ -42,8 +41,6 @@
     <string name="class_">Klasse</string>
     <string name="run_setup_assistant">Bitte den Setup-Assistenten ausführen!\nAndernfalls können leider nur Termine und die Startseite des SMVBlogs eingesehen werden.</string>
     <string name="setup_assistant_opening">Der Setup-Assistant wird ausgeführt.</string>
-    <string name="setup_assistant">Setup-Assistent</string>
-    <string name="setup_assistant_again">Den Setup-Assistenten nochmals ausführen</string>
     <string name="choose_lessons">Bitte die jeweils besuchte Stunde wählen:</string>
     <string name="subjectlist">Fächerübersicht</string>
     <string name="subjectlist_empty">Fächerübersicht leer</string>
@@ -55,7 +52,6 @@
     <string name="refresh">Aktualisieren</string>
     <string name="noact">Keine Aktualisierung der Vertretungen notwendig</string>
     <string name="login">Zugangsdaten</string>
-    <string name="login_summary">Benutzername &amp; Passwort für den Vertretungsplan</string>
     <string name="password">Passwort</string>
     <string name="username">Benutzername</string>
     <string name="at">bei</string>
@@ -70,7 +66,6 @@
     <string name="loading_timetable">Lade Stundenplan&#8230;</string>
     <string name="loading_data">Lade Daten&#8230;</string>
     <string name="downloading_update">Lade Update herunter</string>
-    <string name="no_class"></string>
     <string name="showwithoutclass">Vertretungen ohne Klassenbezeichnung anzeigen</string>
     <string name="showonlywhitelist">Nur Vertretungen aus Whitelist anzeigen</string>
     <string name="excludesubject">Fach ausblenden</string>

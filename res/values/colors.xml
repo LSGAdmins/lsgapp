@@ -15,10 +15,11 @@
     <color name="darkgrey">#DFDFDF</color>
     <color name="white">#FFF</color>
     <color name="margingrey">#A2A2A2</color>
-    <color name="darkblack">#111111</color>
+    <color name="darkblack">#454545</color>
+    <color name="slideblack">#000000</color>
+    <color name="activeblack">#212121</color>
     <color name="dividerblack">#1F1F1F</color>
     <color name="lightblack">#5F5F5F</color>
-    <color name="slideblack">#1d1d1d</color>
     <color name="oldblue">#0000ff</color>
     <color name="floralwhite">#fffaf0</color>
     <color name="ghostwhite">#f8f8ff</color>

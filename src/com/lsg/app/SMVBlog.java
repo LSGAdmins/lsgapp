@@ -13,10 +13,10 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.lsg.app.lib.SlideMenu;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
+import com.lsg.lib.slidemenu.SlideMenu;
 
 public class SMVBlog extends Fragment implements HomeCall, RefreshCall {
 	@Override

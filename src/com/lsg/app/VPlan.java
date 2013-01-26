@@ -690,7 +690,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 	    if(Functions.getSDK() >= 11) {
 	    	AdvancedWrapper ahelp = new AdvancedWrapper();
 			ahelp.searchBar(menu, adapter);
-			refresh = menu.findItem(R.id.search);
+			refresh = menu.findItem(R.id.refresh);
 		} else {
 			menu.removeItem(R.id.search);
 			menu.removeItem(R.id.refresh);
@@ -783,23 +783,22 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 		} while (vplan.moveToNext());
 		vplan.close();
 	}
+	
 	private static ServiceHandler hand;
+	private boolean actionViewSet;
 	@TargetApi(11)
 	public void updateVP() {
+		actionViewSet = false;
 		refreshing = true;
-		final View actionView;
-		View v;
 		if (Functions.getSDK() >= 11) {
 			try {
 				AdvancedWrapper adv = new AdvancedWrapper();
-				v = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
+				adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
+				actionViewSet = true;
 			} catch (NullPointerException e) {
 				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_vplan));
-				v = null;
 			}
-			actionView = v;
 		} else {
-			actionView = null;
 			loading = ProgressDialog.show(getActivity(), null,
 					getString(R.string.loading_vplan));
 		}
@@ -812,14 +811,13 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			@Override
 			public void onFinishedService() {
 				try {
-				if (Functions.getSDK() >= 11 && actionView != null) {
+				if (Functions.getSDK() >= 11 && actionViewSet) {
 					AdvancedWrapper adv = new AdvancedWrapper();
-					adv.setMenuActionView(refresh, actionView);
+					adv.setMenuActionView(refresh, null);
 				}
 				else
 					loading.cancel();
 				} catch(Exception e) {
-					Log.w("LSGäpp", "Error dismissing loading dialog");
 					e.printStackTrace();
 				}
 				refreshing = false;

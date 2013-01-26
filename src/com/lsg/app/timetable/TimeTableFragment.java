@@ -210,9 +210,12 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
+	
 	private MenuItem refresh;
+	private boolean actionViewSet;
 	@TargetApi(11)
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		actionViewSet = false;
 		inflater.inflate(R.menu.timetable, menu);
 		if(Functions.getSDK() < 11)
 			menu.removeItem(R.id.refresh);
@@ -220,7 +223,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			refresh = menu.findItem(R.id.refresh);
 		if(isRefreshing && Functions.getSDK() >= 11) {
 			AdvancedWrapper adv = new AdvancedWrapper();
-			actionView = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
+			adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
 		}
 		else if(isRefreshing)
 			loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_timetable));
@@ -239,24 +242,21 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	}
 	private boolean isRefreshing = false;
 	private static ServiceHandler hand;
-	private View actionView;
 	public void updateTimeTable() {
 		updateTimeTable(false);
 	}
 	public void updateTimeTable(boolean force) {
+		actionViewSet = false;
 		isRefreshing = true;
-		View v;
 		if (Functions.getSDK() >= 11) {
 			try {
 				AdvancedWrapper adv = new AdvancedWrapper();
-				v = adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
+				adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
+				actionViewSet = true;
 			} catch (NullPointerException e) {
 				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_timetable));
-				v = null;
 			}
-			actionView = v;
 		} else {
-			actionView = null;
 			loading = ProgressDialog.show(getActivity(), null,
 					getString(R.string.loading_timetable));
 		}
@@ -270,9 +270,9 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
 				try {
-				if (Functions.getSDK() >= 11 && actionView != null) {
+				if (Functions.getSDK() >= 11 && actionViewSet) {
 					AdvancedWrapper adv = new AdvancedWrapper();
-					adv.setMenuActionView(refresh, actionView);
+					adv.setMenuActionView(refresh, null);
 				}
 				else
 					loading.cancel();
