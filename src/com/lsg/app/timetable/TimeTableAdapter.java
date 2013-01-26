@@ -18,7 +18,7 @@ public class TimeTableAdapter extends CursorAdapter {
 	class TimetableItem {
 		public LinearLayout lay;
 		public TextView break_surveillance;
-		public TextView timetable_day;
+		public TextView timetable_affection_what;
 		public TextView timetable_hour;
 		public TextView header;
 		public TextView subtitle;
@@ -33,18 +33,16 @@ public class TimeTableAdapter extends CursorAdapter {
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View rowView = inflater
-				.inflate(R.layout.timetable_item, null, true);
+		View rowView = inflater.inflate(R.layout.timetable_item, null, true);
 		TimetableItem holder = new TimetableItem();
-		holder.lay = (LinearLayout) rowView
-				.findViewById(R.id.timetable_lay);
-		holder.break_surveillance = (TextView) rowView.findViewById(R.id.break_surveillance);
-		holder.timetable_day = (TextView) rowView
-				.findViewById(R.id.timetable_day);
+		holder.lay = (LinearLayout) rowView.findViewById(R.id.timetable_lay);
+		holder.break_surveillance = (TextView) rowView
+				.findViewById(R.id.break_surveillance);
+		holder.timetable_affection_what = (TextView) rowView
+				.findViewById(R.id.timetable_affection_what);
 		holder.timetable_hour = (TextView) rowView
 				.findViewById(R.id.timetable_hour);
-		holder.header = (TextView) rowView
-				.findViewById(R.id.timetable_subject);
+		holder.header = (TextView) rowView.findViewById(R.id.timetable_subject);
 		holder.subtitle = (TextView) rowView
 				.findViewById(R.id.timetable_teacher);
 		holder.timetable_room = (TextView) rowView
@@ -59,8 +57,8 @@ public class TimeTableAdapter extends CursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		TimetableItem holder = (TimetableItem) view.getTag();
-		holder.timetable_day.setVisibility(View.GONE);
-		int hour = cursor.getInt(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_HOUR)) + 1;
+		int hour = cursor.getInt(cursor
+				.getColumnIndex(LSGSQliteOpenHelper.DB_HOUR)) + 1;
 		String when = Integer.valueOf(hour).toString();
 		int i = 1;
 		int length = cursor.getInt(cursor
@@ -69,29 +67,51 @@ public class TimeTableAdapter extends CursorAdapter {
 			when += ", " + Integer.valueOf(hour + i).toString();
 			i++;
 		}
-		if (cursor
-				.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG)) != null
-				&& cursor.getString(
-						cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG))
-						.equals("true"))
+		if (cursor.getString(cursor
+				.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG)) != null
+				&& cursor
+						.getString(
+								cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG))
+						.equals("true")) {
 			holder.lay.setBackgroundResource(R.layout.background_info);
-		else
+
+			holder.timetable_affection_what.setVisibility(View.VISIBLE);
+			int type = cursor.getInt(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_MATCHING_TYPE));
+			if (type == 0)
+				holder.timetable_affection_what.setBackgroundColor(context
+						.getResources().getColor(R.color.lightgreen));
+			else if (type == 1)
+				holder.timetable_affection_what.setBackgroundColor(context
+						.getResources().getColor(R.color.lightorange));
+			else if (type == 2)
+				holder.timetable_affection_what.setBackgroundColor(context
+						.getResources().getColor(R.color.lightred));
+			holder.timetable_affection_what.setText(cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_MATCHING_TYPE_RAW)));
+		} else {
 			holder.lay.setBackgroundResource(R.layout.background);
+			holder.timetable_affection_what.setVisibility(View.GONE);
+		}
+		
+		
+		
 		holder.timetable_hour.setText(when + ". "
 				+ context.getString(R.string.hour));
-		holder.timetable_room
-				.setText(context.getString(R.string.room)
-						+ " "
-						+ cursor.getString(cursor
-								.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM)));
+		holder.timetable_room.setText(context.getString(R.string.room)
+				+ " "
+				+ cursor.getString(cursor
+						.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM)));
 		String subtitle;
 		if (cursor.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE) != -1) {
-			if (!cursor.getString(
-					cursor.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE))
+			if (!cursor
+					.getString(
+							cursor.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE))
 					.equals("null")) {
 				holder.break_surveillance.setVisibility(View.VISIBLE);
-				holder.break_surveillance.setText(context.getString(R.string.break_surveillance) + " " + cursor.getString(cursor
-						.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE)));
+				holder.break_surveillance
+						.setText(context.getString(R.string.break_surveillance)
+								+ " "
+								+ cursor.getString(cursor
+										.getColumnIndex(LSGSQliteOpenHelper.DB_BREAK_SURVEILLANCE)));
 			} else
 				holder.break_surveillance.setVisibility(View.GONE);
 			subtitle = LSGSQliteOpenHelper.DB_CLASS;
@@ -99,8 +119,9 @@ public class TimeTableAdapter extends CursorAdapter {
 			holder.break_surveillance.setVisibility(View.GONE);
 			subtitle = LSGSQliteOpenHelper.DB_LEHRER;
 		}
-		if(cursor.getString(cursor
-				.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM)).equals("null"))
+		if (cursor
+				.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_ROOM))
+				.equals("null"))
 			holder.timetable_room.setVisibility(View.GONE);
 		else
 			holder.timetable_room.setVisibility(View.VISIBLE);
@@ -108,7 +129,7 @@ public class TimeTableAdapter extends CursorAdapter {
 				.getColumnIndex(LSGSQliteOpenHelper.DB_FACH)));
 		holder.subtitle.setText(cursor.getString(cursor
 				.getColumnIndex(subtitle)));
-		if(holder.subtitle.getText().equals("null"))
+		if (holder.subtitle.getText().equals("null"))
 			holder.subtitle.setVisibility(View.GONE);
 		else
 			holder.subtitle.setVisibility(View.VISIBLE);

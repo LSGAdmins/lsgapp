@@ -304,27 +304,37 @@ public class Functions {
 		myDB.update(LSGSQliteOpenHelper.DB_TIME_TABLE, vals, null, null);
 		vals.put(LSGSQliteOpenHelper.DB_VERTRETUNG, "true");
 
-		Cursor c = myDB
-				.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE, new String[] {
-						LSGSQliteOpenHelper.DB_ROWID,
-						LSGSQliteOpenHelper.DB_DAY_OF_WEEK,
-						LSGSQliteOpenHelper.DB_STUNDE,
-						LSGSQliteOpenHelper.DB_RAW_LEHRER,
-						LSGSQliteOpenHelper.DB_RAW_FACH }, null, null, null,
-						null, null);
+		Cursor c = myDB.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE, new String[] {
+				LSGSQliteOpenHelper.DB_ROWID,
+				LSGSQliteOpenHelper.DB_DAY_OF_WEEK,
+				LSGSQliteOpenHelper.DB_STUNDE,
+				LSGSQliteOpenHelper.DB_RAW_LEHRER,
+				LSGSQliteOpenHelper.DB_RAW_FACH,
+				LSGSQliteOpenHelper.DB_TYPE }, null, null, null, null,
+				null);
 		c.moveToFirst();
 		if (c.getCount() > 0)
 			do {
-				vals.put(LSGSQliteOpenHelper.DB_REMOTE_ID,
-						c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_ROWID)));
+				vals.put(LSGSQliteOpenHelper.DB_REMOTE_ID, c.getString(c
+						.getColumnIndex(LSGSQliteOpenHelper.DB_ROWID)));
+				int type = 0;
+				String rawtype = c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_TYPE));
+				if(rawtype.contains("Vertretung"))
+					type = 1;
+				if(rawtype.contains("Entfall"))
+					type = 2;
+				vals.put(LSGSQliteOpenHelper.DB_MATCHING_TYPE, type);
+				vals.put(LSGSQliteOpenHelper.DB_MATCHING_TYPE_RAW, rawtype);
 				long num_rows = myDB
 						.update(LSGSQliteOpenHelper.DB_TIME_TABLE,
 								vals,
 								LSGSQliteOpenHelper.DB_DAY + "=? AND "
-										+ LSGSQliteOpenHelper.DB_HOUR + "=? AND "
+										+ LSGSQliteOpenHelper.DB_HOUR
+										+ "=? AND "
 										+ LSGSQliteOpenHelper.DB_RAW_LEHRER
 										+ " LIKE ? AND "
-										+ LSGSQliteOpenHelper.DB_RAW_FACH + "=?",
+										+ LSGSQliteOpenHelper.DB_RAW_FACH
+										+ "=?",
 								new String[] {
 										c.getString(c
 												.getColumnIndex(LSGSQliteOpenHelper.DB_DAY_OF_WEEK)),
@@ -338,19 +348,25 @@ public class Functions {
 												+ "%",
 										c.getString(c
 												.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)) });
+				// collapsed items in timetable:
+				// run through to first hour
 				int ii = 1;
-
 				while (num_rows == 0
-						&& c.getInt(c.getColumnIndex(LSGSQliteOpenHelper.DB_STUNDE)) - ii >= 0) {
+						&& c.getInt(c
+								.getColumnIndex(LSGSQliteOpenHelper.DB_STUNDE))
+								- ii >= 0) {
 					num_rows = myDB
 							.update(LSGSQliteOpenHelper.DB_TIME_TABLE,
 									vals,
 									LSGSQliteOpenHelper.DB_DAY + "=? AND "
-											+ LSGSQliteOpenHelper.DB_HOUR + "=? AND "
+											+ LSGSQliteOpenHelper.DB_HOUR
+											+ "=? AND "
 											+ LSGSQliteOpenHelper.DB_RAW_LEHRER
 											+ " LIKE ? AND "
-											+ LSGSQliteOpenHelper.DB_RAW_FACH + "=? AND "
-											+ LSGSQliteOpenHelper.DB_LENGTH + "=?",
+											+ LSGSQliteOpenHelper.DB_RAW_FACH
+											+ "=? AND "
+											+ LSGSQliteOpenHelper.DB_LENGTH
+											+ "=?",
 									new String[] {
 											c.getString(c
 													.getColumnIndex(LSGSQliteOpenHelper.DB_DAY_OF_WEEK)),

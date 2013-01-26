@@ -49,6 +49,8 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_HOUR = "hour";
 	public static final String DB_DISABLED = "disabled";
 	public static final String DB_VERTRETUNG = "vertretung";
+	public static final String DB_MATCHING_TYPE = "matching_type";
+	public static final String DB_MATCHING_TYPE_RAW = "matching_type_raw";
 	// for teachers
 	public static final String DB_TIME_TABLE_TEACHERS = "timetable_teachers";
 	public static final String DB_BREAK_SURVEILLANCE = "pausenaufsicht";
@@ -74,7 +76,7 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
 	
-	public static final int DB_VERSION = 17;
+	public static final int DB_VERSION = 19;
 
 	public LSGSQliteOpenHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -272,6 +274,12 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 		 case 16:
 			 Log.d(DB_INCLUDE_TABLE, "adding column " + DB_TYPE);
 			 database.execSQL("ALTER TABLE " + DB_INCLUDE_TABLE + " ADD COLUMN " + DB_TYPE + " TEXT");
+		 case 17:
+			 Log.d(DB_TIME_TABLE, "adding column " + DB_MATCHING_TYPE);
+			 database.execSQL("ALTER TABLE " + DB_TIME_TABLE + " ADD COLUMN " + DB_MATCHING_TYPE + " INTEGER");
+		 case 18:
+			 Log.d(DB_TIME_TABLE, "adding column " + DB_MATCHING_TYPE_RAW);
+			 database.execSQL("ALTER TABLE " + DB_TIME_TABLE + " ADD COLUMN " + DB_MATCHING_TYPE_RAW + " INTEGER");
 		}
 		}
 	}

@@ -1,63 +1,84 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/timetable_lay"
-    android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@layout/background" >
+    android:background="@layout/background"
+    android:orientation="vertical" >
+
     <!-- break surveillance -->
-    <TextView 
+
+    <TextView
         android:id="@+id/break_surveillance"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5sp"
-        android:textSize="16sp"
+        android:background="@layout/background"
         android:textColor="@color/darkblue"
-        android:background="@layout/background" />
+        android:textSize="16sp" />
     <!-- possible seperators -->
+
     <TextView
-        style="?android:attr/listSeparatorTextViewStyle"
-        android:id="@+id/timetable_day"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="30sp"
-  	    android:gravity="center_vertical|center_horizontal"
-        android:textColor="@color/darkblue"
-        android:background="@layout/background" />
-    <TextView
-        style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+id/timetable_hour"
+        style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-  	    android:gravity="center_vertical|center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
         android:textColor="@color/lightblue"
-         />
+        android:textSize="16sp" />
     <!-- content -->
-    <TextView
-        android:id="@+id/timetable_subject"
+
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:layout_marginLeft="5sp"
-        android:textColor="@color/fontblack" />
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:stretchColumns="1">
-    <TableRow>
-        <TextView
-            android:id="@+id/timetable_teacher"
-    	    android:textSize="14sp"
-            android:layout_column="1"
-      	    android:layout_marginLeft="5sp"
-      	    android:textColor="@color/fontgrey" />
-        <TextView
-            android:id="@+id/timetable_room"
-            android:gravity="right"
-    	    android:textSize="14sp"
-            android:layout_marginRight="5sp"
-            android:textColor="@color/fontgrey" />
-    </TableRow>
-</TableLayout>
+        android:layout_height="fill_parent"
+        android:stretchColumns="1" >
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/timetable_subject"
+                android:layout_column="1"
+                android:layout_marginLeft="5sp"
+                android:textColor="@color/fontblack"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/timetable_affection_what"
+                android:layout_marginRight="5sp"
+                android:background="@color/lightred"
+                android:gravity="right"
+                android:paddingBottom="5sp"
+                android:paddingLeft="5sp"
+                android:paddingRight="5sp"
+                android:paddingTop="0dp"
+                android:text="Entfall"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="1" >
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/timetable_teacher"
+                android:layout_column="1"
+                android:layout_marginLeft="5sp"
+                android:textColor="@color/fontgrey"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/timetable_room"
+                android:layout_marginRight="5sp"
+                android:gravity="right"
+                android:textColor="@color/fontgrey"
+                android:textSize="14sp" />
+        </TableRow>
+    </TableLayout>
+
 </LinearLayout>

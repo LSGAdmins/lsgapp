@@ -91,7 +91,9 @@ public class TimeTable {
 								LSGSQliteOpenHelper.DB_CLASS,
 								LSGSQliteOpenHelper.DB_LENGTH,
 								LSGSQliteOpenHelper.DB_HOUR,
-								LSGSQliteOpenHelper.DB_DAY },
+								LSGSQliteOpenHelper.DB_DAY,
+								LSGSQliteOpenHelper.DB_MATCHING_TYPE,
+								LSGSQliteOpenHelper.DB_MATCHING_TYPE_RAW },
 						LSGSQliteOpenHelper.DB_SHORT + "=? AND "
 								+ LSGSQliteOpenHelper.DB_DAY + "=?",
 						new String[] { this.displayingTeacher,
@@ -123,8 +125,10 @@ public class TimeTable {
 								LSGSQliteOpenHelper.DB_LENGTH,
 								LSGSQliteOpenHelper.DB_HOUR,
 								LSGSQliteOpenHelper.DB_DAY,
-								LSGSQliteOpenHelper.DB_RAW_FACH }, wherecond,
-						excludeSubjects, null, null, null);
+								LSGSQliteOpenHelper.DB_RAW_FACH,
+								LSGSQliteOpenHelper.DB_MATCHING_TYPE,
+								LSGSQliteOpenHelper.DB_MATCHING_TYPE_RAW },
+						wherecond, excludeSubjects, null, null, null);
 				Log.d("where", excludeSubjects[i]);
 			}
 		}
