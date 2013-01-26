@@ -30,7 +30,6 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		super.onCreate(savedInstanceState);
 		
 		Functions.setTheme(false, false, this);
-		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
         addPreferencesFromResource(R.xml.login_settings);
         addPreferencesFromResource(R.xml.timetable_settings);

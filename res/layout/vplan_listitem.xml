@@ -77,8 +77,7 @@
     <WebView
         android:id="@+id/standard_webview"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@layout/background" >
+        android:layout_height="wrap_content" >
     </WebView>
 
 </LinearLayout>

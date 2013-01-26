@@ -103,7 +103,6 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
 		setContentView(R.layout.list);
-		getWindow().setBackgroundDrawableResource(R.layout.background);
 		
 		//set header search bar
 		if(Functions.getSDK() < 11) {

@@ -144,7 +144,7 @@
     <string name="sendcrashes">Abstürze melden</string>
     <string name="general_settings">Allgemeine Einstellungen</string>
     <string name="general_summary">Allgemeine Einstellungen anpassen</string>
-    <string name="check_login">Teste Login-Daten...</string>
+    <string name="check_login">Teste Login-Daten&#8230;</string>
     <string name="network_conn_req">Internet-Verbindung ist zum Setup erforderlich.</string>
     <string name="rerun_setup_assistant">Wollen Sie den Setup-Assistenten wirklich erneut ausführen?</string>
     <string name="homeasuphelp">Klicke auf das LSGäpp-Logo, um das Menü anzuzeigen.</string>

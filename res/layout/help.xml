@@ -5,7 +5,6 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@layout/background"
         android:orientation="vertical"
         android:padding="10dp" >
 

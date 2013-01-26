@@ -46,12 +46,6 @@ public class AdvancedWrapper {
 	public View setMenuActionView(MenuItem item, View actionView) {
 		return Advanced.setMenuActionView(item, actionView);
 	}
-	public void showMenuActionView(MenuItem item) {
-		Advanced.showMenuActionView(item);
-	}
-	public void removeActionView(MenuItem item) {
-		Advanced.removeActionView(item);
-	}
 	@TargetApi(5)
 	public void postUrl(WebView webv, String url, byte[] data) {
 		webv.postUrl(url, data);

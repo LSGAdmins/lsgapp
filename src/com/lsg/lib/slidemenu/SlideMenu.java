@@ -42,10 +42,12 @@ public class SlideMenu implements OnTouchListener {
 		this.act = act;
 		contentContainer = ((LinearLayout) act.findViewById(
 				android.R.id.content).getParent());
-		(act.findViewById(android.R.id.content))
-				.setBackgroundResource(R.layout.background);
 
 		decorView = (FrameLayout) contentContainer.getParent();
+
+		(act.findViewById(android.R.id.content)).setBackground(decorView
+				.getBackground());
+		
 		LayoutInflater inflater = (LayoutInflater) act
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 

@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
@@ -363,7 +364,12 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
+	
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		// TODO insert selected Event into Calendar
+	}
+	
 	private static ServiceHandler hand;
 	private boolean actionViewSet = false;
 	@TargetApi(11)

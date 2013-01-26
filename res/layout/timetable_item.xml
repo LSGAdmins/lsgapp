@@ -2,7 +2,6 @@
     android:id="@+id/timetable_lay"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@layout/background"
     android:orientation="vertical" >
 
     <!-- break surveillance -->
@@ -12,7 +11,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5sp"
-        android:background="@layout/background"
         android:textColor="@color/darkblue"
         android:textSize="16sp" />
     <!-- possible seperators -->

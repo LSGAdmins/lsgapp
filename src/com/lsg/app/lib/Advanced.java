@@ -110,10 +110,4 @@ public class Advanced implements SearchView.OnQueryTextListener {
 		item.getActionView().setSaveEnabled(false);
 		return v;
 	}
-	public static void showMenuActionView(MenuItem item) {
-		item.expandActionView();
-	}
-	public static void removeActionView(MenuItem item) {
-		item.collapseActionView();
-	}
 }

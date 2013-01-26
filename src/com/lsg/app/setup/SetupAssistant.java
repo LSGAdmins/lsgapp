@@ -420,7 +420,6 @@ public class SetupAssistant extends Activity {
 		super.onCreate(savedInstanceState);
 		Functions.init(this);
 		Functions.setTheme(false, false, this);
-		getWindow().setBackgroundDrawableResource(R.layout.background);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		edit = prefs.edit();
 		if (!prefs.getBoolean(Functions.IS_LOGGED_IN, false))

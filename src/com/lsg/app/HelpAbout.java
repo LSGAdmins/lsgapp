@@ -12,7 +12,6 @@ public class HelpAbout extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.setTheme(false, true, this);
-		getWindow().setBackgroundDrawableResource(R.layout.background);
 		Bundle data = getIntent().getExtras();
 		String type = data.getString(Functions.HELPABOUT);
 		if(type.equals(Functions.help)) {
@@ -20,7 +19,7 @@ public class HelpAbout extends FragmentActivity {
 			setTitle(getString(R.string.help));
 		}
 		else {
-			setContentView(R.layout.about);
+			setContentView(R.layout.activity_about);
 			setTitle(getString(R.string.about));
 		}
 	}

@@ -73,7 +73,7 @@ public class TimeTableAdapter extends CursorAdapter {
 						.getString(
 								cursor.getColumnIndex(LSGSQliteOpenHelper.DB_VERTRETUNG))
 						.equals("true")) {
-			holder.lay.setBackgroundResource(R.layout.background_info);
+			holder.lay.setBackgroundResource(R.layout.layout_highlight);
 
 			holder.timetable_affection_what.setVisibility(View.VISIBLE);
 			int type = cursor.getInt(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_MATCHING_TYPE));
@@ -88,7 +88,7 @@ public class TimeTableAdapter extends CursorAdapter {
 						.getResources().getColor(R.color.lightred));
 			holder.timetable_affection_what.setText(cursor.getString(cursor.getColumnIndex(LSGSQliteOpenHelper.DB_MATCHING_TYPE_RAW)));
 		} else {
-			holder.lay.setBackgroundResource(R.layout.background);
+			holder.lay.setBackground(null);
 			holder.timetable_affection_what.setVisibility(View.GONE);
 		}
 		
