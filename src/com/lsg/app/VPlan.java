@@ -314,6 +314,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 			where_conds_events[5] = "%" + searchText + "%";
 			updateCursor();
 		}
+		@Override
 		public void updateList() {
 			updateCondLists();
 			updateCursor();
@@ -821,6 +822,7 @@ public class VPlan extends Fragment implements HomeCall, RefreshCall, WorkerServ
 					e.printStackTrace();
 				}
 				refreshing = false;
+				adapter.updateList();
 			}
 		});
 		Handler handler = hand.getHandler();

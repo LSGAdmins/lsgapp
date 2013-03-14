@@ -108,6 +108,7 @@ public class SlideMenuFragment extends ListFragment {
 			items[0].label = "Stundenplan";
 			items[0].openFragment = TimeTableFragment.class;
 			items[0].containerActivity = MainActivity.class;
+			items[0].selected = true;
 			// VPlan
 			items[1].icon = R.drawable.ic_vplan_green;
 			items[1].label = "Vertretungsplan";
@@ -169,6 +170,7 @@ public class SlideMenuFragment extends ListFragment {
 			items[1].label = "Termine";
 			items[1].openFragment = Events.class;
 			items[1].containerActivity = MainActivity.class;
+			items[1].selected = true;
 			items[2].icon = R.drawable.ic_smv;
 			items[2].label = "SMVBlog";
 			items[2].openFragment = SMVBlog.class;

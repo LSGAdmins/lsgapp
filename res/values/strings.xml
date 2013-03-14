@@ -114,7 +114,9 @@
     <string name="admin">Admin</string>
     <string name="teacher_short">Kürzel</string>
     <string name="select_short">Kürzel auswählen</string>
-    <string name="vplan_num">Vertretungsanzahl&#160;&#160;&#160;&#160;</string>
+    <string name="vplan_mine_num">&#160;Vertretungen für mich</string>
+    <string name="vplan_pupils_num">&#160;Schülervertretungen</string>
+    <string name="vplan_teachers_num">&#160;Lehrervertretungen</string>
     <string name="tasks">Aufgaben</string>
     <string name="exams">Schulaufgaben</string>
     <string name="newExam">Neue Schulaufgabe</string>

@@ -45,7 +45,7 @@ public class SlideMenu implements OnTouchListener {
 
 		decorView = (FrameLayout) contentContainer.getParent();
 
-		(act.findViewById(android.R.id.content)).setBackground(decorView
+		(act.findViewById(android.R.id.content)).setBackgroundDrawable(decorView
 				.getBackground());
 		
 		LayoutInflater inflater = (LayoutInflater) act

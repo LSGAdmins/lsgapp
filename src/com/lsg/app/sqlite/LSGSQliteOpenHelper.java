@@ -5,8 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.lsg.app.Functions;
-
 public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_ROWID = "_id";
 	public static final String DB_NAME = "lsgapp";
@@ -76,7 +74,7 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 	public static final String DB_CLASS_TABLE = "classes";
 	public static final String DB_CLASS = "class";
 	
-	public static final int DB_VERSION = 19;
+	public static final int DB_VERSION = 21;
 
 	public LSGSQliteOpenHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -280,6 +278,12 @@ public class LSGSQliteOpenHelper extends SQLiteOpenHelper {
 		 case 18:
 			 Log.d(DB_TIME_TABLE, "adding column " + DB_MATCHING_TYPE_RAW);
 			 database.execSQL("ALTER TABLE " + DB_TIME_TABLE + " ADD COLUMN " + DB_MATCHING_TYPE_RAW + " INTEGER");
+		 case 19:
+			 Log.d(DB_TIME_TABLE_TEACHERS, "adding column " + DB_MATCHING_TYPE_RAW);
+			 database.execSQL("ALTER TABLE " + DB_TIME_TABLE_TEACHERS + " ADD COLUMN " + DB_MATCHING_TYPE_RAW + " INTEGER");
+		 case 20:
+			 Log.d(DB_TIME_TABLE_TEACHERS, "adding column " + DB_MATCHING_TYPE);
+			 database.execSQL("ALTER TABLE " + DB_TIME_TABLE_TEACHERS + " ADD COLUMN " + DB_MATCHING_TYPE + " INTEGER");
 		}
 		}
 	}

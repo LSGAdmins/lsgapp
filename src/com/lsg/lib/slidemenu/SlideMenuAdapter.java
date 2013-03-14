@@ -81,7 +81,7 @@ public class SlideMenuAdapter extends ArrayAdapter<SlideMenuAdapter.MenuDesc> {
 			rowView.setBackgroundColor(act.getResources().getColor(
 					R.color.activeblack));
 		else
-			rowView.setBackground(null);
+			rowView.setBackgroundDrawable(null);
 
 		if (holder.title != null) {
 			if (items[position].title != null) {

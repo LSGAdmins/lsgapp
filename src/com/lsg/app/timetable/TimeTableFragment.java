@@ -44,7 +44,8 @@ import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
-public class TimeTableFragment extends Fragment implements SelectedCallback, RefreshCall, WorkerService.WorkerClass {
+public class TimeTableFragment extends Fragment implements SelectedCallback,
+		RefreshCall, WorkerService.WorkerClass {
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
@@ -56,24 +57,29 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.viewpager, null);
 	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 	}
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getActivity().setTitle(R.string.timetable);
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TimeTableFragment.class);
-		
+		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(
+				TimeTableFragment.class);
+
 		float pageWidth = 1.0F;
-//		Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-//		if(display.getOrientation() == Configuration.ORIENTATION_LANDSCAPE)
-//			pageWidth = (1.0F - Functions.percentWidth(Functions.dpToPx(40, getActivity()), getActivity())) / 2;
-		
+		// Display display = ((WindowManager)
+		// getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		// if(display.getOrientation() == Configuration.ORIENTATION_LANDSCAPE)
+		// pageWidth = (1.0F - Functions.percentWidth(Functions.dpToPx(40,
+		// getActivity()), getActivity())) / 2;
+
 		viewpageradap = new TimeTableViewPagerAdapter(this, pageWidth);
-		
+
 		pager = (ViewPager) getActivity().findViewById(R.id.viewpager);
 		pager.setAdapter(viewpageradap);
 		pager.setPageMargin(Functions.dpToPx(40, getActivity()));
@@ -109,7 +115,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		titlebar = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
 		titlebar.addRefresh(this);
 		titlebar.setTitle(getActivity().getTitle());
-		
+
 		// add actions for teachers & admins
 		if ((prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs
 				.getBoolean(Functions.RIGHTS_ADMIN, false))) {
@@ -117,8 +123,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 					Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions
 					: R.array.timetable_actions_teachers));
 		}
-		Log.d("admin", Boolean.valueOf(prefs.getBoolean(Functions.RIGHTS_ADMIN, false)).toString());
-		//something to restore...
+		Log.d("admin",
+				Boolean.valueOf(prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
+						.toString());
+		// something to restore...
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getString("selclass") != null) {
 				viewpageradap.setClass(
@@ -141,20 +149,25 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 				ignoreSpinnerSelect = true;
 				AdvancedWrapper adv = new AdvancedWrapper();
 				adv.setSelectedItem(
-						savedInstanceState.getInt("navlistselected"), getActivity());
+						savedInstanceState.getInt("navlistselected"),
+						getActivity());
 				// TODO selected item also for pre-ics
 			}
 			isRefreshing = savedInstanceState.getBoolean("refreshing");
 		}
-		//show help overlays
+		// show help overlays
 		Functions.checkMessage(getActivity(), new String[] {
 				Functions.OVERLAY_HOMEBUTTON, Functions.OVERLAY_SWIPE });
 	}
+
 	public void showMine() {
-		((TextView) getActivity().findViewById(R.id.footer_text)).setVisibility(View.GONE);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		((TextView) getActivity().findViewById(R.id.footer_text))
+				.setVisibility(View.GONE);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getActivity());
 		if (prefs.getBoolean(Functions.RIGHTS_TEACHER, false)) {
-			viewpageradap.setTeacher(prefs.getString(LSGSQliteOpenHelper.TEACHER_SHORT, ""));
+			viewpageradap.setTeacher(prefs.getString(
+					LSGSQliteOpenHelper.TEACHER_SHORT, ""));
 			viewpageradap.updateList();
 		} else {
 			viewpageradap.setClass("", true);
@@ -165,19 +178,21 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	public void showClasses() {
 		footer.setVisibility(View.VISIBLE);
 		final SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
-		final Cursor c = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS,
-				new String[] { LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_KLASSE }, null,
-				null, null, null, null);
+		final Cursor c = myDB.query(
+				LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_PUPILS, new String[] {
+						LSGSQliteOpenHelper.DB_ROWID,
+						LSGSQliteOpenHelper.DB_KLASSE }, null, null, null,
+				null, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.select_class);
 		builder.setCursor(c, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				c.moveToPosition(item);
-				viewpageradap.setClass(
-						c.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE)),
-						false);
+				viewpageradap.setClass(c.getString(c
+						.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE)), false);
 				((TextView) getActivity().findViewById(R.id.footer_text)).setText(c
-						.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE)));
+						.getString(c
+								.getColumnIndex(LSGSQliteOpenHelper.DB_KLASSE)));
 				viewpageradap.updateList();
 				c.close();
 			}
@@ -190,9 +205,12 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 	public void showTeachers() {
 		footer.setVisibility(View.VISIBLE);
 		final SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
-		final Cursor c = myDB.query(LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS,
-				new String[] { LSGSQliteOpenHelper.DB_ROWID, LSGSQliteOpenHelper.DB_TEACHER,
-				LSGSQliteOpenHelper.DB_SHORT }, null, null, null, null, null);
+		final Cursor c = myDB.query(
+				LSGSQliteOpenHelper.DB_TIME_TABLE_HEADERS_TEACHERS,
+				new String[] { LSGSQliteOpenHelper.DB_ROWID,
+						LSGSQliteOpenHelper.DB_TEACHER,
+						LSGSQliteOpenHelper.DB_SHORT }, null, null, null, null,
+				null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.select_teacher);
 		builder.setCursor(c, new DialogInterface.OnClickListener() {
@@ -200,8 +218,8 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 				c.moveToPosition(item);
 				viewpageradap.setTeacher(c.getString(c
 						.getColumnIndex(LSGSQliteOpenHelper.DB_SHORT)));
-				((TextView) getActivity().findViewById(R.id.footer_text)).setText(c
-						.getString(c.getColumnIndex(LSGSQliteOpenHelper.DB_TEACHER)));
+				((TextView) getActivity().findViewById(R.id.footer_text)).setText(c.getString(c
+						.getColumnIndex(LSGSQliteOpenHelper.DB_TEACHER)));
 				viewpageradap.updateList();
 				c.close();
 			}
@@ -210,23 +228,24 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
-	
+
 	private MenuItem refresh;
 	private boolean actionViewSet;
+
 	@TargetApi(11)
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		actionViewSet = false;
 		inflater.inflate(R.menu.timetable, menu);
-		if(Functions.getSDK() < 11)
+		if (Functions.getSDK() < 11)
 			menu.removeItem(R.id.refresh);
 		else
 			refresh = menu.findItem(R.id.refresh);
-		if(isRefreshing && Functions.getSDK() >= 11) {
+		if (isRefreshing && Functions.getSDK() >= 11) {
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
-		}
-		else if(isRefreshing)
-			loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_timetable));
+		} else if (isRefreshing)
+			loading = ProgressDialog.show(getActivity(), null,
+					getString(R.string.loading_timetable));
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -240,11 +259,14 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
 	private boolean isRefreshing = false;
 	private static ServiceHandler hand;
+
 	public void updateTimeTable() {
 		updateTimeTable(false);
 	}
+
 	public void updateTimeTable(boolean force) {
 		actionViewSet = false;
 		isRefreshing = true;
@@ -254,7 +276,8 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 				adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
 				actionViewSet = true;
 			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading_timetable));
+				loading = ProgressDialog.show(getActivity(), null,
+						getString(R.string.loading_timetable));
 			}
 		} else {
 			loading = ProgressDialog.show(getActivity(), null,
@@ -270,13 +293,12 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
 				try {
-				if (Functions.getSDK() >= 11 && actionViewSet) {
-					AdvancedWrapper adv = new AdvancedWrapper();
-					adv.setMenuActionView(refresh, null);
-				}
-				else
-					loading.cancel();
-				} catch(Exception e) {
+					if (Functions.getSDK() >= 11 && actionViewSet) {
+						AdvancedWrapper adv = new AdvancedWrapper();
+						adv.setMenuActionView(refresh, null);
+					} else
+						loading.cancel();
+				} catch (Exception e) {
 					Log.w("LSGäpp", "Error hiding loading");
 					e.printStackTrace();
 				}
@@ -284,24 +306,27 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 			}
 		});
 		Handler handler = hand.getHandler();
-		
+
 		Intent intent = new Intent(getActivity(), WorkerService.class);
-	    // Create a new Messenger for getting the result
-	    Messenger messenger = new Messenger(handler);
-	    intent.putExtra(WorkerService.MESSENGER, messenger);
-	    intent.putExtra(WorkerService.WORKER_CLASS, TimeTableFragment.class.getCanonicalName());
+		// Create a new Messenger for getting the result
+		Messenger messenger = new Messenger(handler);
+		intent.putExtra(WorkerService.MESSENGER, messenger);
+		intent.putExtra(WorkerService.WORKER_CLASS,
+				TimeTableFragment.class.getCanonicalName());
 		if (force)
 			intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL_FORCE);
 		else
 			intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
-	    getActivity().startService(intent);
+		getActivity().startService(intent);
 	}
+
 	private int selectedPos;
 	private boolean ignoreSpinnerSelect = false;
+
 	@Override
 	public boolean selected(int position, long id) {
 		selectedPos = position;
-		switch(position) {
+		switch (position) {
 		case 0:
 			showMine();
 			break;
@@ -339,21 +364,25 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		super.onSaveInstanceState(savedInstanceState);
 		try {
 			savedInstanceState.putInt("navlistselected", selectedPos);
-			savedInstanceState.putBoolean("ownclass", viewpageradap.getOwnClass());
+			savedInstanceState.putBoolean("ownclass",
+					viewpageradap.getOwnClass());
 			savedInstanceState.putString("selclass", viewpageradap.getKlasse());
-			savedInstanceState.putString("selshort", viewpageradap.getTeacher());
+			savedInstanceState
+					.putString("selshort", viewpageradap.getTeacher());
 			savedInstanceState.putBoolean("refreshing", isRefreshing);
 		} catch (NullPointerException e) {
 			Log.w("LSGäpp", "error saving state");
-		  e.printStackTrace();
-	  }
+			e.printStackTrace();
+		}
 	}
+
 	@Override
 	public void onStop() {
-		//cleanup
+		// cleanup
 		titlebar.removeSpinnerNavigation();
 		super.onStop();
 	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -362,22 +391,30 @@ public class TimeTableFragment extends Fragment implements SelectedCallback, Ref
 		if (viewpageradap != null)
 			viewpageradap.closeCursors();
 	}
+
 	@Override
 	public void onRefreshPress() {
 		updateTimeTable();
 	}
+
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Functions.createContextMenu(menu, v, menuInfo, getActivity(), LSGSQliteOpenHelper.DB_TIME_TABLE);
+		if (selectedPos != 2)
+			Functions.createContextMenu(menu, v, menuInfo, getActivity(),
+					LSGSQliteOpenHelper.DB_TIME_TABLE);
 	}
+
 	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
-		return Functions.contextMenuSelect(item, getActivity(), viewpageradap, LSGSQliteOpenHelper.DB_TIME_TABLE);
+		return Functions.contextMenuSelect(item, getActivity(), viewpageradap,
+				LSGSQliteOpenHelper.DB_TIME_TABLE);
 	}
+
 	public void update(int what, Context c) {
 		TimeTableUpdater udp = new TimeTableUpdater(c);
-		switch(what) {
+		switch (what) {
 		case WorkerService.UPDATE_ALL_FORCE:
 			udp.updatePupils(true);
 			udp.updateTeachers(true);
