@@ -19,7 +19,6 @@ public class InfoActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle extras = getIntent().getExtras();
-		Log.d("type", extras.getString("type"));
 		if (extras.getString("type").equals("vplan")) {
 			setTitle(R.string.vplan);
 			setContentView(R.layout.info_vplan);

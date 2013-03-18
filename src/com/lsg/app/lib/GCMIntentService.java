@@ -8,9 +8,9 @@ import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 import com.lsg.app.Events;
 import com.lsg.app.Functions;
-import com.lsg.app.VPlan;
 import com.lsg.app.WorkerService;
 import com.lsg.app.timetable.TimeTableFragment;
+import com.lsg.app.vplan.VPlan;
 
 public class GCMIntentService extends GCMBaseIntentService {
 	public GCMIntentService() {

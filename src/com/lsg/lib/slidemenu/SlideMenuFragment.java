@@ -19,11 +19,12 @@ import com.lsg.app.InfoActivity;
 import com.lsg.app.MainActivity;
 import com.lsg.app.R;
 import com.lsg.app.SMVBlog;
-import com.lsg.app.VPlan;
 import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.setup.SetupAssistant;
 import com.lsg.app.tasks.TasksOverView;
 import com.lsg.app.timetable.TimeTableFragment;
+import com.lsg.app.vplan.VPlanFragment;
+
 
 public class SlideMenuFragment extends ListFragment {
 
@@ -36,22 +37,26 @@ public class SlideMenuFragment extends ListFragment {
 			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.menu, null);
 	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		fill();
 		getListView().setDivider(null);
 	}
+
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO highlight selected item
-		
-		Class<? extends Fragment> fragment = ((FragmentActivityCallbacks) getActivity()).getSlideMenu().getFragment();
+
+		Class<? extends Fragment> fragment = ((FragmentActivityCallbacks) getActivity())
+				.getSlideMenu().getFragment();
 		// if not clicked item for current Activity
 		if (fragment != null && fragment.equals(items[position].openFragment))
 			((FragmentActivityCallbacks) getActivity()).getSlideMenu().hide();
@@ -62,12 +67,14 @@ public class SlideMenuFragment extends ListFragment {
 				SlideMenu.menuToHide = true;
 			// start new activity / intent
 			if (items[position].openActivity != null) {
-				Intent intent = new Intent(getActivity(), items[position].openActivity);
+				Intent intent = new Intent(getActivity(),
+						items[position].openActivity);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 				getActivity().startActivity(intent);
 
 			} else if (items[position].containerActivity != null) {
-				if (!items[position].containerActivity.equals(getActivity().getClass())) {
+				if (!items[position].containerActivity.equals(getActivity()
+						.getClass())) {
 					Intent intent = new Intent(getActivity(),
 							items[position].containerActivity);
 					intent.putExtra("fragment", items[position].openFragment);
@@ -76,7 +83,8 @@ public class SlideMenuFragment extends ListFragment {
 					Log.d("slide", "change fragment");
 					((FragmentActivityCallbacks) getActivity())
 							.changeFragment(items[position].openFragment);
-					((FragmentActivityCallbacks) getActivity()).getSlideMenu().hide();
+					((FragmentActivityCallbacks) getActivity()).getSlideMenu()
+							.hide();
 				}
 			} else
 				getActivity().startActivity(items[position].openIntent);
@@ -112,7 +120,7 @@ public class SlideMenuFragment extends ListFragment {
 			// VPlan
 			items[1].icon = R.drawable.ic_vplan_green;
 			items[1].label = "Vertretungsplan";
-			items[1].openFragment = VPlan.class;
+			items[1].openFragment = VPlanFragment.class;
 			items[1].containerActivity = MainActivity.class;
 			// Tasks
 			items[2].icon = R.drawable.ic_tasks;
@@ -152,7 +160,8 @@ public class SlideMenuFragment extends ListFragment {
 				items[6].label = news_teachers.substring(0, ((news_teachers
 						.length() > 60) ? 60 : news_teachers.length()))
 						+ ((news_teachers.length() > 60) ? "..." : "");
-				items[6].openIntent = new Intent(getActivity(), InfoActivity.class);
+				items[6].openIntent = new Intent(getActivity(),
+						InfoActivity.class);
 				items[6].openIntent.putExtra("type", "info");
 				items[6].openIntent.putExtra("info_type", "teachers");
 				items[6].useSlideMenu = false;

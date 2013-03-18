@@ -34,6 +34,7 @@ import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
+import com.lsg.app.vplan.VPlan;
 
 public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 	public static class SubjectListUpdater {

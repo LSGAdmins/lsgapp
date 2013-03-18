@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.lsg.app.vplan.VPlan;
+
 public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	/*public static class ProgressThread extends Thread {
 		Handler handler;

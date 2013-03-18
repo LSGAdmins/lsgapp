@@ -135,7 +135,7 @@
     <string name="small_test">Kurzarbeit</string>
     <string name="other_test">Etwas Anderes</string>
     <string name="homebutton">Home-Button</string>
-    <string name="searchbutton">Button zum Suchen</string>
+    <string name="refreshbutton">Button zum Aktualisieren</string>
     <string name="icon">Icon</string>
     <string name="vplan_of">Vertretungen von</string>
     <string name="change_user">Login-Daten</string>

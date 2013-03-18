@@ -20,7 +20,6 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -377,7 +375,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 	}
 
 	@Override
-	public void onStop() {
+	public void onPause() {
 		// cleanup
 		titlebar.removeSpinnerNavigation();
 		super.onStop();
@@ -401,7 +399,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		if (selectedPos != 2)
+		if (selectedPos != 2) // no teacher
 			Functions.createContextMenu(menu, v, menuInfo, getActivity(),
 					LSGSQliteOpenHelper.DB_TIME_TABLE);
 	}

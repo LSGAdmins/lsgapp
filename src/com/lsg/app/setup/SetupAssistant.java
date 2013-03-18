@@ -43,13 +43,13 @@ import com.lsg.app.MainActivity;
 import com.lsg.app.R;
 import com.lsg.app.SMVBlog;
 import com.lsg.app.SubjectList;
-import com.lsg.app.VPlan;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.settings.Settings;
 import com.lsg.app.settings.SettingsAdvanced;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 import com.lsg.app.timetable.TimeTableFragment;
 import com.lsg.app.timetable.TimeTableUpdater;
+import com.lsg.app.vplan.VPlan;
 
 public class SetupAssistant extends Activity {
 	private SharedPreferences prefs;

@@ -33,12 +33,12 @@
         android:layout_marginLeft="-50dip" >
 
         <ImageView
-            android:id="@+id/search_item"
+            android:id="@+id/refresh_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="right"
             android:src="@android:drawable/ic_menu_rotate"
-            android:contentDescription="@string/searchbutton" />
+            android:contentDescription="@string/refreshbutton" />
     </LinearLayout>
 
 </LinearLayout>

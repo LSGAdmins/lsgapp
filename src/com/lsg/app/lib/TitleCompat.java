@@ -6,6 +6,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -48,7 +49,7 @@ public class TitleCompat {
 							homecall.onHomePress();
 						}
 					});
-			(activity.findViewById(R.id.search_item)).setVisibility(View.GONE);
+			(activity.findViewById(R.id.refresh_item)).setVisibility(View.GONE);
 			(activity.findViewById(R.id.titlebar_spinner))
 					.setVisibility(View.GONE);
 		}
@@ -70,9 +71,9 @@ public class TitleCompat {
 
 	public void addRefresh(final RefreshCall sc) {
 		if (Functions.getSDK() < 11) {
-			(activity.findViewById(R.id.search_item))
+			(activity.findViewById(R.id.refresh_item))
 					.setVisibility(View.VISIBLE);
-			(activity.findViewById(R.id.search_item))
+			(activity.findViewById(R.id.refresh_item))
 					.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -111,10 +112,12 @@ public class TitleCompat {
 	public void removeSpinnerNavigation() {
 		// TODO test on pre-honeycomb
 		if(Functions.getSDK() < 11) {
-			(activity.findViewById(R.id.title)).setVisibility(View.VISIBLE);
 			Spinner spinner = (Spinner) activity
 					.findViewById(R.id.titlebar_spinner);
 			spinner.setVisibility(View.GONE);
+			(activity.findViewById(R.id.title)).setVisibility(View.VISIBLE);
+			((TextView) activity.findViewById(R.id.title)).invalidate();
+			((LinearLayout) (activity.findViewById(R.id.title)).getParent()).invalidate();
 		} else {
 			AdvancedWrapper adv = new AdvancedWrapper();
 			adv.standardNavigation(activity);
