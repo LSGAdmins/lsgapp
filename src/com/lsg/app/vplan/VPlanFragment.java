@@ -1,20 +1,5 @@
 package com.lsg.app.vplan;
 
-import com.lsg.app.Functions;
-import com.lsg.app.InfoActivity;
-import com.lsg.app.R;
-import com.lsg.app.ServiceHandler;
-import com.lsg.app.SubjectList;
-import com.lsg.app.WorkerService;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
-import com.lsg.app.lib.AdvancedWrapper;
-import com.lsg.app.lib.LSGApplication;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
-import com.lsg.app.sqlite.LSGSQliteOpenHelper;
-import com.lsg.app.vplan.VPlan.VPlanUpdater;
-
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -30,15 +15,29 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.lsg.app.Functions;
+import com.lsg.app.InfoActivity;
+import com.lsg.app.R;
+import com.lsg.app.ServiceHandler;
+import com.lsg.app.SubjectList;
+import com.lsg.app.WorkerService;
+import com.lsg.app.interfaces.FragmentActivityCallbacks;
+import com.lsg.app.lib.AdvancedWrapper;
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.lib.TitleCompat;
+import com.lsg.app.lib.TitleCompat.HomeCall;
+import com.lsg.app.lib.TitleCompat.RefreshCall;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class VPlanFragment extends Fragment implements HomeCall, RefreshCall {
 	@Override
@@ -139,43 +138,6 @@ public class VPlanFragment extends Fragment implements HomeCall, RefreshCall {
 				: LSGSQliteOpenHelper.DB_VPLAN_TEACHER;
 		return Functions.contextMenuSelect(item, getActivity(), adapter, table);
 	}
-
-	public static void blacklistVPlan(Context context) {
-		SQLiteDatabase myDB = LSGApplication.getSqliteDatabase();
-		Cursor vplan = myDB.query(LSGSQliteOpenHelper.DB_VPLAN_TABLE,
-				new String[] { LSGSQliteOpenHelper.DB_ROWID,
-						LSGSQliteOpenHelper.DB_RAW_FACH }, null, null, null,
-				null, null);
-		vplan.moveToFirst();
-		ContentValues vals = new ContentValues();
-		vals.put(LSGSQliteOpenHelper.DB_DISABLED, 2);
-		myDB.update(LSGSQliteOpenHelper.DB_VPLAN_TABLE, vals, null, null);
-		if (vplan.getCount() > 0)
-			do {
-				Cursor exclude = myDB
-						.query(LSGSQliteOpenHelper.DB_EXCLUDE_TABLE,
-								new String[] { LSGSQliteOpenHelper.DB_ROWID },
-								LSGSQliteOpenHelper.DB_RAW_FACH + "=? AND "
-										+ LSGSQliteOpenHelper.DB_TYPE + "=?",
-								new String[] {
-										vplan.getString(vplan
-												.getColumnIndex(LSGSQliteOpenHelper.DB_RAW_FACH)),
-										"oldstyle" }, null, null, null);
-				if (exclude.getCount() > 0) {
-					myDB.execSQL(
-							"UPDATE " + LSGSQliteOpenHelper.DB_VPLAN_TABLE
-									+ " SET " + LSGSQliteOpenHelper.DB_DISABLED
-									+ "=? WHERE "
-									+ LSGSQliteOpenHelper.DB_ROWID + "=?",
-							new String[] {
-									"1",
-									vplan.getString(vplan
-											.getColumnIndex(LSGSQliteOpenHelper.DB_ROWID)) });
-			}
-			exclude.close();
-		} while (vplan.moveToNext());
-		vplan.close();
-	}
 	
 	private static ServiceHandler hand;
 	private boolean actionViewSet;
@@ -223,7 +185,7 @@ public class VPlanFragment extends Fragment implements HomeCall, RefreshCall {
 	    // Create a new Messenger for the communication back
 	    Messenger messenger = new Messenger(handler);
 	    intent.putExtra(WorkerService.MESSENGER, messenger);
-	    intent.putExtra(WorkerService.WORKER_CLASS, VPlan.class.getCanonicalName());
+	    intent.putExtra(WorkerService.WORKER_CLASS, VPlanUpdater.class.getCanonicalName());
 	    intent.putExtra(WorkerService.WHAT, WorkerService.UPDATE_ALL);
 	    getActivity().startService(intent);
 	}

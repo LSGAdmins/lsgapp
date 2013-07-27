@@ -57,7 +57,8 @@ public class VPlanPagerAdapter extends PagerAdapter implements SQLlist,
 		titles[0] = act.getString(R.string.vplan_mine);
 		titles[1] = act.getString(R.string.vplan_pupils);
 		titles[2] = act.getString(R.string.vplan_teachers);
-		prefs = PreferenceManager.getDefaultSharedPreferences(act.getActivity());
+		prefs = PreferenceManager
+				.getDefaultSharedPreferences(act.getActivity());
 		exclude_subjects[1] = (prefs.getString(Functions.GENDER, "")
 				.equals("m")) ? "Sw" : "Sm";
 		if (prefs.getString(Functions.RELIGION, "")
@@ -92,8 +93,7 @@ public class VPlanPagerAdapter extends PagerAdapter implements SQLlist,
 		vadapter_mine = new VPlanAdapter(context, cursor_mine,
 				prefs.getBoolean(Functions.RIGHTS_TEACHER, false));
 		vadapter_all = new VPlanAdapter(context, cursor_all, false);
-		vadapter_teachers = new VPlanAdapter(context,
-				cursor_teachers, true);
+		vadapter_teachers = new VPlanAdapter(context, cursor_teachers, true);
 		updateCursor();
 	}
 

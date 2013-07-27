@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lsg.app.vplan.VPlan;
+import com.lsg.app.vplan.VPlanUpdater;
 
 public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	/*public static class ProgressThread extends Thread {
@@ -66,7 +66,7 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 			context = c;
 		}
 		public void run() {
-			VPlan.VPlanUpdater vpup = new VPlan.VPlanUpdater(context);
+			VPlanUpdater vpup = new VPlanUpdater(context);
 			String res[] = vpup.updatePupils();
 			Log.d(res[0], res[1]);
 			res = vpup.updateTeachers();
