@@ -35,8 +35,6 @@ import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -47,11 +45,14 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gcm.GCMRegistrar;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
+
 
 public class Functions {
 	public static final String   TAG            = "LSGäpp";

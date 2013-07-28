@@ -88,7 +88,7 @@ public class VPlanPagerAdapter extends PagerAdapter implements SQLlist,
 						+ LSGSQliteOpenHelper.DB_VPLAN_TEACHER);
 		long count2 = num_rows_2.simpleQueryForLong();
 		if (count == 0 && count2 == 0)
-			act.updateVP();
+			act.updateVP(true);
 		num_rows.close();
 		vadapter_mine = new VPlanAdapter(context, cursor_mine,
 				prefs.getBoolean(Functions.RIGHTS_TEACHER, false));

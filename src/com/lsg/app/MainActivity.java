@@ -5,16 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.Window;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.lsg.app.interfaces.FragmentActivityCallbacks;
-import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.settings.Settings;
 import com.lsg.app.settings.SettingsAdvanced;
@@ -25,9 +24,8 @@ import com.lsg.app.tasks.TaskSelected;
 import com.lsg.app.timetable.TimeTableFragment;
 import com.lsg.lib.slidemenu.SlideMenu;
 
-public class MainActivity extends FragmentActivity implements HomeCall,
+public class MainActivity extends SherlockFragmentActivity implements HomeCall,
 		FragmentActivityCallbacks, TaskSelected {
-	private TitleCompat titlebar;
 	private SlideMenu slidemenu;
 	private Class<? extends Fragment> curFrag;
 	private Fragment fragment;
@@ -46,14 +44,13 @@ public class MainActivity extends FragmentActivity implements HomeCall,
 		boolean homeAsUp = true;
 		if (getResources().getBoolean(R.bool.isTablet))
 			homeAsUp = false;
-		titlebar = new TitleCompat(this, homeAsUp);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(homeAsUp);
 
 		if (getResources().getBoolean(R.bool.isTablet))
 			setContentView(R.layout.fragment_main_tablet);
 		else
 			setContentView(R.layout.fragment_main);
-		titlebar.init(this);
-		titlebar.setTitle(getTitle());
+		
 		slidemenu = new SlideMenu(this);
 
 		Class<? extends Fragment> frag = null;
@@ -117,7 +114,7 @@ public class MainActivity extends FragmentActivity implements HomeCall,
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.base_menu, menu);
 		if (!((SharedPreferences) PreferenceManager
 				.getDefaultSharedPreferences(this)).getBoolean(
@@ -149,10 +146,6 @@ public class MainActivity extends FragmentActivity implements HomeCall,
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	public TitleCompat getTitlebar() {
-		return titlebar;
 	}
 
 	public SlideMenu getSlideMenu() {

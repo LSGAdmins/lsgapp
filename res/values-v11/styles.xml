@@ -1,7 +1,5 @@
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light" />
-
     <style name="AppThemeDialog" parent="@android:style/Theme.Holo.Light.Dialog" />
 
     <style name="Theme.Transparent" parent="@android:style/Theme.Holo.NoActionBar">

@@ -17,33 +17,34 @@ import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
-import android.support.v4.app.ListFragment;
+import android.support.v4.widget.CursorAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
 import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
-public class Events extends ListFragment implements SQLlist, RefreshCall,
-		TextWatcher, WorkerService.WorkerClass {
+public class Events extends SherlockListFragment implements SQLlist,
+		RefreshCall, TextWatcher, WorkerService.WorkerClass,
+		SearchView.OnQueryTextListener {
 	public static class EventAdapter extends CursorAdapter implements
 			SectionIndexer {
 		Cursor cursor;
@@ -272,6 +273,7 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 	private Cursor events;
 	private SQLiteDatabase myDB;
 	private TitleCompat titlebar;
+	private boolean eventsEmpty;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -322,13 +324,10 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 						+ LSGSQliteOpenHelper.DB_EVENTS_TABLE);
 		long count = num_rows.simpleQueryForLong();
 		if (count == 0)
-			updateEvents();
+			updateEvents(true);
 		num_rows.close();
 
-		titlebar = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
-		titlebar.addRefresh(this);
 		getActivity().setTitle(R.string.events);
-		titlebar.setTitle(getActivity().getTitle());
 		Functions.alwaysDisplayFastScroll(getListView());
 		setHasOptionsMenu(true);
 		if (savedInstanceState != null)
@@ -343,14 +342,12 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.events, menu);
-		if (Functions.getSDK() >= 11) {
-			AdvancedWrapper ahelp = new AdvancedWrapper();
-			ahelp.searchBar(menu, this);
-			refresh = menu.findItem(R.id.refresh);
-		} else {
-			menu.removeItem(R.id.search);
-			menu.removeItem(R.id.refresh);
-		}
+		refresh = menu.findItem(R.id.refresh);
+		if (eventsEmpty)
+			updateEvents();
+		SearchView searchView = (SearchView) menu.findItem(R.id.search)
+				.getActionView();
+		searchView.setOnQueryTextListener(this);
 	}
 
 	@Override
@@ -364,29 +361,23 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO insert selected Event into Calendar
 	}
-	
+
 	private static ServiceHandler hand;
 	private boolean actionViewSet = false;
+
+	public void updateEvents(boolean wait) {
+		eventsEmpty = true;
+	}
+
 	@TargetApi(11)
 	public void updateEvents() {
 		refreshing = true;
-		if (Functions.getSDK() >= 11) {
-			try {
-				AdvancedWrapper adv = new AdvancedWrapper();
-				adv.setMenuActionView(refresh, new ProgressBar(
-						getActivity()));
-				actionViewSet = true;
-			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(getActivity(), null,
-						getString(R.string.loading_events));
-			}
-		} else
-			loading = ProgressDialog.show(getActivity(), null, "Lade...");
+		refresh.setActionView(new ProgressBar(getActivity()));
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
 			public void onServiceError() {
@@ -396,15 +387,7 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				try {
-					if (Functions.getSDK() >= 11 && actionViewSet) {
-						AdvancedWrapper adv = new AdvancedWrapper();
-						adv.setMenuActionView(refresh, null);
-					} else
-						loading.cancel();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				refresh.setActionView(null);
 				updateList();
 				refreshing = false;
 			}
@@ -472,6 +455,16 @@ public class Events extends ListFragment implements SQLlist, RefreshCall,
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		updateWhereCond(s.toString());
 		updateList();
+	}
+
+	public boolean onQueryTextChange(String text) {
+		updateWhereCond(text);
+		updateList();
+		return true;
+	}
+
+	public boolean onQueryTextSubmit(String text) {
+		return true;
 	}
 
 	@Override

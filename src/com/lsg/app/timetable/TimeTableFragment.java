@@ -15,21 +15,24 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
 import com.lsg.app.ServiceHandler;
@@ -38,17 +41,17 @@ import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SelectedCallback;
 import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
-import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
-public class TimeTableFragment extends Fragment implements SelectedCallback,
+
+
+public class TimeTableFragment extends SherlockFragment implements SelectedCallback,
 		RefreshCall, WorkerService.WorkerClass {
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
 	private TextView footer;
-	private TitleCompat titlebar;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,20 +113,27 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 				.getDefaultSharedPreferences(getActivity());
 		pager.setCurrentItem(day, true);
 		footer = (TextView) getActivity().findViewById(R.id.footer_text);
-		titlebar = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
-		titlebar.addRefresh(this);
-		titlebar.setTitle(getActivity().getTitle());
-
+		
 		// add actions for teachers & admins
 		if ((prefs.getBoolean(Functions.RIGHTS_TEACHER, false) || prefs
 				.getBoolean(Functions.RIGHTS_ADMIN, false))) {
-			titlebar.addSpinnerNavigation(this, ((prefs.getBoolean(
-					Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions
-					: R.array.timetable_actions_teachers));
+			SpinnerAdapter mSpinnerAdapter = ArrayAdapter
+					.createFromResource(
+							getActivity(),
+							((prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions
+									: R.array.timetable_actions_teachers), (Functions.getSDK() >= 15) ? android.R.layout.simple_spinner_dropdown_item : R.layout.sherlock_spinner_dropdown_item);
+			ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
+				@Override
+				public boolean onNavigationItemSelected(int itemPosition,
+						long itemId) {
+					return TimeTableFragment.this.selected(itemPosition, itemId);
+				}
+			};
+			ActionBar actionBar = getSherlockActivity().getSupportActionBar();
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+			actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);
+			actionBar.setSelectedNavigationItem(0);
 		}
-		Log.d("admin",
-				Boolean.valueOf(prefs.getBoolean(Functions.RIGHTS_ADMIN, false))
-						.toString());
 		// something to restore...
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getString("selclass") != null) {
@@ -234,16 +244,10 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		actionViewSet = false;
 		inflater.inflate(R.menu.timetable, menu);
-		if (Functions.getSDK() < 11)
-			menu.removeItem(R.id.refresh);
-		else
 			refresh = menu.findItem(R.id.refresh);
-		if (isRefreshing && Functions.getSDK() >= 11) {
-			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
-		} else if (isRefreshing)
-			loading = ProgressDialog.show(getActivity(), null,
-					getString(R.string.loading_timetable));
+		if(isRefreshing) {
+			refresh.setActionView(new ProgressBar(getActivity()));
+		}
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -266,21 +270,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 	}
 
 	public void updateTimeTable(boolean force) {
-		actionViewSet = false;
-		isRefreshing = true;
-		if (Functions.getSDK() >= 11) {
-			try {
-				AdvancedWrapper adv = new AdvancedWrapper();
-				adv.setMenuActionView(refresh, new ProgressBar(getActivity()));
-				actionViewSet = true;
-			} catch (NullPointerException e) {
-				loading = ProgressDialog.show(getActivity(), null,
-						getString(R.string.loading_timetable));
-			}
-		} else {
-			loading = ProgressDialog.show(getActivity(), null,
-					getString(R.string.loading_timetable));
-		}
+		refresh.setActionView(new ProgressBar(getActivity()));
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
 			public void onServiceError() {
@@ -290,16 +280,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				try {
-					if (Functions.getSDK() >= 11 && actionViewSet) {
-						AdvancedWrapper adv = new AdvancedWrapper();
-						adv.setMenuActionView(refresh, null);
-					} else
-						loading.cancel();
-				} catch (Exception e) {
-					Log.w("LSGäpp", "Error hiding loading");
-					e.printStackTrace();
-				}
+					refresh.setActionView(null);
 				isRefreshing = false;
 			}
 		});
@@ -377,7 +358,7 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 	@Override
 	public void onPause() {
 		// cleanup
-		titlebar.removeSpinnerNavigation();
+		getSherlockActivity().getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		super.onStop();
 	}
 
@@ -404,7 +385,6 @@ public class TimeTableFragment extends Fragment implements SelectedCallback,
 					LSGSQliteOpenHelper.DB_TIME_TABLE);
 	}
 
-	@Override
 	public boolean onContextItemSelected(final MenuItem item) {
 		return Functions.contextMenuSelect(item, getActivity(), viewpageradap,
 				LSGSQliteOpenHelper.DB_TIME_TABLE);

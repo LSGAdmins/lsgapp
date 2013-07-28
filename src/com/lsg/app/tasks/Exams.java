@@ -49,8 +49,8 @@ public class Exams extends ListFragment {
 		
 		//set Title
 		getActivity().setTitle(R.string.exams);
-		TitleCompat titleCompat = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
-		titleCompat.setTitle(getActivity().getTitle());
+//		TitleCompat titleCompat = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
+//		titleCompat.setTitle(getActivity().getTitle());
 
 		// header view, to add new exam
 		LayoutInflater inflater = getLayoutInflater(savedInstanceState);

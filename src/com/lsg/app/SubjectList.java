@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -23,20 +22,22 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 import com.lsg.app.vplan.VPlan;
 
-public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
+
+public class SubjectList extends SherlockListActivity implements SQLlist, TextWatcher {
 	public static class SubjectListUpdater {
 		Context context;
 		public SubjectListUpdater(Context c) {
@@ -132,13 +133,13 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
         where_conds = new String[1];
         where_conds[0] = "%";
 	}
-	@Override
+	
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getSupportMenuInflater();
 	    inflater.inflate(R.menu.subjectlist, menu);
 	    if(Functions.getSDK() >= 11) {
 	    	AdvancedWrapper ahelp = new AdvancedWrapper();
-	    	ahelp.searchBar(menu, this);
+//	    	ahelp.searchBar(menu, this);
 	    }
 	    else
 	    	menu.removeItem(R.id.search);
@@ -167,7 +168,7 @@ public class SubjectList extends ListActivity implements SQLlist, TextWatcher {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		Functions.createContextMenu(menu, v, menuInfo, this, LSGSQliteOpenHelper.DB_SUBJECT_TABLE);
 	}
-	@Override
+	
 	public boolean onContextItemSelected(final MenuItem item) {
 		return Functions.contextMenuSelect(item, this, this, LSGSQliteOpenHelper.DB_SUBJECT_TABLE);
 	}

@@ -146,7 +146,7 @@ public class SlideMenu implements OnTouchListener {
 	}
 
 	public void show() {
-		if (statusBarHeight == 0) {
+		if (statusBarHeight == 0 && Functions.getSDK() >= 11) {
 			Rect rectgle = new Rect();
 			Window window = act.getWindow();
 			window.getDecorView().getWindowVisibleDisplayFrame(rectgle);

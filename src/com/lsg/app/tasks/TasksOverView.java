@@ -59,8 +59,8 @@ public class TasksOverView extends ListFragment {
 		setListAdapter(new TasksOverViewAdapter(getActivity().getApplicationContext(), mergedCursor));
 		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TasksOverView.class);
 		getActivity().setTitle(R.string.tasks);
-		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
-		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
+//		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
+//		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
 	}
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
