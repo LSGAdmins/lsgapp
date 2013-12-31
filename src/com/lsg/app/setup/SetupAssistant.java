@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,6 +21,7 @@ import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -51,7 +51,7 @@ import com.lsg.app.timetable.TimeTableFragment;
 import com.lsg.app.timetable.TimeTableUpdater;
 import com.lsg.app.vplan.VPlan;
 
-public class SetupAssistant extends Activity {
+public class SetupAssistant extends ActionBarActivity {
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor edit;
 
@@ -419,7 +419,6 @@ public class SetupAssistant extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Functions.init(this);
-		Functions.setTheme(false, false, this);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		edit = prefs.edit();
 		if (!prefs.getBoolean(Functions.IS_LOGGED_IN, false))

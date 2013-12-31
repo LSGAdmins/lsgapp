@@ -7,32 +7,33 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.lsg.app.Functions;
 import com.lsg.app.InfoActivity;
 import com.lsg.app.R;
 import com.lsg.app.ServiceHandler;
 import com.lsg.app.SubjectList;
 import com.lsg.app.WorkerService;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
-import com.lsg.app.lib.TitleCompat.HomeCall;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
-public class VPlanFragment extends SherlockFragment implements HomeCall,
-		RefreshCall {
+
+
+
+public class VPlanFragment extends Fragment implements OnQueryTextListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -61,8 +62,6 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 		pager.setPageMarginDrawable(R.layout.viewpager_margin);
 
 		getActivity().setTitle(R.string.vplan);
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(
-				VPlanFragment.class);
 	}
 
 	private MenuItem refresh;
@@ -72,9 +71,11 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 		inflater.inflate(R.menu.vplan, menu);
 
 		refresh = menu.findItem(R.id.refresh);
-
 		if (vplanEmpty)
 			updateVP();
+
+		SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
+		searchView.setOnQueryTextListener(this);
 	}
 
 	@Override
@@ -82,7 +83,7 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.refresh:
-			onRefreshPress();
+			updateVP();
 			return true;
 		case R.id.subjects:
 			Toast.makeText(getActivity(), getString(R.string.subjectlist_info),
@@ -111,9 +112,6 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 					Functions.RIGHTS_ADMIN, false)));
 			startActivity(intent);
 			return true;
-		case android.R.id.home:
-			onHomePress();
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -141,7 +139,6 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 	}
 
 	private static ServiceHandler hand;
-	private boolean actionViewSet;
 
 	public void updateVP(boolean wait) {
 		vplanEmpty = true;
@@ -149,9 +146,8 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 
 	@TargetApi(11)
 	public void updateVP() {
-		actionViewSet = false;
 		refreshing = true;
-		refresh.setActionView(new ProgressBar(getActivity()));
+		MenuItemCompat.expandActionView(refresh);
 
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
@@ -161,7 +157,7 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 
 			@Override
 			public void onFinishedService() {
-				refresh.setActionView(null);
+				MenuItemCompat.collapseActionView(refresh);
 				refreshing = false;
 				adapter.updateList();
 			}
@@ -185,12 +181,14 @@ public class VPlanFragment extends SherlockFragment implements HomeCall,
 	}
 
 	@Override
-	public void onHomePress() {
-		// slidemenu.show();
+	public boolean onQueryTextChange(String arg0) {
+		adapter.updateWhereCond(arg0);
+		return false;
 	}
 
 	@Override
-	public void onRefreshPress() {
-		updateVP();
+	public boolean onQueryTextSubmit(String arg0) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

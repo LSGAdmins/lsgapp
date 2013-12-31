@@ -1,38 +1,44 @@
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_setup"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/username"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-    	android:layout_marginLeft="10dp"
-    	android:layout_marginRight="10dp"
-        android:orientation="vertical" >                         
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_setup"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-        <EditText
-            android:id="@+id/username"
-            android:singleLine="true"
+        android:layout_height="wrap_content"
+        android:ems="15"
+        android:hint="@string/username"
+        android:singleLine="true" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="15"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom" >
+
+        <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:ems="15"
-            android:hint="@string/username" >
-            <requestFocus />
-        </EditText>
-        <EditText
-            android:id="@+id/password"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:ems="15"
-            android:inputType="textPassword"
-            android:hint="@string/password" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom">
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/next"
-                android:onClick="next" />
-        </LinearLayout>
+            android:onClick="next"
+            android:text="@string/next" />
     </LinearLayout>
+
+</LinearLayout>

@@ -57,7 +57,7 @@ public class TasksOverView extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		mergedCursor = new MergeCursor(new Cursor[] {new TaskButtonCursor()});
 		setListAdapter(new TasksOverViewAdapter(getActivity().getApplicationContext(), mergedCursor));
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TasksOverView.class);
+//		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(TasksOverView.class);
 		getActivity().setTitle(R.string.tasks);
 //		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());
 //		((FragmentActivityCallbacks) getActivity()).getTitlebar().setTitle(getActivity().getTitle());

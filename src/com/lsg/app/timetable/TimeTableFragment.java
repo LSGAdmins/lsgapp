@@ -15,11 +15,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -28,26 +35,18 @@ import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
 import com.lsg.app.ServiceHandler;
 import com.lsg.app.WorkerService;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SelectedCallback;
-import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 
-
-public class TimeTableFragment extends SherlockFragment implements SelectedCallback,
-		RefreshCall, WorkerService.WorkerClass {
+ 
+public class TimeTableFragment extends Fragment implements SelectedCallback,
+		WorkerService.WorkerClass {
 	private ProgressDialog loading;
 	private TimeTableViewPagerAdapter viewpageradap;
 	private ViewPager pager;
@@ -69,17 +68,8 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getActivity().setTitle(R.string.timetable);
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(
-				TimeTableFragment.class);
 
-		float pageWidth = 1.0F;
-		// Display display = ((WindowManager)
-		// getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-		// if(display.getOrientation() == Configuration.ORIENTATION_LANDSCAPE)
-		// pageWidth = (1.0F - Functions.percentWidth(Functions.dpToPx(40,
-		// getActivity()), getActivity())) / 2;
-
-		viewpageradap = new TimeTableViewPagerAdapter(this, pageWidth);
+		viewpageradap = new TimeTableViewPagerAdapter(this);
 
 		pager = (ViewPager) getActivity().findViewById(R.id.viewpager);
 		pager.setAdapter(viewpageradap);
@@ -121,7 +111,7 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 					.createFromResource(
 							getActivity(),
 							((prefs.getBoolean(Functions.RIGHTS_ADMIN, false)) ? R.array.timetable_actions
-									: R.array.timetable_actions_teachers), (Functions.getSDK() >= 15) ? android.R.layout.simple_spinner_dropdown_item : R.layout.sherlock_spinner_dropdown_item);
+									: R.array.timetable_actions_teachers), (Functions.getSDK() >= 15) ? android.R.layout.simple_spinner_dropdown_item : android.R.layout.simple_spinner_dropdown_item); // TODO with sdk < 15
 			ActionBar.OnNavigationListener navListener = new ActionBar.OnNavigationListener() {
 				@Override
 				public boolean onNavigationItemSelected(int itemPosition,
@@ -129,7 +119,8 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 					return TimeTableFragment.this.selected(itemPosition, itemId);
 				}
 			};
-			ActionBar actionBar = getSherlockActivity().getSupportActionBar();
+			
+			ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
 			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 			actionBar.setListNavigationCallbacks(mSpinnerAdapter, navListener);
 			actionBar.setSelectedNavigationItem(0);
@@ -151,16 +142,10 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 				footer.setText(savedInstanceState.getString("selshort"));
 			}
 			viewpageradap.updateList();
-			if (Functions.getSDK() >= 11
-					&& (prefs.getBoolean(Functions.RIGHTS_ADMIN, false) || prefs
-							.getBoolean(Functions.RIGHTS_TEACHER, false))) {
-				ignoreSpinnerSelect = true;
-				AdvancedWrapper adv = new AdvancedWrapper();
-				adv.setSelectedItem(
-						savedInstanceState.getInt("navlistselected"),
-						getActivity());
-				// TODO selected item also for pre-ics
-			}
+			
+			// select the item
+			ignoreSpinnerSelect = true;
+			((ActionBarActivity) getActivity()).getSupportActionBar().setSelectedNavigationItem(savedInstanceState.getInt("navlistselected"));
 			isRefreshing = savedInstanceState.getBoolean("refreshing");
 		}
 		// show help overlays
@@ -246,7 +231,7 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 		inflater.inflate(R.menu.timetable, menu);
 			refresh = menu.findItem(R.id.refresh);
 		if(isRefreshing) {
-			refresh.setActionView(new ProgressBar(getActivity()));
+			MenuItemCompat.setActionView(refresh, new ProgressBar(getActivity()));
 		}
 		super.onCreateOptionsMenu(menu, inflater);
 	}
@@ -255,7 +240,7 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.refresh:
-			onRefreshPress();
+			updateTimeTable();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -270,7 +255,7 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 	}
 
 	public void updateTimeTable(boolean force) {
-		refresh.setActionView(new ProgressBar(getActivity()));
+		MenuItemCompat.setActionView(refresh, new ProgressBar(getActivity()));
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
 			public void onServiceError() {
@@ -280,7 +265,7 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-					refresh.setActionView(null);
+				MenuItemCompat.collapseActionView(refresh);
 				isRefreshing = false;
 			}
 		});
@@ -357,8 +342,7 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 
 	@Override
 	public void onPause() {
-		// cleanup
-		getSherlockActivity().getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		((ActionBarActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		super.onStop();
 	}
 
@@ -370,12 +354,6 @@ public class TimeTableFragment extends SherlockFragment implements SelectedCallb
 		if (viewpageradap != null)
 			viewpageradap.closeCursors();
 	}
-
-	@Override
-	public void onRefreshPress() {
-		updateTimeTable();
-	}
-
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {

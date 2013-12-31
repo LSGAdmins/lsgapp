@@ -11,6 +11,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,19 +23,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
-import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 import com.lsg.app.timetable.TimeTable;
 import com.lsg.app.widget.DateButton;
+
 
 public class CreateEditFragment extends Fragment implements
 		DatePickerDialog.OnDateSetListener {
@@ -52,12 +53,11 @@ public class CreateEditFragment extends Fragment implements
 
 	private SQLiteDatabase myDB;
 	private ArrayList<String> subjects = new ArrayList<String>();
+	private int actionBarDisplayOptions;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().tabletHide();
 
 		switch (((TaskSelected) getActivity()).getCurTask()) {
 		case TaskSelected.TASK_EDIT_EXAMS:
@@ -194,16 +194,9 @@ public class CreateEditFragment extends Fragment implements
 						onCancel();
 					}
 				});
-		if (Functions.getSDK() < 11)
-			((LinearLayout) getActivity().findViewById(R.id.actionButtons))
-					.addView(customActionBarView,
-							new LinearLayout.LayoutParams(
-									ViewGroup.LayoutParams.MATCH_PARENT,
-									ViewGroup.LayoutParams.MATCH_PARENT));
-		else {
-			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.setActionBarCustomView(getActivity(), customActionBarView);
-		}
+		((ActionBarActivity) getActivity()).getSupportActionBar().setCustomView(customActionBarView);
+		actionBarDisplayOptions = ((ActionBarActivity) getActivity()).getSupportActionBar().getDisplayOptions();
+		((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		super.onResume();
 	}
 
@@ -214,8 +207,17 @@ public class CreateEditFragment extends Fragment implements
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						getActivity().getSupportFragmentManager()
-								.popBackStack();
+						FragmentManager fragmentManager = ((ActionBarActivity) getActivity())
+								.getSupportFragmentManager();
+//						FragmentTransaction trans = fragmentManager
+//								.beginTransaction();
+//						trans.remove(CreateEditFragment.this);
+//						trans.commit();
+						fragmentManager.popBackStack();
+						fragmentManager.beginTransaction().remove(CreateEditFragment.this).commit();
+						// fragmentManager.popBackStack(((MainActivity)
+						// getActivity()).getTransId(),
+						// FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					}
 				});
 		builder.setNegativeButton(R.string.no, null);
@@ -302,12 +304,7 @@ public class CreateEditFragment extends Fragment implements
 
 	@Override
 	public void onStop() {
-		if (Functions.getSDK() > 11) {
-			AdvancedWrapper adv = new AdvancedWrapper();
-			adv.removeActionBarCustomView(getActivity(), !getActivity()
-					.getResources().getBoolean(R.bool.isTablet));
-		}
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().tabletShow();
+		((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayOptions(actionBarDisplayOptions);
 		super.onStop();
 	}
 }

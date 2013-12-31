@@ -11,25 +11,18 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 
 import com.lsg.app.Functions;
 import com.lsg.app.R;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.HomeCall;
 import com.lsg.app.setup.SetupAssistant;
-import com.lsg.lib.slidemenu.SlideMenu;
 
 //code for old devices -> deprecated
 @SuppressWarnings("deprecation")
-public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener, HomeCall {
-	private TitleCompat titlebar;
+public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		titlebar = new TitleCompat(this, true);
 		super.onCreate(savedInstanceState);
 		
-		Functions.setTheme(false, false, this);
 		
         addPreferencesFromResource(R.xml.login_settings);
         addPreferencesFromResource(R.xml.timetable_settings);
@@ -95,8 +88,6 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
         	Preference ac2dm = (Preference) findPreference("useac2dm");
         	prefCat.removePreference(ac2dm);
         }
-        titlebar.init(this);
-        titlebar.setTitle(getTitle());
 	}
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -120,19 +111,4 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
     	((CheckBoxPreference) findPreference("autopullvplan")).setEnabled(enabled);
     	((EditTextPreference) findPreference("autopull_intervall")).setEnabled(enabled);
     }
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-	    	Intent intent = new Intent(this, SetupAssistant.class);
-	    	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	    	startActivity(intent);
-	        return false;
-	    }
-	    else
-	    	return super.onKeyDown(keyCode, event);
-	}
-	@Override
-	public void onHomePress() {
-		finish();
-	}
 }

@@ -7,43 +7,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
+import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.interfaces.SQLlist;
 import com.lsg.app.lib.LSGApplication;
-import com.lsg.app.lib.TitleCompat;
-import com.lsg.app.lib.TitleCompat.RefreshCall;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
-public class Events extends SherlockListFragment implements SQLlist,
-		RefreshCall, TextWatcher, WorkerService.WorkerClass,
+public class Events extends ListFragment implements SQLlist,
+		WorkerService.WorkerClass,
 		SearchView.OnQueryTextListener {
 	public static class EventAdapter extends CursorAdapter implements
 			SectionIndexer {
@@ -261,7 +256,6 @@ public class Events extends SherlockListFragment implements SQLlist,
 		}
 	}
 
-	private ProgressDialog loading;
 	private EventAdapter evadap;
 	private String where_cond = " " + LSGSQliteOpenHelper.DB_DATES
 			+ " LIKE ? OR " + LSGSQliteOpenHelper.DB_ENDDATES + " LIKE ? OR "
@@ -272,7 +266,6 @@ public class Events extends SherlockListFragment implements SQLlist,
 	private String[] where_conds_events = new String[6];
 	private Cursor events;
 	private SQLiteDatabase myDB;
-	private TitleCompat titlebar;
 	private boolean eventsEmpty;
 
 	@Override
@@ -290,15 +283,6 @@ public class Events extends SherlockListFragment implements SQLlist,
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		if (Functions.getSDK() < 11) {
-			View search = ((LayoutInflater) getActivity().getSystemService(
-					Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.search,
-					null);
-			EditText searchEdit = (EditText) search
-					.findViewById(R.id.search_edit);
-			searchEdit.addTextChangedListener(this);
-			getListView().addHeaderView(search);
-		}
 		super.onCreate(savedInstanceState);
 		myDB = LSGApplication.getSqliteDatabase();
 		updateWhereCond("%");
@@ -309,9 +293,6 @@ public class Events extends SherlockListFragment implements SQLlist,
 				LSGSQliteOpenHelper.DB_VENUE }, where_cond, where_conds_events,
 				null, null, null);
 		evadap = new EventAdapter(getActivity(), events);
-		// setContentView(R.layout.list);
-
-		// set header search bar
 		getListView().setAdapter(evadap);
 		getListView().setEmptyView(
 				getListView().findViewById(R.id.list_view_empty));
@@ -328,13 +309,12 @@ public class Events extends SherlockListFragment implements SQLlist,
 		num_rows.close();
 
 		getActivity().setTitle(R.string.events);
-		Functions.alwaysDisplayFastScroll(getListView());
+		if(Build.VERSION.SDK_INT > 11) {
+			getListView().setFastScrollAlwaysVisible(true);
+		}
 		setHasOptionsMenu(true);
 		if (savedInstanceState != null)
 			refreshing = savedInstanceState.getBoolean("refreshing");
-
-		((FragmentActivityCallbacks) getActivity()).getSlideMenu().setFragment(
-				Events.class);
 	}
 
 	private boolean refreshing = false;
@@ -345,8 +325,7 @@ public class Events extends SherlockListFragment implements SQLlist,
 		refresh = menu.findItem(R.id.refresh);
 		if (eventsEmpty)
 			updateEvents();
-		SearchView searchView = (SearchView) menu.findItem(R.id.search)
-				.getActionView();
+		SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
 		searchView.setOnQueryTextListener(this);
 	}
 
@@ -355,7 +334,7 @@ public class Events extends SherlockListFragment implements SQLlist,
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.refresh:
-			onRefreshPress();
+			updateEvents();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -368,7 +347,6 @@ public class Events extends SherlockListFragment implements SQLlist,
 	}
 
 	private static ServiceHandler hand;
-	private boolean actionViewSet = false;
 
 	public void updateEvents(boolean wait) {
 		eventsEmpty = true;
@@ -377,7 +355,7 @@ public class Events extends SherlockListFragment implements SQLlist,
 	@TargetApi(11)
 	public void updateEvents() {
 		refreshing = true;
-		refresh.setActionView(new ProgressBar(getActivity()));
+		MenuItemCompat.setActionView(refresh, new ProgressBar(getActivity()));
 		hand = new ServiceHandler(new ServiceHandler.ServiceHandlerCallback() {
 			@Override
 			public void onServiceError() {
@@ -387,7 +365,7 @@ public class Events extends SherlockListFragment implements SQLlist,
 			@Override
 			public void onFinishedService() {
 				Log.d("service", "finished without error");
-				refresh.setActionView(null);
+				MenuItemCompat.collapseActionView(refresh);
 				updateList();
 				refreshing = false;
 			}
@@ -435,26 +413,6 @@ public class Events extends SherlockListFragment implements SQLlist,
 		super.onDestroy();
 		if (events != null)
 			events.close();
-	}
-
-	@Override
-	public void onRefreshPress() {
-		updateEvents();
-	}
-
-	@Override
-	public void afterTextChanged(Editable s) {
-	}
-
-	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {
-	}
-
-	@Override
-	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		updateWhereCond(s.toString());
-		updateList();
 	}
 
 	public boolean onQueryTextChange(String text) {

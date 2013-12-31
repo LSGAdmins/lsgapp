@@ -24,7 +24,7 @@ public class SettingsAdvanced extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Functions.homeUp(this);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override

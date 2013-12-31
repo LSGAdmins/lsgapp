@@ -1,18 +1,17 @@
 package com.lsg.app;
 
-import com.lsg.app.lib.LSGApplication;
-import com.lsg.app.sqlite.LSGSQliteOpenHelper;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
+
+import com.lsg.app.lib.LSGApplication;
+import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class InfoActivity extends Activity {
 	@Override

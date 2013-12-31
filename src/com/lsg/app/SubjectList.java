@@ -9,35 +9,33 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
-import com.lsg.app.vplan.VPlan;
 
 
-public class SubjectList extends SherlockListActivity implements SQLlist, TextWatcher {
+public class SubjectList extends ActionBarActivity implements SQLlist, TextWatcher, SearchView.OnQueryTextListener {
 	public static class SubjectListUpdater {
 		Context context;
 		public SubjectListUpdater(Context c) {
@@ -100,49 +98,46 @@ public class SubjectList extends SherlockListActivity implements SQLlist, TextWa
 	private SQLiteDatabase myDB;
 	private String   where_cond;
 	private String[] where_conds;
+	private ListView listView;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Functions.setTheme(false, true, this);
 		setContentView(R.layout.list);
 		
-		//set header search bar
-		if(Functions.getSDK() < 11) {
-			LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
-			View search = inflater.inflate(R.layout.search, null);
-			EditText searchEdit = (EditText) search.findViewById(R.id.search_edit);
-			searchEdit.addTextChangedListener(this);
-			getListView().addHeaderView(search);
-		}
+		listView = ((ListView) findViewById(android.R.id.list));
 		
 		myDB = LSGApplication.getSqliteDatabase();
 		
 		updateCursor();
 		adap = new SimpleCursorAdapter(this, R.layout.main_listitem, c, new String[] {LSGSQliteOpenHelper.DB_FACH},
 				new int[] {R.id.main_textview}, 0);
-		setListAdapter(adap);
+		listView.setAdapter(adap);
 		
-		registerForContextMenu(getListView());
+		registerForContextMenu(listView);
 		
 		//info if listview empty
-        getListView().setEmptyView(findViewById(R.id.list_view_empty));
+        listView.setEmptyView(findViewById(R.id.list_view_empty));
         TextView textv = (TextView) findViewById(R.id.list_view_empty);
         textv.setText(R.string.subjectlist_empty);
         
         where_cond = LSGSQliteOpenHelper.DB_FACH + " LIKE ?";
         where_conds = new String[1];
         where_conds[0] = "%";
+        
+        // set home as up
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.subjectlist, menu);
-	    if(Functions.getSDK() >= 11) {
-	    	AdvancedWrapper ahelp = new AdvancedWrapper();
-//	    	ahelp.searchBar(menu, this);
-	    }
-	    else
-	    	menu.removeItem(R.id.search);
+	    ((SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search))).setOnQueryTextListener(this);
+//	    if(Functions.getSDK() >= 11) {
+//	    	AdvancedWrapper ahelp = new AdvancedWrapper();
+////	    	ahelp.searchBar(menu, this);
+//	    }
+//	    else
+//	    	menu.removeItem(R.id.search);
 	    return true;
 	}
 	@Override
@@ -153,12 +148,7 @@ public class SubjectList extends SherlockListActivity implements SQLlist, TextWa
 	    	updateSubjects();
 	    	return true;
         case android.R.id.home:
-            // app icon in action bar clicked; go home
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.putExtra("fragment", VPlan.class);
-            startActivity(intent);
-            return true;
+			finish();
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
@@ -194,5 +184,18 @@ public class SubjectList extends SherlockListActivity implements SQLlist, TextWa
 	public void onTextChanged (CharSequence s, int start, int before, int count) {
 		String search = s + "";
 		updateWhereCond(search);
+	}
+
+	@Override
+	public boolean onQueryTextChange(String arg0) {
+		String search = arg0 + "";
+		updateWhereCond(search);
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String arg0) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

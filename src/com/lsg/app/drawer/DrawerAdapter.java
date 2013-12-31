@@ -1,4 +1,4 @@
-package com.lsg.lib.slidemenu;
+package com.lsg.app.drawer;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,9 +13,10 @@ import android.widget.TextView;
 import com.lsg.app.Functions;
 import com.lsg.app.R;
 
-public class SlideMenuAdapter extends ArrayAdapter<SlideMenuAdapter.MenuDesc> {
+public class DrawerAdapter extends ArrayAdapter<DrawerAdapter.MenuDesc> {
 	Activity act;
-	SlideMenuAdapter.MenuDesc[] items;
+	DrawerAdapter.MenuDesc[] items;
+	int selected;
 
 	class MenuItem {
 		public TextView label;
@@ -23,7 +24,7 @@ public class SlideMenuAdapter extends ArrayAdapter<SlideMenuAdapter.MenuDesc> {
 		public ImageView icon;
 	}
 
-	static class MenuDesc {
+	public static class MenuDesc {
 		public boolean useSlideMenu = true;
 		public int type = Functions.TYPE_PAGE;
 		public int icon;
@@ -36,7 +37,7 @@ public class SlideMenuAdapter extends ArrayAdapter<SlideMenuAdapter.MenuDesc> {
 		public boolean selected;
 	}
 
-	public SlideMenuAdapter(Activity act, SlideMenuAdapter.MenuDesc[] items) {
+	public DrawerAdapter(Activity act, DrawerAdapter.MenuDesc[] items) {
 		super(act, R.id.menu_label, items);
 		this.act = act;
 		this.items = items;
@@ -77,9 +78,11 @@ public class SlideMenuAdapter extends ArrayAdapter<SlideMenuAdapter.MenuDesc> {
 		holder.label.setText(s);
 		holder.icon.setImageResource(items[position].icon);
 
-		if (items[position].selected)
+		if (items[position].selected) {
 			rowView.setBackgroundColor(act.getResources().getColor(
 					R.color.activeblack));
+			selected = position;
+		}
 		else
 			rowView.setBackgroundDrawable(null);
 
@@ -92,5 +95,8 @@ public class SlideMenuAdapter extends ArrayAdapter<SlideMenuAdapter.MenuDesc> {
 		}
 
 		return rowView;
+	}
+	public void clearSelection() {
+		items[selected].selected = false;
 	}
 }

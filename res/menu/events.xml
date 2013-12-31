@@ -1,15 +1,16 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:lsgapp="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/search"
-        android:actionViewClass="com.actionbarsherlock.widget.SearchView"
+        lsgapp:actionViewClass="android.support.v7.widget.SearchView"
         android:icon="@android:drawable/ic_menu_search"
-        android:showAsAction="ifRoom|withText"
+        lsgapp:showAsAction="ifRoom|withText"
         android:title="@string/search"/>
     <item
         android:id="@+id/refresh"
         android:icon="@android:drawable/ic_menu_rotate"
-        android:showAsAction="ifRoom|withText"
+        lsgapp:showAsAction="ifRoom|withText"
         android:title="@string/refresh"/>
 
 </menu>

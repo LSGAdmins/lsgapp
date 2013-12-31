@@ -14,9 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lsg.app.R;
-import com.lsg.app.interfaces.FragmentActivityCallbacks;
 import com.lsg.app.lib.LSGApplication;
-import com.lsg.app.lib.TitleCompat;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class Exams extends ListFragment {
@@ -49,8 +47,6 @@ public class Exams extends ListFragment {
 		
 		//set Title
 		getActivity().setTitle(R.string.exams);
-//		TitleCompat titleCompat = ((FragmentActivityCallbacks) getActivity()).getTitlebar();
-//		titleCompat.setTitle(getActivity().getTitle());
 
 		// header view, to add new exam
 		LayoutInflater inflater = getLayoutInflater(savedInstanceState);

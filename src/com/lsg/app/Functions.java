@@ -35,6 +35,8 @@ import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -45,11 +47,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gcm.GCMRegistrar;
 import com.lsg.app.interfaces.SQLlist;
-import com.lsg.app.lib.AdvancedWrapper;
 import com.lsg.app.lib.LSGApplication;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
@@ -112,37 +111,6 @@ public class Functions {
 	public static final String OVERLAY_HOMEBUTTON = "home";
 	public static final String OVERLAY_SWIPE      = "swipe";
 	
-	/**
-	 * set holo theme in android 4
-	 * @param dialog if it should be a dialog
-	 * @param homeasup if there should be a "homeasup" navigation
-	 * @param act the calling activity
-	 */
-	public static void setTheme(boolean dialog, boolean homeasup, Activity act) {
-		if(homeasup && Functions.getSDK() >= 11) {
-			homeUp(act);
-		}
-	}
-	/**
-	 * method to set home as up
-	 * @param act the calling activity
-	 */
-	public static void homeUp(Activity act) {
-		try {
-			AdvancedWrapper advWrapper = new AdvancedWrapper();
-			advWrapper.homeasup(act);
-		} catch (Exception e) {
-		}
-	}
-	public static void alwaysDisplayFastScroll(ListView lv) {
-		if (Functions.getSDK() >= 11) {
-			try {
-				AdvancedWrapper advWrapper = new AdvancedWrapper();
-				advWrapper.alwaysDisplayFastScroll(lv);
-			} catch (Exception e) {
-			}
-		}
-	}
 	/**
 	 * initialize the vplan-pull
 	 * @param context the app context
@@ -700,12 +668,7 @@ public class Functions {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(act);
 		String postData = "log=" + prefs.getString("username", "")
 				+ "&pwd=" + prefs.getString("password", "") + "&redirect_to=http://www.lsg.musin.de/smv/aktuelles/";
-		if(Functions.getSDK() >= 5) {
-			AdvancedWrapper advWrapper = new AdvancedWrapper();
-			advWrapper.postUrl(webv, "http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
-			advWrapper = null;
-		} else
-			webv.loadUrl("http://www.lsg.musin.de/smv/login/?action=login");
+			webv.postUrl("http://www.lsg.musin.de/smv/login/?action=login", EncodingUtils.getBytes(postData, "BASE64"));
 		if (prefs.getBoolean("useac2dm", false))
 			Functions.registerGCM(act);
 	}

@@ -16,7 +16,6 @@ import com.lsg.app.R;
 import com.lsg.app.sqlite.LSGSQliteOpenHelper;
 
 public class VPlanAdapter extends CursorAdapter {
-	private Context context;
 	private boolean teacher;
 	class Standard {
 		public LinearLayout standard;
@@ -31,7 +30,6 @@ public class VPlanAdapter extends CursorAdapter {
 		}
 	public VPlanAdapter(Context context, Cursor c, boolean teacher) {
 		super(context, c, false);
-		this.context = context;
 		this.teacher = teacher;
 		}
 	@Override
